@@ -1,0 +1,138 @@
+{
+  "project_info": {
+    "project_number": "101509450226",
+    "firebase_url": "https://charg-stations.firebaseio.com",
+    "project_id": "charg-stations",
+    "storage_bucket": "charg-stations.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:101509450226:android:2616255b4887508c",
+        "android_client_info": {
+          "package_name": "io.charg.chargstation"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "101509450226-7r7qmuo3naljrkurelh0c3g1fmtaqvqt.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.charg.chargstation",
+            "certificate_hash": "34182c15b2c3da246491d94c78e645f74038847f"
+          }
+        },
+        {
+          "client_id": "101509450226-njvtcdke8ogfnhoosmeifjh1ga8btfd2.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "io.charg.chargstation",
+            "certificate_hash": "8e994db6844757feb21058baf30032b148602d02"
+          }
+        },
+        {
+          "client_id": "101509450226-fa6qgm84257hr250vggeh2tia16odlbt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3KWLPRkK2_FFs4x8Yw6_2b-MeTn_z62s"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "101509450226-fa6qgm84257hr250vggeh2tia16odlbt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:101509450226:android:ff8d2751f9728551",
+        "android_client_info": {
+          "package_name": "io.charg.android"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "101509450226-fa6qgm84257hr250vggeh2tia16odlbt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3KWLPRkK2_FFs4x8Yw6_2b-MeTn_z62s"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:101509450226:android:978319fae57b189f",
+        "android_client_info": {
+          "package_name": "com.hub.charge.chargehub"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "101509450226-fqp3np3pfh4lq5r7gdbqprmn53kibfh1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.hub.charge.chargehub",
+            "certificate_hash": "e08e35aa658f776eefcb98b3a4f738d3c63b04fd"
+          }
+        },
+        {
+          "client_id": "101509450226-fa6qgm84257hr250vggeh2tia16odlbt.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyB3KWLPRkK2_FFs4x8Yw6_2b-MeTn_z62s"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 2,
+          "other_platform_oauth_client": [
+            {
+              "client_id": "101509450226-fa6qgm84257hr250vggeh2tia16odlbt.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

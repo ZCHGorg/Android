@@ -1,0 +1,12 @@
+{
+  "rules": {
+    ".read": "true",
+    "locations": {
+      ".read": "true",
+      ".indexOn": "g",
+      "$uid": {
+        ".write": "$uid === auth.uid"
+      }
+    }
+  }
+}

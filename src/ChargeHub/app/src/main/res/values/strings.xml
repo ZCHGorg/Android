@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Charg</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="ask_login">You must set eth address for using this app.\nWithout eth address some functions will be disabled\nDo you want to login?</string>
+    <string name="yes">Yes</string>
+    <string name="no">No</string>
+    <string name="not_defined">not defined</string>
+    <string name="eth_address_copied">Ethereum address was copied to clipboard</string>
+    <string name="err_loading_balance">Error while loading balance</string>
+    <string name="not_implemented_yet">Arriving March, 2018</string>
+    <string name="eth_address_empty">Eth address is empty!!!</string>
+    <string name="eth_private_key_empty">Private kay is empty</string>
+    <string name="eth_address">Eth address</string>
+    <string name="save">Save</string>
+    <string name="discard">Discard</string>
+    <string name="private_key">ETH wallet private key</string>
+    <string name="ask_delete_wallet">All data will be erased. Do you realy want to log out?</string>
+    <string name="eth_test_address">0xce443043d36bd4027a0c52ca2a17ba370e458bc8</string>
+    <string name="ask_parking_off">You are parking now. Do you want to stop parking?</string>
+    <string name="ask_charging_off">You are charging now. Do you want to stop?</string>
+    <string name="execute_tansaction">Transaction executed</string>
+    <string name="ask_user_approvement_charge">Charging station is ready for using. Do you want to start charging?</string>
+    <string name="is_charging">Station state is not idle. Try again later.</string>
+    <string name="is_request">Please wait for response from charging station</string>
+</resources>

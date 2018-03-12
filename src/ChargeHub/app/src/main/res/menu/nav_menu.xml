@@ -1,0 +1,43 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+      xmlns:tools="http://schemas.android.com/tools"
+      tools:context=".MainActivity">
+
+    <group android:id="@+id/grp1">
+
+        <item
+            android:id="@+id/menu_map"
+            android:icon="@drawable/ic_map"
+            android:title="Map"/>
+
+        <item
+            android:id="@+id/menu_wallet"
+            android:icon="@drawable/ic_wallet"
+            android:title="Wallet"/>
+
+        <item
+            android:id="@+id/menu_filter"
+            android:icon="@drawable/ic_filter"
+            android:title="Filter"/>
+
+        <item
+            android:id="@+id/menu_qr_code"
+            android:icon="@drawable/ic_camera"
+            android:title="QR Code Scanner"/>
+
+    </group>
+
+    <group android:id="@+id/grp2">
+
+        <item
+            android:id="@+id/menu_log_out"
+            android:icon="@drawable/ic_exit"
+            android:title="Log out"/>
+
+        <item
+            android:id="@+id/menu_exit"
+            android:icon="@drawable/ic_close"
+            android:title="Exit"/>
+
+    </group>
+
+</menu>
