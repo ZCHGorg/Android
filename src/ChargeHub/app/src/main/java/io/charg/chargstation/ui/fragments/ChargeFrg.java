@@ -243,6 +243,9 @@ public class ChargeFrg extends BaseFragment {
             @Override
             public void run() {
                 enableButtons();
+                if (mSmartContractManager.isNowParking()) {
+                    mSmartContractManager.parkingOffAsync(mChargeStation.getEthAddress());
+                }
             }
         });
     }
@@ -287,7 +290,8 @@ public class ChargeFrg extends BaseFragment {
                 }
 
                 if (node == null) {
-                    Toast.makeText(getContext(), "Error access to node: " + mChargeStation.getEthAddress(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), "Couldn't find node: " + mChargeStation.getEthAddress(), Toast.LENGTH_SHORT).show();
+                    return;
                 }
 
                 if (node.getStation_state().equals(Node.STATION_STATE_IDLE)) {
