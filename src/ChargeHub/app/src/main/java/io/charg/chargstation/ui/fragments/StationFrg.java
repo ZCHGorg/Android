@@ -11,12 +11,11 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.bumptech.glide.Glide;
-
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
-import io.charg.chargstation.models.firebase.ChargeStation;
+import io.charg.chargstation.models.firebase.GeofireDto;
+import io.charg.chargstation.models.firebase.NodeDto;
 import io.charg.chargstation.root.IAsyncCommand;
 import io.charg.chargstation.root.IStationFrgListener;
 import io.charg.chargstation.services.ChargeHubService;
@@ -34,7 +33,7 @@ public class StationFrg extends BaseFragment {
     private FilteringService mFilterService;
 
     private String mStationKey;
-    private ChargeStation mStation;
+    private NodeDto mStation;
 
     @BindView(R.id.tv_location)
     TextView tvLocation;
@@ -99,7 +98,7 @@ public class StationFrg extends BaseFragment {
     }
 
     private void loadStationAsync() {
-        mChargeHubService.getChargeStationAsync(new IAsyncCommand<String, ChargeStation>() {
+        mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, NodeDto>() {
 
             @Override
             public String getInputData() {
@@ -113,7 +112,7 @@ public class StationFrg extends BaseFragment {
             }
 
             @Override
-            public void onComplete(ChargeStation result) {
+            public void onComplete(NodeDto result) {
                 mStation = result;
                 refreshUI();
 
@@ -137,37 +136,28 @@ public class StationFrg extends BaseFragment {
             Toast.makeText(getContext(), "Couldn't find charge station", Toast.LENGTH_SHORT).show();
         }
 
-        tvLocation.setText(mStation.getAddressInfo().getTitle());
+        tvLocation.setText(mStation.getTitle());
 
         tvOnline.setText("N/A");
 
         tvAcceptsCharge.setText("N/A");
 
-        String telephone = "";
-        telephone += mStation.getAddressInfo().getContactTelephone1();
-        if (!mStation.getAddressInfo().getContactTelephone2().isEmpty()) {
-            telephone += "\n" + mStation.getAddressInfo().getContactTelephone2();
-        }
-        tvTelephone.setText(telephone);
+        tvTelephone.setText(mStation.getPhone());
 
-        String address = "";
-        address += mStation.getAddressInfo().getAddressLine1();
-        if (!mStation.getAddressInfo().getAddressLine2().isEmpty()) {
-            address += "\n" + mStation.getAddressInfo().getAddressLine2();
-        }
-        tvAddress.setText(address);
+        tvAddress.setText(mStation.getAddress());
 
-        tvPorts.setText(String.valueOf(mStation.getNumberOfPoints()));
+        tvPorts.setText("N/A");
 
-        tvConnectionType.setText(mFilterService.loadConnectorFilter(mStation.getConnections().get(0).getConnectionTypeID()).getTitle());
+        tvConnectionType.setText(mFilterService.loadConnectorFilter(mStation.getConnector_type()).getTitle());
 
-        tvPower.setText(String.format("%s KW", mStation.getConnections().get(0).getPowerKW()));
+        tvPower.setText(String.format("%s KW", mStation.getPower()));
 
-        tvNotes.setText(mStation.getGeneralComments());
+        tvNotes.setText(mStation.getComments());
 
-        if (mStation.getMediaItems().size() > 0) {
+        //TODO loading image
+/*        if (mStation.getMediaItems().size() > 0) {
             Glide.with(this).load(mStation.getMediaItems().get(0).getItemThumbnailURL()).into(ivStation);
-        }
+        }*/
     }
 
     @OnClick(R.id.btn_charge)
@@ -187,16 +177,37 @@ public class StationFrg extends BaseFragment {
 
     @OnClick(R.id.btn_directions)
     void onBtnDirectionsClick() {
-        try {
-            String packageName = "com.google.android.apps.maps";
-            String query = String.format("google.navigation:q=%s,%s", mStation.getAddressInfo().getLatitude(), mStation.getAddressInfo().getLongitude());
-            Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(packageName);
-            intent.setAction(Intent.ACTION_VIEW);
-            intent.setData(Uri.parse(query));
-            startActivity(intent);
-        } catch (Exception ex) {
-            Toast.makeText(getContext(), ex.getMessage(), Toast.LENGTH_SHORT).show();
-        }
+
+        mChargeHubService.getLocationAsync(new IAsyncCommand<String, GeofireDto>() {
+            @Override
+            public String getInputData() {
+                return mStationKey;
+            }
+
+            @Override
+            public void onPrepare() {
+
+            }
+
+            @Override
+            public void onComplete(GeofireDto result) {
+                try {
+                    String packageName = "com.google.android.apps.maps";
+                    String query = String.format("google.navigation:q=%s,%s", result.getLat(), result.getLng());
+                    Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(packageName);
+                    intent.setAction(Intent.ACTION_VIEW);
+                    intent.setData(Uri.parse(query));
+                    startActivity(intent);
+                } catch (Exception ex) {
+                    Toast.makeText(getContext(), ex.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+
+            }
+        });
     }
 
     public static StationFrg newInstance(String stationKey) {

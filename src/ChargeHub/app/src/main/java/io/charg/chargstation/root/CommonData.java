@@ -8,8 +8,7 @@ import java.math.BigInteger;
 
 public class CommonData {
 
-    public static final String GEOFIRE_PATH = "geofire";
-    public static final String LOCATIONS_PATH = "locations";
+    public static final String FIREBASE_PATH_GEOFIRE = "geofire";
     public static final String FIREBASE_PATH_NODES = "nodes";
 
     public static final double RADIUS_LIMIT = 75;

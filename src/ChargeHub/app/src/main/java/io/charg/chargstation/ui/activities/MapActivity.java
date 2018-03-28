@@ -1,7 +1,6 @@
 package io.charg.chargstation.ui.activities;
 
 import android.Manifest;
-import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -29,10 +28,8 @@ import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlaceAutocomplete;
-import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
-import com.google.android.gms.maps.MapFragment;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
@@ -52,7 +49,8 @@ import butterknife.BindView;
 import io.charg.chargstation.R;
 import io.charg.chargstation.models.ChargeStationMarker;
 import io.charg.chargstation.models.GeoFireRequest;
-import io.charg.chargstation.models.firebase.ChargeStation;
+import io.charg.chargstation.models.firebase.GeofireDto;
+import io.charg.chargstation.models.firebase.NodeDto;
 import io.charg.chargstation.root.CommonData;
 import io.charg.chargstation.root.Helpers;
 import io.charg.chargstation.root.IAsyncCommand;
@@ -234,7 +232,7 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
 
     private void initGeoFire() {
         FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference dbRef = database.getReference(CommonData.GEOFIRE_PATH);
+        DatabaseReference dbRef = database.getReference(CommonData.FIREBASE_PATH_GEOFIRE);
         mGeoFire = new GeoFire(dbRef);
     }
 
@@ -256,7 +254,7 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
                     return;
                 }
 
-                mChargeHubService.getChargeStationAsync(new IAsyncCommand<String, ChargeStation>() {
+                mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, NodeDto>() {
                     @Override
                     public String getInputData() {
                         return key;
@@ -268,7 +266,7 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
                     }
 
                     @Override
-                    public void onComplete(ChargeStation result) {
+                    public void onComplete(NodeDto result) {
                         if (mFilteringService.isValid(result)) {
                             mKeys.add(key);
                             mClusterManager.addItem(new ChargeStationMarker(location.latitude, location.longitude, key));
@@ -387,7 +385,7 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
         mClusterManager.cluster();
 
         for (final String item : mKeys) {
-            mChargeHubService.getChargeStationAsync(new IAsyncCommand<String, ChargeStation>() {
+            mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, NodeDto>() {
                 @Override
                 public String getInputData() {
                     return item;
@@ -399,16 +397,37 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
                 }
 
                 @Override
-                public void onComplete(ChargeStation result) {
+                public void onComplete(final NodeDto result) {
                     if (mFilteringService.isValid(result)) {
-                        mClusterManager.addItem(new ChargeStationMarker(result.getAddressInfo().getLatitude(), result.getAddressInfo().getLongitude(), result.getID().toString()));
-                        mClusterManager.cluster();
+
+                        mChargeHubService.getLocationAsync(new IAsyncCommand<String, GeofireDto>() {
+                            @Override
+                            public String getInputData() {
+                                return result.getEth_address();
+                            }
+
+                            @Override
+                            public void onPrepare() {
+
+                            }
+
+                            @Override
+                            public void onComplete(GeofireDto result) {
+                                mClusterManager.addItem(new ChargeStationMarker(result.getLat(), result.getLng(), item));
+                                mClusterManager.cluster();
+                            }
+
+                            @Override
+                            public void onError(String error) {
+                                Toast.makeText(MapActivity.this, error, Toast.LENGTH_SHORT).show();
+                            }
+                        });
                     }
                 }
 
                 @Override
                 public void onError(String error) {
-
+                    Toast.makeText(MapActivity.this, error, Toast.LENGTH_SHORT).show();
                 }
             });
         }

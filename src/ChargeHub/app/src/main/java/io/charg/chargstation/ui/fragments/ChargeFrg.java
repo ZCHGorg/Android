@@ -23,13 +23,13 @@ import java.math.BigInteger;
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
-import io.charg.chargstation.models.firebase.ChargeStation;
-import io.charg.chargstation.models.firebase.Node;
+import io.charg.chargstation.models.firebase.NodeDto;
 import io.charg.chargstation.root.IAsyncCommand;
 import io.charg.chargstation.services.AccountService;
 import io.charg.chargstation.services.ChargeHubService;
 import io.charg.chargstation.services.DialogHelper;
 import io.charg.chargstation.services.SmartContractManager;
+import io.charg.chargstation.services.StringHelper;
 import io.charg.chargstation.ui.activities.StationActivity;
 import io.charg.chargstation.ui.dialogs.SendChargDialog;
 
@@ -46,7 +46,7 @@ public class ChargeFrg extends BaseFragment {
     private static final int DEFAULT_CHARG_TICKS = 300000;
 
     private String mStationKey;
-    private ChargeStation mChargeStation;
+    private NodeDto mChargeStation;
 
     @BindView(R.id.tv_location)
     TextView tvLocationName;
@@ -118,7 +118,7 @@ public class ChargeFrg extends BaseFragment {
     }
 
     private void initDataAsync() {
-        mChargeHubService.getChargeStationAsync(new IAsyncCommand<String, ChargeStation>() {
+        mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, NodeDto>() {
             @Override
             public String getInputData() {
                 return mStationKey;
@@ -131,7 +131,7 @@ public class ChargeFrg extends BaseFragment {
             }
 
             @Override
-            public void onComplete(ChargeStation result) {
+            public void onComplete(NodeDto result) {
                 mChargeStation = result;
                 refreshUI();
 
@@ -149,11 +149,11 @@ public class ChargeFrg extends BaseFragment {
     }
 
     private void refreshUI() {
-        tvLocationName.setText(mChargeStation.getAddressInfo().getTitle());
-        tvStationKey.setText(String.valueOf(mChargeStation.getID()));
-        tvPower.setText(String.format("%s kW/h", mChargeStation.getConnections().get(0).getPowerKW()));
-        tvCostKwh.setText(String.valueOf(mChargeStation.getCostCharge()));
-        tvCostMinPark.setText(String.valueOf(mChargeStation.getCostPark()));
+        tvLocationName.setText(mChargeStation.getTitle());
+        tvStationKey.setText(StringHelper.getReadableEthAddress(mChargeStation.getEth_address()));
+        tvPower.setText(String.format("%s kW/h", mChargeStation.getPower()));
+        tvCostKwh.setText(String.valueOf(mChargeStation.getCost_charge()));
+        tvCostMinPark.setText(String.valueOf(mChargeStation.getCost_park()));
 
         refreshTimerLabels();
     }
@@ -166,7 +166,7 @@ public class ChargeFrg extends BaseFragment {
     }
 
     private double calcAmount() {
-        return mChargeTicksDone * (mIsChargMode ? mChargeStation.getCostCharge() : mChargeStation.getCostPark()) / 60000;
+        return mChargeTicksDone * (mIsChargMode ? mChargeStation.getCost_charge() : mChargeStation.getCost_park()) / 60000;
     }
 
     private void initServices() {
@@ -190,7 +190,7 @@ public class ChargeFrg extends BaseFragment {
     @OnClick(R.id.btn_terms)
     void onBtnTermsClick() {
         new AlertDialog.Builder(getContext())
-                .setMessage(String.format("Terms and conditions:\n%s", mChargeStation.getUsageCost()))
+                .setMessage(String.format("Terms and conditions:\n%s", mChargeStation.getComments()))
                 .setTitle(R.string.app_name)
                 .setIcon(R.mipmap.ic_launcher)
                 .setPositiveButton("OK", new DialogInterface.OnClickListener() {
@@ -227,13 +227,13 @@ public class ChargeFrg extends BaseFragment {
             DialogHelper.showQuestion(getContext(), R.string.ask_parking_off, new Runnable() {
                 @Override
                 public void run() {
-                    mSmartContractManager.parkingOffAsync(mChargeStation.getEthAddress());
+                    mSmartContractManager.parkingOffAsync(mChargeStation.getEth_address());
                 }
             });
             return;
         }
 
-        mSmartContractManager.parkingOnAsync(mChargeStation.getEthAddress(), BigInteger.valueOf(mChargeTicksEstimate / 1000));
+        mSmartContractManager.parkingOnAsync(mChargeStation.getEth_address(), BigInteger.valueOf(mChargeTicksEstimate / 1000));
 
         disableButtons();
         btnStopPark.setVisibility(View.VISIBLE);
@@ -244,7 +244,7 @@ public class ChargeFrg extends BaseFragment {
             public void run() {
                 enableButtons();
                 if (mSmartContractManager.isNowParking()) {
-                    mSmartContractManager.parkingOffAsync(mChargeStation.getEthAddress());
+                    mSmartContractManager.parkingOffAsync(mChargeStation.getEth_address());
                 }
             }
         });
@@ -252,7 +252,7 @@ public class ChargeFrg extends BaseFragment {
 
     @OnClick(R.id.btn_stop_park)
     void onBtnStopParkClick() {
-        mSmartContractManager.parkingOffAsync(mChargeStation.getEthAddress());
+        mSmartContractManager.parkingOffAsync(mChargeStation.getEth_address());
 
         countDownTimer.cancel();
         enableButtons();
@@ -264,10 +264,10 @@ public class ChargeFrg extends BaseFragment {
     @OnClick(R.id.btn_charge)
     void onBtnChargeClick() {
 
-        mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, Node>() {
+        mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, NodeDto>() {
             @Override
             public String getInputData() {
-                return mChargeStation.getEthAddress();
+                return mChargeStation.getEth_address();
             }
 
             @Override
@@ -276,44 +276,44 @@ public class ChargeFrg extends BaseFragment {
             }
 
             @Override
-            public void onComplete(final Node node) {
+            public void onComplete(final NodeDto nodeDto) {
 
                 boolean isNowCharging = mSmartContractManager.isNowCharging();
                 if (isNowCharging) {
                     DialogHelper.showQuestion(getContext(), R.string.ask_charging_off, new Runnable() {
                         @Override
                         public void run() {
-                            mSmartContractManager.chargeOffAsync(mChargeStation.getEthAddress());
+                            mSmartContractManager.chargeOffAsync(mChargeStation.getEth_address());
                         }
                     });
                     return;
                 }
 
-                if (node == null) {
-                    Toast.makeText(getContext(), "Couldn't find node: " + mChargeStation.getEthAddress(), Toast.LENGTH_SHORT).show();
+                if (nodeDto == null) {
+                    Toast.makeText(getContext(), "Couldn't find nodeDto: " + mChargeStation.getEth_address(), Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if (node.getStation_state().equals(Node.STATION_STATE_IDLE)) {
+                if (nodeDto.getStation_state().equals(NodeDto.STATION_STATE_IDLE)) {
 
-                    String clientState = node.getClient_state();
+                    String clientState = nodeDto.getClient_state();
 
                     if (clientState == null) {
                         clientState = "";
                     }
 
-                    if (clientState.equals(Node.CLIENT_STATE_REQUEST)) {
+                    if (clientState.equals(NodeDto.CLIENT_STATE_REQUEST)) {
                         Toast.makeText(getContext(), getContext().getText(R.string.is_request) + "\r\nCurrent state is: " + clientState, Toast.LENGTH_SHORT).show();
                     } else {
-                        node.setClient_state(Node.CLIENT_STATE_REQUEST);
-                        node.setClient_address(mAccountService.getEthAddress());
-                        mChargeHubService.saveNode(mChargeStation.getEthAddress(), node);
-                        mSmartContractManager.chargeOnAsync(mChargeStation.getEthAddress(), BigInteger.valueOf(mChargeTicksEstimate / 1000));
+                        nodeDto.setClient_state(NodeDto.CLIENT_STATE_REQUEST);
+                        nodeDto.setClient_address(mAccountService.getEthAddress());
+                        mChargeHubService.saveNode(mChargeStation.getEth_address(), nodeDto);
+                        mSmartContractManager.chargeOnAsync(mChargeStation.getEth_address(), BigInteger.valueOf(mChargeTicksEstimate / 1000));
                     }
 
-                    listenChargeStationEvents(mChargeStation.getEthAddress());
+                    listenChargeStationEvents(mChargeStation.getEth_address());
                 } else {
-                    Toast.makeText(getContext(), getContext().getText(R.string.is_charging) + "\r\nCurrent state is: " + node.getStation_state(), Toast.LENGTH_SHORT).show();
+                    Toast.makeText(getContext(), getContext().getText(R.string.is_charging) + "\r\nCurrent state is: " + nodeDto.getStation_state(), Toast.LENGTH_SHORT).show();
                 }
             }
 
@@ -334,10 +334,10 @@ public class ChargeFrg extends BaseFragment {
         dbRef.addValueEventListener(mNodeEventListener = new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                final Node node = dataSnapshot.getValue(Node.class);
+                final NodeDto nodeDto = dataSnapshot.getValue(NodeDto.class);
 
-                if (node.getStation_state().equals(Node.STATION_STATE_READY)) {
-                    if (node.getClient_state().equals(Node.CLIENT_STATE_READY)) {
+                if (nodeDto.getStation_state().equals(NodeDto.STATION_STATE_READY)) {
+                    if (nodeDto.getClient_state().equals(NodeDto.CLIENT_STATE_READY)) {
                         disableButtons();
                         btnStopCharge.setVisibility(View.VISIBLE);
                         mIsChargMode = true;
@@ -352,17 +352,17 @@ public class ChargeFrg extends BaseFragment {
                         DialogHelper.showQuestion(getContext(), R.string.ask_user_approvement_charge, new Runnable() {
                             @Override
                             public void run() {
-                                node.setClient_state(Node.CLIENT_STATE_READY);
-                                node.setClient_address(mAccountService.getEthAddress());
-                                mChargeHubService.saveNode(mChargeStation.getEthAddress(), node);
+                                nodeDto.setClient_state(NodeDto.CLIENT_STATE_READY);
+                                nodeDto.setClient_address(mAccountService.getEthAddress());
+                                mChargeHubService.saveNode(mChargeStation.getEth_address(), nodeDto);
                             }
                         });
                     }
-                } else if (node.getStation_state().equals(Node.STATION_STATE_CHARGED)) {
+                } else if (nodeDto.getStation_state().equals(NodeDto.STATION_STATE_CHARGED)) {
                     onBtnStopChargeClick();
-                    node.setClient_state(Node.CLIENT_STATE_CHARGED);
-                    node.setClient_address(mAccountService.getEthAddress());
-                    mChargeHubService.saveNode(mChargeStation.getEthAddress(), node);
+                    nodeDto.setClient_state(NodeDto.CLIENT_STATE_CHARGED);
+                    nodeDto.setClient_address(mAccountService.getEthAddress());
+                    mChargeHubService.saveNode(mChargeStation.getEth_address(), nodeDto);
                     dbRef.removeEventListener(mNodeEventListener);
                 }
             }
@@ -376,7 +376,7 @@ public class ChargeFrg extends BaseFragment {
 
     @OnClick(R.id.btn_stop_charge)
     void onBtnStopChargeClick() {
-        mSmartContractManager.chargeOffAsync(mChargeStation.getEthAddress());
+        mSmartContractManager.chargeOffAsync(mChargeStation.getEth_address());
 
         countDownTimer.cancel();
         enableButtons();
@@ -425,6 +425,6 @@ public class ChargeFrg extends BaseFragment {
     @OnClick(R.id.btn_pay)
     void onBtnPayClicked() {
         SendChargDialog dlg = new SendChargDialog(getContext());
-        dlg.sendCharg(mChargeStation.getEthAddress(), 1);
+        dlg.sendCharg(mChargeStation.getEth_address(), 1);
     }
 }

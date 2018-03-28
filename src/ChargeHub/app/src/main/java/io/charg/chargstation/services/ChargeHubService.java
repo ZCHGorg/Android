@@ -1,18 +1,13 @@
 package io.charg.chargstation.services;
 
-import android.util.Log;
-import android.widget.Toast;
-
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import io.charg.chargstation.models.ChargeStationMarker;
-import io.charg.chargstation.models.GeoFireRequest;
-import io.charg.chargstation.models.firebase.ChargeStation;
-import io.charg.chargstation.models.firebase.Node;
+import io.charg.chargstation.models.firebase.GeofireDto;
+import io.charg.chargstation.models.firebase.NodeDto;
 import io.charg.chargstation.root.CommonData;
 import io.charg.chargstation.root.IAsyncCommand;
 
@@ -22,28 +17,7 @@ import io.charg.chargstation.root.IAsyncCommand;
 
 public class ChargeHubService {
 
-    public void getChargeLocationsAsync(IAsyncCommand<GeoFireRequest, ChargeStationMarker> command) {
-
-    }
-
-    public void getChargeStationAsync(final IAsyncCommand<String, ChargeStation> command) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference dbRef = database.getReference(CommonData.LOCATIONS_PATH);
-        dbRef.child(command.getInputData()).addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                ChargeStation chargeStation = dataSnapshot.getValue(ChargeStation.class);
-                command.onComplete(chargeStation);
-            }
-
-            @Override
-            public void onCancelled(DatabaseError databaseError) {
-                command.onError(databaseError.getMessage());
-            }
-        });
-    }
-
-    public void getChargeNodeAsync(final IAsyncCommand<String, Node> command) {
+    public void getChargeNodeAsync(final IAsyncCommand<String, NodeDto> command) {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference dbRef = database.getReference(CommonData.FIREBASE_PATH_NODES);
 
@@ -51,8 +25,8 @@ public class ChargeHubService {
         dbNodeRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                Node node = dataSnapshot.getValue(Node.class);
-                command.onComplete(node);
+                NodeDto nodeDto = dataSnapshot.getValue(NodeDto.class);
+                command.onComplete(nodeDto);
                 dbNodeRef.removeEventListener(this);
             }
 
@@ -63,15 +37,35 @@ public class ChargeHubService {
         });
     }
 
-    public void saveNode(String key, Node node) {
+    public void saveNode(String key, NodeDto nodeDto) {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference dbRef = database.getReference(CommonData.FIREBASE_PATH_NODES);
-        dbRef.child(key).setValue(node);
+        dbRef.child(key).setValue(nodeDto);
     }
 
     public DatabaseReference getChargeNodeDbRef(String key) {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference dbRef = database.getReference(CommonData.FIREBASE_PATH_NODES).child(key);
         return dbRef;
+    }
+
+    public void getLocationAsync(final IAsyncCommand<String, GeofireDto> command) {
+        final FirebaseDatabase database = FirebaseDatabase.getInstance();
+        DatabaseReference dbRef = database.getReference(CommonData.FIREBASE_PATH_GEOFIRE);
+
+        final DatabaseReference dbNodeRef = dbRef.child(command.getInputData());
+        dbNodeRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                GeofireDto location = dataSnapshot.getValue(GeofireDto.class);
+                command.onComplete(location);
+                dbNodeRef.removeEventListener(this);
+            }
+
+            @Override
+            public void onCancelled(DatabaseError databaseError) {
+                command.onError(databaseError.getMessage());
+            }
+        });
     }
 }
