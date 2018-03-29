@@ -5,13 +5,17 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import io.charg.chargstation.R;
+import io.charg.chargstation.models.firebase.NodeDto;
+import io.charg.chargstation.root.IAsyncCommand;
 import io.charg.chargstation.root.IStationFrgListener;
+import io.charg.chargstation.services.ChargeHubService;
 import io.charg.chargstation.ui.fragments.BaseFragment;
 import io.charg.chargstation.ui.fragments.ChargeFrg;
 import io.charg.chargstation.ui.fragments.StationFrg;
@@ -25,6 +29,8 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
     public static final String ARG_STATION_KEY = "ARG_STATION_KEY";
     private String mStationKey;
 
+    private ChargeHubService mChargeHubService;
+
     @BindView(R.id.view_pager)
     ViewPager mViewPager;
 
@@ -34,6 +40,7 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
+
     @Override
     public int getResourceId() {
         return R.layout.activity_station;
@@ -41,10 +48,15 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
 
     @Override
     public void onActivate() {
+        initServices();
         initToolbar();
         readIntent();
         initTabLayout();
         initViewPager();
+    }
+
+    private void initServices() {
+        mChargeHubService = new ChargeHubService();
     }
 
     private void initToolbar() {
@@ -89,6 +101,29 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
 
     private void readIntent() {
         mStationKey = getIntent().getStringExtra(ARG_STATION_KEY);
+        mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, NodeDto>() {
+            @Override
+            public String getInputData() {
+                return mStationKey;
+            }
+
+            @Override
+            public void onPrepare() {
+
+            }
+
+            @Override
+            public void onComplete(NodeDto result) {
+                if (result == null) {
+                    finish();
+                }
+            }
+
+            @Override
+            public void onError(String error) {
+                Toast.makeText(StationActivity.this, error, Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
 

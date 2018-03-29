@@ -13,6 +13,7 @@ public class CommonData {
 
     public static final double RADIUS_LIMIT = 75;
     public static final String TAG = "charge";
+    public static final String NOT_DEFINED = "Not defined";
 
     //main net
     /*public static final String ETH_URL = "https://mainnet.infura.io/Zp6evGImttk7WOe95WcW";

@@ -20,6 +20,7 @@ import io.charg.chargstation.root.IAsyncCommand;
 import io.charg.chargstation.root.IStationFrgListener;
 import io.charg.chargstation.services.ChargeHubService;
 import io.charg.chargstation.services.FilteringService;
+import io.charg.chargstation.services.StringHelper;
 import io.charg.chargstation.ui.activities.StationActivity;
 
 /**
@@ -32,7 +33,7 @@ public class StationFrg extends BaseFragment {
     private ChargeHubService mChargeHubService;
     private FilteringService mFilterService;
 
-    private String mStationKey;
+    private String mNodeEthAddress;
     private NodeDto mStation;
 
     @BindView(R.id.tv_location)
@@ -89,7 +90,7 @@ public class StationFrg extends BaseFragment {
     }
 
     private void readArgs() {
-        mStationKey = getArguments().getString(StationActivity.ARG_STATION_KEY);
+        mNodeEthAddress = getArguments().getString(StationActivity.ARG_STATION_KEY);
     }
 
     private void initServices() {
@@ -102,7 +103,7 @@ public class StationFrg extends BaseFragment {
 
             @Override
             public String getInputData() {
-                return mStationKey;
+                return mNodeEthAddress;
             }
 
             @Override
@@ -133,7 +134,8 @@ public class StationFrg extends BaseFragment {
     private void refreshUI() {
 
         if (mStation == null) {
-            Toast.makeText(getContext(), "Couldn't find charge station", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), String.format("Couldn't find charge station with address: %s", StringHelper.getShortEthAddress(mNodeEthAddress)), Toast.LENGTH_SHORT).show();
+            return;
         }
 
         tvLocation.setText(mStation.getTitle());
@@ -181,7 +183,7 @@ public class StationFrg extends BaseFragment {
         mChargeHubService.getLocationAsync(new IAsyncCommand<String, GeofireDto>() {
             @Override
             public String getInputData() {
-                return mStationKey;
+                return mNodeEthAddress;
             }
 
             @Override
@@ -193,7 +195,7 @@ public class StationFrg extends BaseFragment {
             public void onComplete(GeofireDto result) {
                 try {
                     String packageName = "com.google.android.apps.maps";
-                    String query = String.format("google.navigation:q=%s,%s", result.getLat(), result.getLng());
+                    String query = String.format("google.navigation:q=%s,%s", String.valueOf(result.getLat()), String.valueOf(result.getLng()));
                     Intent intent = getContext().getPackageManager().getLaunchIntentForPackage(packageName);
                     intent.setAction(Intent.ACTION_VIEW);
                     intent.setData(Uri.parse(query));

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
@@ -31,7 +30,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="end"
-                    android:text="Location"/>
+                    android:text="Location" />
 
                 <TextView
                     android:id="@+id/tv_location"
@@ -40,7 +39,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
-                    tools:text="Berlin"/>
+                    tools:text="Berlin" />
 
             </LinearLayout>
 
@@ -55,7 +54,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center_vertical|end"
-                    android:text="Station №"/>
+                    android:text="Station №" />
 
                 <TextView
                     android:id="@+id/tv_station_id"
@@ -64,7 +63,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
-                    tools:text="Berlin"/>
+                    tools:text="Berlin" />
 
             </LinearLayout>
 
@@ -79,7 +78,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center_vertical|end"
-                    android:text="Power"/>
+                    android:text="Power" />
 
                 <TextView
                     android:id="@+id/tv_power"
@@ -88,7 +87,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center_vertical"
-                    tools:text="Berlin"/>
+                    tools:text="Berlin" />
 
             </LinearLayout>
 
@@ -103,7 +102,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center_vertical|end"
-                    android:text="Cost charge/min"/>
+                    android:text="Cost charge/min" />
 
                 <TextView
                     android:id="@+id/tv_cost_kwh"
@@ -111,7 +110,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    tools:text="Berlin"/>
+                    tools:text="Berlin" />
 
             </LinearLayout>
 
@@ -126,7 +125,7 @@
                     android:layout_height="match_parent"
                     android:layout_weight="1"
                     android:gravity="center_vertical|end"
-                    android:text="Cost park/min"/>
+                    android:text="Cost park/min" />
 
                 <TextView
                     android:id="@+id/tv_cost_min_park"
@@ -134,7 +133,76 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_weight="1"
-                    tools:text="Berlin"/>
+                    tools:text="Berlin" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/TextViewKey"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical|end"
+                    android:text="Station state" />
+
+                <TextView
+                    android:id="@+id/tv_station_state"
+                    style="@style/TextViewValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    tools:text="Berlin" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/TextViewKey"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical|end"
+                    android:text="Client state" />
+
+                <TextView
+                    android:id="@+id/tv_client_state"
+                    style="@style/TextViewValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    tools:text="Berlin" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/TextViewKey"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical|end"
+                    android:text="Client address" />
+
+                <TextView
+                    android:id="@+id/tv_client_address"
+                    style="@style/TextViewValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    tools:text="Berlin" />
 
             </LinearLayout>
 
@@ -142,7 +210,7 @@
                 android:id="@+id/btn_terms"
                 android:layout_width="match_parent"
                 android:layout_height="56dp"
-                android:text="Terms and conditions"/>
+                android:text="Terms and conditions" />
 
             <Button
                 android:id="@+id/btn_pay"
@@ -150,7 +218,7 @@
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/dark_green"
                 android:foreground="?android:attr/selectableItemBackground"
-                android:text="Pay"/>
+                android:text="Pay" />
 
             <android.support.v7.widget.CardView
                 android:layout_width="match_parent"
@@ -170,12 +238,12 @@
                         android:layout_height="wrap_content"
                         android:gravity="center"
                         android:text="Duration"
-                        android:textSize="18sp"/>
+                        android:textSize="18sp" />
 
                     <View
                         android:layout_width="match_parent"
                         android:layout_height="1dp"
-                        android:background="@color/light_gray"/>
+                        android:background="@color/light_gray" />
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -188,7 +256,7 @@
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:text="Timer:"
-                            android:textSize="22sp"/>
+                            android:textSize="22sp" />
 
                         <TextView
                             android:id="@+id/tv_timer"
@@ -197,7 +265,7 @@
                             android:layout_height="wrap_content"
                             android:gravity="center"
                             android:text="00 : 00 : 00"
-                            android:textSize="22sp"/>
+                            android:textSize="22sp" />
 
                     </LinearLayout>
 
@@ -218,7 +286,7 @@
                     android:backgroundTint="@color/dark_red"
                     android:foreground="?android:attr/selectableItemBackground"
                     android:text="Just Park"
-                    android:textColor="@android:color/white"/>
+                    android:textColor="@android:color/white" />
 
                 <Button
                     android:id="@+id/btn_stop_park"
@@ -229,7 +297,7 @@
                     android:text="Stop parking"
                     android:textColor="@android:color/white"
                     android:visibility="gone"
-                    tools:visibility="visible"/>
+                    tools:visibility="visible" />
 
             </FrameLayout>
 
@@ -243,7 +311,7 @@
                     android:layout_height="56dp"
                     android:backgroundTint="@color/dark_green"
                     android:foreground="?android:attr/selectableItemBackground"
-                    android:text="Charg!"/>
+                    android:text="Charg!" />
 
                 <Button
                     android:id="@+id/btn_stop_charge"
@@ -253,7 +321,7 @@
                     android:foreground="?android:attr/selectableItemBackground"
                     android:text="Stop charg"
                     android:visibility="gone"
-                    tools:visibility="visible"/>
+                    tools:visibility="visible" />
 
             </FrameLayout>
 
@@ -273,7 +341,7 @@
                         style="@style/TextViewKey"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:text="Charging time:"/>
+                        android:text="Charging time:" />
 
                     <LinearLayout
                         android:layout_width="0dp"
@@ -286,14 +354,14 @@
                             style="@style/TextViewValue"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            tools:text="15 sec"/>
+                            tools:text="15 sec" />
 
                         <TextView
                             android:id="@+id/tv_charged_price"
                             style="@style/TextViewValue"
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            tools:text="0.06 CHG"/>
+                            tools:text="0.06 CHG" />
 
                     </LinearLayout>
 
@@ -312,6 +380,6 @@
         android:layout_gravity="center"
         android:indeterminate="true"
         android:visibility="gone"
-        tools:visibility="visible"/>
+        tools:visibility="visible" />
 
 </FrameLayout>

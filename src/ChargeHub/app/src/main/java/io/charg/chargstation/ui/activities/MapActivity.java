@@ -134,7 +134,7 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
     private void loadAccountData() {
         String ethAddress = mAccountService.getEthAddress();
         if (!ethAddress.isEmpty()) {
-            tvEthAddress.setText(StringHelper.getReadableEthAddress(ethAddress));
+            tvEthAddress.setText(StringHelper.getShortEthAddress(ethAddress));
         } else {
             tvEthAddress.setText(StringHelper.getValueOrNotDefine(ethAddress));
         }
