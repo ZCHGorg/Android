@@ -168,7 +168,7 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
                         startActivity(new Intent(MapActivity.this, ChangeWalletActivity.class));
                         return true;
                     case R.id.menu_log_out:
-                        DialogHelper.showQuestion(MapActivity.this, R.string.ask_delete_wallet, new Runnable() {
+                        DialogHelper.showQuestion(MapActivity.this, getString(R.string.ask_delete_wallet), new Runnable() {
                             @Override
                             public void run() {
                                 mLocalDb.clearDb();

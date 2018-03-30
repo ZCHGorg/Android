@@ -25,7 +25,7 @@ public abstract class BaseAuthActivity extends BaseActivity {
         String ethAddress = accountService.getEthAddress();
         String privateKey = accountService.getPrivateKey();
         if (ethAddress == null || ethAddress.isEmpty() || privateKey == null || privateKey.isEmpty()) {
-            DialogHelper.showQuestion(this, R.string.ask_login, new Runnable() {
+            DialogHelper.showQuestion(this, getString(R.string.ask_login), new Runnable() {
                 @Override
                 public void run() {
                     startActivity(new Intent(BaseAuthActivity.this, ChangeWalletActivity.class));

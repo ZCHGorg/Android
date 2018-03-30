@@ -13,11 +13,11 @@ import io.charg.chargstation.R;
 
 public class DialogHelper {
 
-    public static void showQuestion(Context context, int messageId, final Runnable runnable) {
+    public static void showQuestion(Context context, String message, final Runnable runnable) {
         new AlertDialog.Builder(context, R.style.Theme_AppCompat_Light_Dialog_Alert)
                 .setTitle(R.string.app_name)
                 .setIcon(R.drawable.charg)
-                .setMessage(messageId)
+                .setMessage(message)
                 .setPositiveButton(R.string.yes, new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialog, int which) {

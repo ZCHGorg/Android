@@ -185,7 +185,6 @@ public class ChargeFrg extends BaseFragment {
     private void refreshTimerLabels() {
         tvTimer.setText(getTickTime(mChargeTicksEstimate));
         tvChargedTime.setText(getTickTime(mChargeTicksDone));
-
         tvChargedPrice.setText(String.format("%.6f CHG", calcAmount()));
     }
 
@@ -248,7 +247,7 @@ public class ChargeFrg extends BaseFragment {
 
         boolean isNowParking = mSmartContractManager.isNowParking();
         if (isNowParking) {
-            DialogHelper.showQuestion(getContext(), R.string.ask_parking_off, new Runnable() {
+            DialogHelper.showQuestion(getContext(), getString(R.string.ask_parking_off), new Runnable() {
                 @Override
                 public void run() {
                     mSmartContractManager.parkingOffAsync(mChargeStation.getEth_address());
@@ -290,7 +289,7 @@ public class ChargeFrg extends BaseFragment {
 
         boolean isNowCharging = mSmartContractManager.isNowCharging();
         if (isNowCharging) {
-            DialogHelper.showQuestion(getContext(), R.string.ask_charging_off, new Runnable() {
+            DialogHelper.showQuestion(getContext(), getString(R.string.ask_charging_off), new Runnable() {
                 @Override
                 public void run() {
                     mSmartContractManager.chargeOffAsync(mChargeStation.getEth_address());
@@ -314,14 +313,18 @@ public class ChargeFrg extends BaseFragment {
             public void onComplete(NodeDto result) {
                 if (result.getStation_state().equals(NodeDto.STATION_STATE_IDLE)) {
 
-                    if (result.getClient_state() == null || (result.getClient_state() != null && !result.getClient_state().equals(NodeDto.CLIENT_STATE_REQUEST))) {
+                    if (result.getClient_state() != null && result.getClient_state().equals(NodeDto.CLIENT_STATE_REQUEST) &&
+                            (result.getClient_address() != null) && result.getClient_address().equals(mAccountService.getEthAddress())) {
+                        Toast.makeText(getContext(), "You allready send request station. Waiting for ready station...", Toast.LENGTH_SHORT).show();
+                    } else {
                         result.setClient_state(NodeDto.CLIENT_STATE_REQUEST);
                         result.setClient_address(mAccountService.getEthAddress());
                         mChargeHubService.saveNode(result.getEth_address(), result);
-
-                        refreshUI();
                         mSmartContractManager.chargeOnAsync(result.getEth_address(), BigInteger.valueOf(mChargeTicksEstimate / 1000));
+                        Toast.makeText(getContext(), "Sending request to station...", Toast.LENGTH_SHORT).show();
                     }
+
+                    refreshUI();
                     listenChargeStationEvents(result.getEth_address());
 
                 } else {
@@ -361,7 +364,7 @@ public class ChargeFrg extends BaseFragment {
                             }
                         });
                     } else {
-                        DialogHelper.showQuestion(getContext(), R.string.ask_user_approvement_charge, new Runnable() {
+                        DialogHelper.showQuestion(getContext(), getString(R.string.ask_user_approvement_charge), new Runnable() {
                             @Override
                             public void run() {
                                 nodeDto.setClient_state(NodeDto.CLIENT_STATE_READY);
