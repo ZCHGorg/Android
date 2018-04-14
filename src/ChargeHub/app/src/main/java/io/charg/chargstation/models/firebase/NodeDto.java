@@ -16,12 +16,12 @@ public class NodeDto {
 
     private String address;
     private String comments;
-    private Integer connector_type;
-    private Double cost_charge;
-    private Double cost_park;
+    private int connector_type;
+    private double cost_charge;
+    private double cost_park;
     private String eth_address;
     private String phone;
-    private Double power;
+    private double power;
     private String title;
     private String client_address;
     private String client_state;
@@ -46,27 +46,27 @@ public class NodeDto {
         this.comments = comments;
     }
 
-    public Integer getConnector_type() {
+    public int getConnector_type() {
         return connector_type;
     }
 
-    public void setConnector_type(Integer connector_type) {
+    public void setConnector_type(int connector_type) {
         this.connector_type = connector_type;
     }
 
-    public Double getCost_charge() {
+    public double getCost_charge() {
         return cost_charge;
     }
 
-    public void setCost_charge(Double cost_charge) {
+    public void setCost_charge(double cost_charge) {
         this.cost_charge = cost_charge;
     }
 
-    public Double getCost_park() {
+    public double getCost_park() {
         return cost_park;
     }
 
-    public void setCost_park(Double cost_park) {
+    public void setCost_park(double cost_park) {
         this.cost_park = cost_park;
     }
 
@@ -86,11 +86,11 @@ public class NodeDto {
         this.phone = phone;
     }
 
-    public Double getPower() {
+    public double getPower() {
         return power;
     }
 
-    public void setPower(Double power) {
+    public void setPower(double power) {
         this.power = power;
     }
 

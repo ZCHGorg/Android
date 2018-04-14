@@ -21,6 +21,11 @@ public class ChargeHubService {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference dbRef = database.getReference(CommonData.FIREBASE_PATH_NODES);
 
+        if (command.getInputData() == null) {
+            command.onError("Node's address is empty");
+            return;
+        }
+
         final DatabaseReference dbNodeRef = dbRef.child(command.getInputData());
         dbNodeRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override

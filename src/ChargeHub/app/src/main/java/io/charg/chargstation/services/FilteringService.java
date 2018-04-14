@@ -32,15 +32,16 @@ public class FilteringService {
         return res;
     }
 
-    public StationFilter loadConnectorFilter(int index) {
-        String json = mLocalDb.getValue(String.format("CONNECTOR_FILTER_%s", index));
+    public StationFilter loadConnectorFilter(int connector_type) {
+
+        String json = mLocalDb.getValue(String.format("CONNECTOR_FILTER_%s", connector_type));
         if (json.isEmpty()) {
             for (StationFilter item : FilteringService.getStaticConnectorFilters()) {
-                if (item.getIndex() == index) {
+                if (item.getIndex() == connector_type) {
                     return item;
                 }
             }
-            return new StationFilter(index, String.format("Connector: %s", index));
+            return new StationFilter(connector_type, String.format("Connector: %s", connector_type));
         } else {
             return new Gson().fromJson(json, StationFilter.class);
         }
@@ -95,9 +96,7 @@ public class FilteringService {
         if (station == null) {
             return true;
         }
-        if (station.getConnector_type() == null) {
-            return true;
-        }
+
         return loadConnectorFilter(station.getConnector_type()).isChecked();
     }
 }
