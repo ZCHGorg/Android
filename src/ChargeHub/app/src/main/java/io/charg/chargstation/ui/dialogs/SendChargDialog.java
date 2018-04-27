@@ -23,6 +23,7 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.protocol.http.HttpService;
 
 import java.math.BigInteger;
+import java.util.Locale;
 
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.CommonData;
@@ -51,6 +52,7 @@ public class SendChargDialog {
 
         final Dialog dlg = new AlertDialog.Builder(mContext)
                 .setView(view)
+                .setCancelable(false)
                 .create();
 
         final EditText tvAmount = view.findViewById(R.id.tv_amount);
@@ -62,7 +64,7 @@ public class SendChargDialog {
         final TextView tvResult = view.findViewById(R.id.tv_result);
         final Button btnOpen = view.findViewById(R.id.btn_open);
 
-        tvAmount.setText(String.format("%.6f", amount));
+        tvAmount.setText(String.format(Locale.ROOT, "%.6f", amount));
         tvAddressTo.setText(address);
         btnDismiss.setOnClickListener(new View.OnClickListener() {
             @Override

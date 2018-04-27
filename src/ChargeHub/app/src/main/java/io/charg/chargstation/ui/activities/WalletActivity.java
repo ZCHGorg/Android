@@ -138,7 +138,6 @@ public class WalletActivity extends BaseActivity {
     void onBtnSendChargClicked() {
         SendChargDialog dialog = new SendChargDialog(this);
         dialog.sendCharg(getString(R.string.eth_test_address), 0.75);
-
     }
 
     @OnClick(R.id.btn_send_eth)
