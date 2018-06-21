@@ -267,11 +267,12 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
 
                     @Override
                     public void onComplete(NodeDto result) {
-                        if (mFilteringService.isValid(result)) {
-                            mKeys.add(key);
-                            mClusterManager.addItem(new ChargeStationMarker(location.latitude, location.longitude, key));
-                            mClusterManager.cluster();
+                        if (!mFilteringService.isValid(result)) {
+                            return;
                         }
+                        mKeys.add(key);
+                        mClusterManager.addItem(new ChargeStationMarker(location.latitude, location.longitude, key));
+                        mClusterManager.cluster();
                     }
 
                     @Override
@@ -403,6 +404,9 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
                         mChargeHubService.getLocationAsync(new IAsyncCommand<String, GeofireDto>() {
                             @Override
                             public String getInputData() {
+                                if (result == null) {
+                                    return null;
+                                }
                                 return result.getEth_address();
                             }
 

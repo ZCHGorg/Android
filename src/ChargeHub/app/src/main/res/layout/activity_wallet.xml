@@ -1,13 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <include layout="@layout/action_bar_main"/>
+    <include layout="@layout/action_bar_main" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -24,9 +23,9 @@
                 android:layout_width="128dp"
                 android:layout_height="128dp"
                 android:layout_gravity="center"
-                android:src="@drawable/charg"/>
-        </FrameLayout>
+                android:src="@drawable/charg" />
 
+        </FrameLayout>
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -43,14 +42,14 @@
                     style="@style/TextViewKey"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:text="ETH address"/>
+                    android:text="ETH address" />
 
                 <TextView
                     android:id="@+id/tv_eth_address"
                     style="@style/TextViewValue"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    tools:text="0x9edf7dD977Ea0b588f20839279A554d640dd9220"/>
+                    tools:text="0x9edf7dD977Ea0b588f20839279A554d640dd9220" />
 
             </LinearLayout>
 
@@ -60,7 +59,7 @@
                 android:layout_height="48dp"
                 android:layout_gravity="center_vertical"
                 android:background="@android:color/transparent"
-                android:src="@drawable/ic_copy"/>
+                android:src="@drawable/ic_copy" />
 
         </LinearLayout>
 
@@ -74,7 +73,7 @@
                 android:layout_height="match_parent"
                 android:indeterminate="true"
                 android:visibility="gone"
-                tools:visibility="visible"/>
+                tools:visibility="visible" />
 
             <LinearLayout
                 android:id="@+id/layout_balance"
@@ -109,7 +108,7 @@
                                 android:layout_height="wrap_content"
                                 android:gravity="right"
                                 android:text="0.000"
-                                android:textAllCaps="true"/>
+                                android:textAllCaps="true" />
 
                             <TextView
                                 style="@style/TextViewKey"
@@ -117,7 +116,7 @@
                                 android:layout_height="wrap_content"
                                 android:gravity="right"
                                 android:text="charg"
-                                android:textAllCaps="true"/>
+                                android:textAllCaps="true" />
 
                         </LinearLayout>
 
@@ -126,7 +125,7 @@
                             android:layout_height="32dp"
                             android:layout_gravity="center_vertical"
                             android:layout_margin="8dp"
-                            android:src="@drawable/charg"/>
+                            android:src="@drawable/charg" />
 
                     </LinearLayout>
 
@@ -150,7 +149,7 @@
                             android:layout_height="32dp"
                             android:layout_gravity="center_vertical"
                             android:layout_margin="8dp"
-                            android:src="@drawable/ethereum"/>
+                            android:src="@drawable/ethereum" />
 
                         <LinearLayout
                             android:layout_width="0dp"
@@ -166,7 +165,7 @@
                                 android:layout_height="wrap_content"
                                 android:gravity="left"
                                 android:text="0.000"
-                                android:textAllCaps="true"/>
+                                android:textAllCaps="true" />
 
                             <TextView
                                 style="@style/TextViewKey"
@@ -174,7 +173,7 @@
                                 android:layout_height="wrap_content"
                                 android:gravity="left"
                                 android:text="eth"
-                                android:textAllCaps="true"/>
+                                android:textAllCaps="true" />
 
                         </LinearLayout>
 
@@ -190,7 +189,7 @@
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_margin="8dp"
-            android:background="@color/dark_gray"/>
+            android:background="@color/dark_gray" />
 
         <LinearLayout
             android:layout_width="match_parent"
@@ -209,7 +208,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="Send charg"
-                    android:textAllCaps="true"/>
+                    android:textAllCaps="true" />
 
                 <Button
                     android:id="@+id/btn_buy_charg"
@@ -217,7 +216,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="Buy charg"
-                    android:textAllCaps="true"/>
+                    android:textAllCaps="true" />
 
             </LinearLayout>
 
@@ -233,7 +232,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="Send eth"
-                    android:textAllCaps="true"/>
+                    android:textAllCaps="true" />
 
                 <Button
                     android:id="@+id/btn_buy_eth"
@@ -241,7 +240,7 @@
                     android:layout_height="wrap_content"
                     android:gravity="center"
                     android:text="Buy eth"
-                    android:textAllCaps="true"/>
+                    android:textAllCaps="true" />
 
             </LinearLayout>
 
@@ -251,7 +250,7 @@
             android:id="@+id/btn_change_wallet"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="change address"/>
+            android:text="change address" />
 
     </LinearLayout>
 

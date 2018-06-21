@@ -58,7 +58,12 @@ public class ChargeHubService {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference dbRef = database.getReference(CommonData.FIREBASE_PATH_GEOFIRE);
 
-        final DatabaseReference dbNodeRef = dbRef.child(command.getInputData());
+        String ethAddress = command.getInputData();
+        if (ethAddress == null) {
+            return;
+        }
+
+        final DatabaseReference dbNodeRef = dbRef.child(ethAddress);
         dbNodeRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {

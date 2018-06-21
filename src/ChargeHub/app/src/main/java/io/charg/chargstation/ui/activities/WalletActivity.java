@@ -126,7 +126,7 @@ public class WalletActivity extends BaseActivity {
 
     @OnClick(R.id.btn_buy_charg)
     void onBtnBuyChargClicked() {
-        Snackbar.make(btnChangeWallet, R.string.not_implemented_yet, Snackbar.LENGTH_SHORT).show();
+        startActivity(new Intent(this, BuyChargActivity.class));
     }
 
     @OnClick(R.id.btn_buy_eth)
