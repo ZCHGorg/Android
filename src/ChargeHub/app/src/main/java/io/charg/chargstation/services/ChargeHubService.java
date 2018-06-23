@@ -31,7 +31,11 @@ public class ChargeHubService {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
                 NodeDto nodeDto = dataSnapshot.getValue(NodeDto.class);
-                command.onComplete(nodeDto);
+                if (nodeDto == null) {
+                    command.onError("Error while loading station " + command.getInputData());
+                } else {
+                    command.onComplete(nodeDto);
+                }
                 dbNodeRef.removeEventListener(this);
             }
 

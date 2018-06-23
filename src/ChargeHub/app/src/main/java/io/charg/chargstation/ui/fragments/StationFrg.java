@@ -134,7 +134,7 @@ public class StationFrg extends BaseFragment {
     private void refreshUI() {
 
         if (mStation == null) {
-            Toast.makeText(getContext(), String.format("Couldn't find charge station with address: %s", StringHelper.getShortEthAddress(mNodeEthAddress)), Toast.LENGTH_SHORT).show();
+            Toast.makeText(getContext(), String.format("Couldn't find charge station with eth address: %s", StringHelper.getShortEthAddress(mNodeEthAddress)), Toast.LENGTH_SHORT).show();
             return;
         }
 

@@ -22,4 +22,7 @@
     <string name="ask_user_approvement_charge">Charging station is ready for using. Do you want to start charging?</string>
     <string name="is_charging">Station state is not idle. Try again later.</string>
     <string name="is_request">Please wait for response from charging station</string>
+    <string name="favorites">Favorites</string>
+    <string name="loading_details">Loading details...</string>
+    <string name="error_loading_data">Error loading data</string>
 </resources>

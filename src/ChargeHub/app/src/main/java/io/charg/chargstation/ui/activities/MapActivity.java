@@ -43,6 +43,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import butterknife.BindView;
@@ -65,10 +66,14 @@ import io.charg.chargstation.ui.views.ChargeClusterManager;
 
 public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback, ICameraChangeListener, ClusterManager.OnClusterItemClickListener<ChargeStationMarker> {
 
-    private static final int INITIAL_ZOOM_LEVEL = 1;
+    private static final int INITIAL_ZOOM_LEVEL = 7;
     private static final int SEARCH_ZOOM_LEVEL = 13;
+    private static final int STATION_ZOOM_LEVEL = 20;
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1000;
     private static final int FILTER_ACTIVITY_REQUEST_CODE = 1001;
+
+    public static final String EXTRA_LAT = "EXTRA_LAT";
+    public static final String EXTRA_LNG = "EXTRA_LNG";
 
     private GoogleMap mGoogleMap;
     private ClusterManager<ChargeStationMarker> mClusterManager;
@@ -94,6 +99,9 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
 
     TextView tvEthAddress;
 
+    private LatLng mInitLocation;
+    private long mLastBackPressedTime;
+
     @Override
     public int getResourceId() {
         return R.layout.activity_main;
@@ -104,9 +112,18 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
         Log.v(getClass().getName(), "onActivate");
 
         initServices();
+        initIntent();
         initToolbar();
         initNavigationView();
-        initMap();
+        initMapAsync();
+    }
+
+    private void initIntent() {
+        double lat = getIntent().getDoubleExtra(EXTRA_LAT, -1);
+        double lng = getIntent().getDoubleExtra(EXTRA_LNG, -1);
+        if (lat != -1 && lng != -1) {
+            mInitLocation = new LatLng(lat, lng);
+        }
     }
 
     @Override
@@ -148,6 +165,16 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
         mDrawerToggle.syncState();
     }
 
+    @Override
+    public void onBackPressed() {
+        if (mLastBackPressedTime + 3000 > new Date().getTime() && mLastBackPressedTime != 0) {
+            super.onBackPressed();
+        } else {
+            mLastBackPressedTime = new Date().getTime();
+            Toast.makeText(this, "Press again to exit", Toast.LENGTH_SHORT).show();
+        }
+    }
+
     private void initNavigationView() {
 
         tvEthAddress = mNavigationView.getHeaderView(0).findViewById(R.id.tv_eth_address);
@@ -157,6 +184,9 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 mDrawerLayout.closeDrawers();
                 switch (item.getItemId()) {
+                    case R.id.menu_favorites:
+                        startActivity(new Intent(MapActivity.this, FavoritesActivity.class));
+                        return true;
                     case R.id.menu_filter:
                         Intent intent = new Intent(MapActivity.this, FilterActivity.class);
                         startActivityForResult(intent, FILTER_ACTIVITY_REQUEST_CODE);
@@ -209,7 +239,7 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
         }
     }
 
-    private void initMap() {
+    private void initMapAsync() {
         mMapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mMapFragment.getMapAsync(this);
     }
@@ -227,6 +257,7 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
 
         mGoogleMap.setOnCameraIdleListener(mClusterManager);
         mGoogleMap.setOnMarkerClickListener(mClusterManager);
+
         getLocationAsync();
     }
 
@@ -313,12 +344,21 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
 
     private void getLocationAsync() {
 
+        if (mInitLocation != null) {
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mInitLocation, STATION_ZOOM_LEVEL));
+            return;
+        }
+
         final LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+        if (locationManager == null) {
+            return;
+        }
 
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 1000);
             return;
         }
+
         locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
@@ -358,15 +398,36 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
     }
 
     @Override
-    public boolean onClusterItemClick(ChargeStationMarker chargeStationMarker) {
+    public boolean onClusterItemClick(final ChargeStationMarker marker) {
 
         if (!checkWallet()) {
             return true;
         }
 
-        Intent intent = new Intent(MapActivity.this, StationActivity.class);
-        intent.putExtra(StationActivity.ARG_STATION_KEY, chargeStationMarker.getKey());
-        startActivity(intent);
+        mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, NodeDto>() {
+            @Override
+            public String getInputData() {
+                return marker.getKey();
+            }
+
+            @Override
+            public void onPrepare() {
+
+            }
+
+            @Override
+            public void onComplete(NodeDto result) {
+                Intent intent = new Intent(MapActivity.this, StationActivity.class);
+                intent.putExtra(StationActivity.ARG_STATION_KEY, result.getEth_address());
+                startActivity(intent);
+            }
+
+            @Override
+            public void onError(String error) {
+                Toast.makeText(MapActivity.this, error, Toast.LENGTH_SHORT).show();
+            }
+        });
+
         return true;
     }
 

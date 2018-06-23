@@ -5,6 +5,8 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -16,6 +18,7 @@ import io.charg.chargstation.models.firebase.NodeDto;
 import io.charg.chargstation.root.IAsyncCommand;
 import io.charg.chargstation.root.IStationFrgListener;
 import io.charg.chargstation.services.ChargeHubService;
+import io.charg.chargstation.services.FavouriteService;
 import io.charg.chargstation.ui.fragments.BaseFragment;
 import io.charg.chargstation.ui.fragments.ChargeFrg;
 import io.charg.chargstation.ui.fragments.StationFrg;
@@ -27,9 +30,10 @@ import io.charg.chargstation.ui.fragments.StationFrg;
 public class StationActivity extends BaseActivity implements IStationFrgListener {
 
     public static final String ARG_STATION_KEY = "ARG_STATION_KEY";
-    private String mStationKey;
+    private NodeDto mStation;
 
     private ChargeHubService mChargeHubService;
+    private FavouriteService mFavouriteService;
 
     @BindView(R.id.view_pager)
     ViewPager mViewPager;
@@ -40,6 +44,7 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
+    private MenuItem menuFavourite;
 
     @Override
     public int getResourceId() {
@@ -50,13 +55,19 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
     public void onActivate() {
         initServices();
         initToolbar();
-        readIntent();
+        readIntentAsync();
         initTabLayout();
-        initViewPager();
+    }
+
+    private void refreshMenu() {
+        menuFavourite.setIcon(mFavouriteService.isFavourite(mStation)
+                ? R.drawable.ic_favorite
+                : R.drawable.ic_favorite_border);
     }
 
     private void initServices() {
         mChargeHubService = new ChargeHubService();
+        mFavouriteService = new FavouriteService(this);
     }
 
     private void initToolbar() {
@@ -71,14 +82,39 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
         return true;
     }
 
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        menuFavourite = menu.add(null);
+        menuFavourite.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+        menuFavourite.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                if (mFavouriteService.isFavourite(mStation)) {
+                    mFavouriteService.removeFromFavorites(mStation);
+                } else {
+                    mFavouriteService.addToFavorites(mStation);
+                }
+                refreshMenu();
+                return false;
+            }
+        });
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
     private void initTabLayout() {
         mTabLayout.setupWithViewPager(mViewPager);
     }
 
     private void initViewPager() {
+        if (mStation == null) {
+            return;
+        }
+
         final List<BaseFragment> fragments = new ArrayList<BaseFragment>() {{
-            add(StationFrg.newInstance(mStationKey));
-            add(ChargeFrg.newInstance(mStationKey));
+            add(StationFrg.newInstance(mStation.getEth_address()));
+            add(ChargeFrg.newInstance(mStation.getEth_address()));
         }};
 
         mViewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
@@ -99,12 +135,14 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
         });
     }
 
-    private void readIntent() {
-        mStationKey = getIntent().getStringExtra(ARG_STATION_KEY);
+    private void readIntentAsync() {
+        final String mStationEth = getIntent().getStringExtra(ARG_STATION_KEY);
+
         mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, NodeDto>() {
+
             @Override
             public String getInputData() {
-                return mStationKey;
+                return mStationEth;
             }
 
             @Override
@@ -117,6 +155,9 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
                 if (result == null) {
                     finish();
                 }
+                mStation = result;
+                initViewPager();
+                refreshMenu();
             }
 
             @Override
