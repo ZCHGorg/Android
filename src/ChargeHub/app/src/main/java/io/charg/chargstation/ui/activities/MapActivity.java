@@ -197,6 +197,9 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
                     case R.id.menu_qr_code:
                         startActivity(new Intent(MapActivity.this, ChangeWalletActivity.class));
                         return true;
+                    case R.id.menu_settings:
+                        startActivity(new Intent(MapActivity.this, SettingsActivity.class));
+                        return true;
                     case R.id.menu_log_out:
                         DialogHelper.showQuestion(MapActivity.this, getString(R.string.ask_delete_wallet), new Runnable() {
                             @Override

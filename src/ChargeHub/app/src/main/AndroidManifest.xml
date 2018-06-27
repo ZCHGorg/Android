@@ -29,6 +29,7 @@
         <activity android:name=".ui.activities.FilterActivity"/>
         <activity android:name=".ui.activities.BuyChargActivity" />
         <activity android:name=".ui.activities.FavoritesActivity" />
+        <activity android:name=".ui.activities.SettingsActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

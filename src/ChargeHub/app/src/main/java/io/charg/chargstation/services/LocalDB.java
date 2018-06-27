@@ -14,6 +14,7 @@ import io.charg.chargstation.models.StationFilter;
 public class LocalDB {
 
     private static final String DB_NAME = "charg";
+    public static final String KEY_SMART_CONTRACT_ADDRESS = "KEY_SMART_CONTRACT_ADDRESS";
 
     private Context mContext;
 
@@ -24,6 +25,11 @@ public class LocalDB {
     public String getValue(String key) {
         SharedPreferences sharedPref = mContext.getSharedPreferences(DB_NAME, Context.MODE_PRIVATE);
         return sharedPref.getString(key, "");
+    }
+
+    public String getValue(String key, String defValue) {
+        SharedPreferences sharedPref = mContext.getSharedPreferences(DB_NAME, Context.MODE_PRIVATE);
+        return sharedPref.getString(key, defValue);
     }
 
     public Boolean putValue(String key, String value) {
