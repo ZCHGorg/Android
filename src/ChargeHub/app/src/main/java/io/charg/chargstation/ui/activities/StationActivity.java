@@ -60,6 +60,9 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
     }
 
     private void refreshMenu() {
+        if (menuFavourite == null) {
+            return;
+        }
         menuFavourite.setIcon(mFavouriteService.isFavourite(mStation)
                 ? R.drawable.ic_favorite
                 : R.drawable.ic_favorite_border);
@@ -99,6 +102,7 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
                 return false;
             }
         });
+        refreshMenu();
 
         return super.onCreateOptionsMenu(menu);
     }
@@ -154,6 +158,7 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
             public void onComplete(NodeDto result) {
                 if (result == null) {
                     finish();
+                    return;
                 }
                 mStation = result;
                 initViewPager();
@@ -163,6 +168,7 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
             @Override
             public void onError(String error) {
                 Toast.makeText(StationActivity.this, error, Toast.LENGTH_SHORT).show();
+                finish();
             }
         });
     }

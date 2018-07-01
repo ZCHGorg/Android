@@ -1,6 +1,7 @@
 package io.charg.chargstation.ui.activities;
 
 import android.Manifest;
+import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -12,6 +13,7 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -415,7 +417,6 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
 
             @Override
             public void onPrepare() {
-
             }
 
             @Override

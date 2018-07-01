@@ -23,7 +23,7 @@ public class AccountService {
     }
 
     public String getPrivateKey() {
-        return mLocalDB.getValue(ARG_PRIVATE_KEY);
+        return mLocalDB.getString(ARG_PRIVATE_KEY);
     }
 
     public String getEthAddress() {

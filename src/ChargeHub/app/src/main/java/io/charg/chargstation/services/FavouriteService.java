@@ -51,7 +51,7 @@ public class FavouriteService {
     }
 
     public List<String> getIds() {
-        String json = mLocalDb.getValue(FAVOURITE_STATIONS);
+        String json = mLocalDb.getString(FAVOURITE_STATIONS);
         List<String> ids = new ArrayList<>();
 
         if (!json.isEmpty()) {

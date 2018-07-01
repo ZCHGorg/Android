@@ -25,4 +25,10 @@
     <string name="favorites">Favorites</string>
     <string name="loading_details">Loading details...</string>
     <string name="error_loading_data">Error loading data</string>
+    <string name="smart_contract_address">Smart contract address</string>
+    <string name="gas_price">Gas price</string>
+    <string name="max_fee">Max TX fee</string>
+    <string name="gas_limit">Gas limit</string>
+    <string name="destination">Destination</string>
+    <string name="next">Next</string>
 </resources>

@@ -1,5 +1,6 @@
 package io.charg.chargstation.ui.activities;
 
+import android.content.pm.ActivityInfo;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 
@@ -20,6 +21,7 @@ public abstract class BaseActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(getResourceId());
 
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         ButterKnife.bind(this);
         onActivate();
     }

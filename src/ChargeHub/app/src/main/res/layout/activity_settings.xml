@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/colorPrimaryDark"
@@ -33,13 +34,13 @@
                 android:layout_weight="1" />
 
             <ImageButton
-                android:id="@+id/btn_edit"
+                android:id="@+id/btn_edit_contract_address"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_edit" />
 
             <ImageButton
-                android:id="@+id/btn_load_default"
+                android:id="@+id/btn_load_default_contract_address"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:src="@drawable/ic_cached" />
@@ -51,6 +52,114 @@
                 android:src="@drawable/ic_camera" />
 
         </LinearLayout>
+
+        <TextView
+            style="@style/TextViewKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ethereum network" />
+
+        <RadioGroup
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <RadioButton
+                android:id="@+id/rbtn_network_main"
+                style="@style/TextViewValue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Main Ethereum network"
+                android:theme="@style/Theme.AppCompat" />
+
+            <RadioButton
+                android:id="@+id/rbtn_network_test"
+                style="@style/TextViewValue"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Rinkeby test network"
+                android:theme="@style/Theme.AppCompat" />
+
+        </RadioGroup>
+
+        <TextView
+            style="@style/TextViewKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/gas_price" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tv_gas_price"
+                style="@style/TextViewValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                tools:text="56 Gwei" />
+
+            <ImageButton
+                android:id="@+id/btn_edit_gas_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_edit" />
+
+            <ImageButton
+                android:id="@+id/btn_load_default_gas_price"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_cached" />
+
+        </LinearLayout>
+
+        <TextView
+            style="@style/TextViewKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/gas_limit" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical">
+
+            <TextView
+                android:id="@+id/tv_gas_limit"
+                style="@style/TextViewValue"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                tools:text="21000" />
+
+            <ImageButton
+                android:id="@+id/btn_edit_gas_limit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_edit" />
+
+            <ImageButton
+                android:id="@+id/btn_load_default_gas_limit"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/ic_cached" />
+
+        </LinearLayout>
+
+
+        <TextView
+            style="@style/TextViewKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/max_fee" />
+
+        <TextView
+            android:id="@+id/tv_max_fee"
+            style="@style/TextViewValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="0.00176 ETH" />
 
     </LinearLayout>
 

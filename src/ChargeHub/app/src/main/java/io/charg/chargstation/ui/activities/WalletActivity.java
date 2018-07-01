@@ -6,6 +6,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
@@ -31,9 +32,8 @@ import io.charg.chargstation.R;
 import io.charg.chargstation.root.CommonData;
 import io.charg.chargstation.services.AccountService;
 import io.charg.chargstation.services.ChargCoinContract;
-import io.charg.chargstation.ui.dialogs.SendChargDialog;
-
-import static org.web3j.tx.ManagedTransaction.GAS_PRICE;
+import io.charg.chargstation.services.SettingsProvider;
+import io.charg.chargstation.ui.activities.sendCharg.SendChargActivity;
 
 /**
  * Created by worker on 13.11.2017.
@@ -42,6 +42,7 @@ import static org.web3j.tx.ManagedTransaction.GAS_PRICE;
 public class WalletActivity extends BaseActivity {
 
     private AccountService mAccountService;
+    private SettingsProvider mSettingsProvider;
 
     @BindView(R.id.tv_eth_address)
     TextView tvEthAddress;
@@ -83,12 +84,17 @@ public class WalletActivity extends BaseActivity {
 
     private void initServices() {
         mAccountService = new AccountService(this);
+        mSettingsProvider = new SettingsProvider(this);
     }
 
     private void initToolbar() {
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar == null) {
+            return;
+        }
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(true);
     }
 
     private void loadBalanceAsync() {
@@ -136,8 +142,7 @@ public class WalletActivity extends BaseActivity {
 
     @OnClick(R.id.btn_send_charg)
     void onBtnSendChargClicked() {
-        SendChargDialog dialog = new SendChargDialog(this);
-        dialog.sendCharg(getString(R.string.eth_test_address), 0.75);
+        startActivity(new Intent(this, SendChargActivity.class));
     }
 
     @OnClick(R.id.btn_send_eth)
@@ -176,7 +181,7 @@ public class WalletActivity extends BaseActivity {
         @Override
         protected ViewModel doInBackground(Object... objects) {
             try {
-                ChargCoinContract contract = ChargCoinContract.load(CommonData.SMART_CONTRACT_ADDRESS, web3, Credentials.create(mAccountService.getPrivateKey()), GAS_PRICE, CommonData.GAS_LIMIT_BIG);
+                ChargCoinContract contract = ChargCoinContract.load(CommonData.SMART_CONTRACT_ADDRESS, web3, Credentials.create(mAccountService.getPrivateKey()), mSettingsProvider.getGasPrice(), mSettingsProvider.getGasLimit());
                 BigInteger chgBalance = contract.balanceOf(mAccountService.getEthAddress()).sendAsync().get();
                 BigInteger ethBalance = web3.ethGetBalance(mAccountService.getEthAddress(), DefaultBlockParameterName.LATEST).sendAsync().get().getBalance();
 

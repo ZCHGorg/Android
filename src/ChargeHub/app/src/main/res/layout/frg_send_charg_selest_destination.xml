@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:orientation="vertical">
+
+    <TextView
+        style="@style/TextViewKey"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/destination" />
+
+    <TextView
+        android:id="@+id/tv_eth_address"
+        style="@style/TextViewValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="@string/eth_address" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@color/light_gray" />
+
+    <Button
+        android:id="@+id/btn_edit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_edit"
+        android:text="Edit" />
+
+    <Button
+        android:id="@+id/btn_load_camera"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_camera"
+        android:text="Load from qr code"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <Button
+        android:id="@+id/btn_load_favorite_stations"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:drawableLeft="@drawable/ic_favorite"
+        android:text="Load from favorite stations"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <Button
+        android:id="@+id/btn_load_from_history"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Load from history"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+</LinearLayout>

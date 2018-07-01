@@ -39,12 +39,14 @@ public class SmartContractManager {
     private final Web3j web3 = Web3jFactory.build(new HttpService(CommonData.ETH_URL));
     private final AccountService mAccountService;
     private final ChargCoinContract contract;
+    private final SettingsProvider mSettingsProvider;
 
     private SmartContractManager(Context context) {
         mContext = context;
         mAccountService = new AccountService(context);
+        mSettingsProvider = new SettingsProvider(context);
         Credentials credentials = Credentials.create(mAccountService.getPrivateKey());
-        contract = ChargCoinContract.load(CommonData.SMART_CONTRACT_ADDRESS, web3, credentials, GAS_PRICE, CommonData.GAS_LIMIT_BIG);
+        contract = ChargCoinContract.load(CommonData.SMART_CONTRACT_ADDRESS, web3, credentials, mSettingsProvider.getGasPrice(), mSettingsProvider.getGasLimit());
     }
 
     public static SmartContractManager getInstance(Context context) {

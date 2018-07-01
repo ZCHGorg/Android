@@ -1,15 +1,32 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/light_gray"
+    android:background="@color/colorPrimaryDark"
     android:gravity="center"
     android:orientation="vertical">
 
     <ImageView
         android:layout_width="192dp"
         android:layout_height="192dp"
-        android:src="@drawable/charg"/>
+        android:src="@drawable/charg" />
+
+    <TextView
+        android:id="@+id/tv_app_version"
+        style="@style/TextViewValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:gravity="center"
+        android:textSize="24sp"
+        android:textStyle="bold"
+        tools:text="@string/discard" />
+
+    <ProgressBar
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:indeterminate="true" />
 
 </LinearLayout>

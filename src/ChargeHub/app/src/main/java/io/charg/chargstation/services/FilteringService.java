@@ -34,7 +34,7 @@ public class FilteringService {
 
     public StationFilter loadConnectorFilter(int connector_type) {
 
-        String json = mLocalDb.getValue(String.format("CONNECTOR_FILTER_%s", connector_type));
+        String json = mLocalDb.getString(String.format("CONNECTOR_FILTER_%s", connector_type));
         if (json.isEmpty()) {
             for (StationFilter item : FilteringService.getStaticConnectorFilters()) {
                 if (item.getIndex() == connector_type) {

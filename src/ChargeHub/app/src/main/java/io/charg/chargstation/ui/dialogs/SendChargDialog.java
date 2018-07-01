@@ -30,6 +30,8 @@ import io.charg.chargstation.root.CommonData;
 import io.charg.chargstation.services.AccountService;
 import io.charg.chargstation.services.ChargCoinContract;
 import io.charg.chargstation.services.LocalDB;
+import io.charg.chargstation.services.SettingsProvider;
+import io.charg.chargstation.services.SmartContractManager;
 
 import static org.web3j.tx.ManagedTransaction.GAS_PRICE;
 
@@ -41,10 +43,12 @@ public class SendChargDialog {
 
     private Context mContext;
     private AccountService mAccountService;
+    private SettingsProvider mSettingsProvider;
 
     public SendChargDialog(Context context) {
         mContext = context;
         mAccountService = new AccountService(context);
+        mSettingsProvider = new SettingsProvider(context);
     }
 
     public void sendCharg(String address, double amount) {
@@ -97,7 +101,7 @@ public class SendChargDialog {
                 @Override
                 protected String doInBackground(Object... objects) {
                     try {
-                        ChargCoinContract contract = ChargCoinContract.load(CommonData.SMART_CONTRACT_ADDRESS, web3, Credentials.create(mAccountService.getPrivateKey()), GAS_PRICE, CommonData.GAS_LIMIT_BIG);
+                        ChargCoinContract contract = ChargCoinContract.load(CommonData.SMART_CONTRACT_ADDRESS, web3, Credentials.create(mAccountService.getPrivateKey()), mSettingsProvider.getGasPrice(), mSettingsProvider.getGasLimit());
                         String addressTo = tvAddressTo.getText().toString();
                         BigInteger amount = BigInteger.valueOf((long) (Double.valueOf(tvAmount.getText().toString()) * 1E18));
                         TransactionReceipt transactionReceipt = contract.transfer(addressTo, amount).sendAsync().get();

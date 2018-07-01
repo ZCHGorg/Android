@@ -18,8 +18,11 @@ import io.charg.chargstation.root.IAsyncCommand;
 public class ChargeHubService {
 
     public void getChargeNodeAsync(final IAsyncCommand<String, NodeDto> command) {
+
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference dbRef = database.getReference(CommonData.FIREBASE_PATH_NODES);
+
+        command.onPrepare();
 
         if (command.getInputData() == null) {
             command.onError("Node's address is empty");
@@ -54,8 +57,7 @@ public class ChargeHubService {
 
     public DatabaseReference getChargeNodeDbRef(String key) {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference dbRef = database.getReference(CommonData.FIREBASE_PATH_NODES).child(key);
-        return dbRef;
+        return database.getReference(CommonData.FIREBASE_PATH_NODES).child(key);
     }
 
     public void getLocationAsync(final IAsyncCommand<String, GeofireDto> command) {
