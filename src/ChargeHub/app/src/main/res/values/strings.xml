@@ -31,4 +31,8 @@
     <string name="gas_limit">Gas limit</string>
     <string name="destination">Destination</string>
     <string name="next">Next</string>
+    <string name="amount">Amount</string>
+    <string name="from">From</string>
+    <string name="to">To</string>
+    <string name="sending_tokens_please_wait_for_some_time">Sending tokens. Please wait for some time</string>
 </resources>

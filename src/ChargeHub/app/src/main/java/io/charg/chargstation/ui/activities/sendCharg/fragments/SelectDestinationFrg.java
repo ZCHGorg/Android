@@ -6,7 +6,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.ICallbackOnComplete;
-import io.charg.chargstation.services.StringHelper;
+import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.ui.dialogs.EditTextDialog;
 import io.charg.chargstation.ui.fragments.BaseFragment;
 
@@ -23,7 +23,7 @@ public class SelectDestinationFrg extends BaseFragment {
     }
 
     @Override
-    protected void onActivate() {
+    protected void onExecute() {
         refreshUI();
     }
 
@@ -47,5 +47,13 @@ public class SelectDestinationFrg extends BaseFragment {
 
     private void refreshUI() {
         mTvEthAddress.setText(StringHelper.getShortEthAddress(mEthAddress));
+    }
+
+    public String getDestinationEth() {
+        return mEthAddress;
+    }
+
+    public boolean isValid() {
+        return !(mEthAddress == null || mEthAddress.isEmpty());
     }
 }

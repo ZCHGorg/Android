@@ -19,11 +19,10 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.CommonData;
-import io.charg.chargstation.root.IAsyncCommand;
 import io.charg.chargstation.root.ICallbackOnComplete;
-import io.charg.chargstation.services.DialogHelper;
-import io.charg.chargstation.services.SettingsProvider;
-import io.charg.chargstation.services.StringHelper;
+import io.charg.chargstation.services.helpers.DialogHelper;
+import io.charg.chargstation.services.local.SettingsProvider;
+import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.ui.dialogs.EditTextDialog;
 
 public class SettingsActivity extends BaseActivity {

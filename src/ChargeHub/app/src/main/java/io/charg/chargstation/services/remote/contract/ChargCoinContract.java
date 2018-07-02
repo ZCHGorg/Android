@@ -1,4 +1,4 @@
-package io.charg.chargstation.services;
+package io.charg.chargstation.services.remote.contract;
 
 import java.math.BigInteger;
 import java.util.ArrayList;

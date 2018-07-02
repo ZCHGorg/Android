@@ -1,5 +1,6 @@
 package io.charg.chargstation.ui.activities;
 
+import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -30,9 +31,9 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.CommonData;
-import io.charg.chargstation.services.AccountService;
-import io.charg.chargstation.services.ChargCoinContract;
-import io.charg.chargstation.services.SettingsProvider;
+import io.charg.chargstation.services.local.AccountService;
+import io.charg.chargstation.services.remote.contract.ChargCoinContract;
+import io.charg.chargstation.services.local.SettingsProvider;
 import io.charg.chargstation.ui.activities.sendCharg.SendChargActivity;
 
 /**
@@ -156,9 +157,10 @@ public class WalletActivity extends BaseActivity {
         return true;
     }
 
+    @SuppressLint("StaticFieldLeak")
     class LoadBalanceAsyncTask extends AsyncTask<Object, Object, LoadBalanceAsyncTask.ViewModel> {
 
-        final Web3j web3 = Web3jFactory.build(new HttpService(CommonData.ETH_URL));
+        final Web3j web3 = Web3jFactory.build(new HttpService(mSettingsProvider.getEthConnectionUrl()));
 
         class ViewModel {
             BigInteger chgBalance;

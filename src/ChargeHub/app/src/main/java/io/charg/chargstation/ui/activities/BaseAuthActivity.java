@@ -4,8 +4,8 @@ import android.content.Intent;
 import android.os.Bundle;
 
 import io.charg.chargstation.R;
-import io.charg.chargstation.services.AccountService;
-import io.charg.chargstation.services.DialogHelper;
+import io.charg.chargstation.services.local.AccountService;
+import io.charg.chargstation.services.helpers.DialogHelper;
 
 /**
  * Created by worker on 23.11.2017.

@@ -3,7 +3,6 @@ package io.charg.chargstation.ui.activities;
 import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -17,10 +16,9 @@ import org.web3j.crypto.Credentials;
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
-import io.charg.chargstation.root.CommonData;
-import io.charg.chargstation.services.AccountService;
-import io.charg.chargstation.services.DialogHelper;
-import io.charg.chargstation.services.StringHelper;
+import io.charg.chargstation.services.local.AccountService;
+import io.charg.chargstation.services.helpers.DialogHelper;
+import io.charg.chargstation.services.helpers.StringHelper;
 
 /**
  * Created by worker on 13.11.2017.

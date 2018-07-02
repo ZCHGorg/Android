@@ -6,7 +6,7 @@ import android.support.v7.widget.Toolbar;
 
 import butterknife.BindView;
 import io.charg.chargstation.R;
-import io.charg.chargstation.services.FavouriteService;
+import io.charg.chargstation.services.local.FavouriteStationsRepository;
 import io.charg.chargstation.ui.adapters.FavoriteAdapter;
 
 public class FavoritesActivity extends BaseActivity {
@@ -17,7 +17,7 @@ public class FavoritesActivity extends BaseActivity {
     @BindView(R.id.rv_items)
     RecyclerView mRvItems;
 
-    private FavouriteService mFavoriteService;
+    private FavouriteStationsRepository mFavoriteService;
     private FavoriteAdapter mAdapter;
 
     @Override
@@ -34,7 +34,7 @@ public class FavoritesActivity extends BaseActivity {
     }
 
     private void initServices() {
-        mFavoriteService = new FavouriteService(this);
+        mFavoriteService = new FavouriteStationsRepository(this);
     }
 
     private void loadItems() {

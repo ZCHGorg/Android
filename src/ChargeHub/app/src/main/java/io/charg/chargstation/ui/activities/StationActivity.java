@@ -17,8 +17,8 @@ import io.charg.chargstation.R;
 import io.charg.chargstation.models.firebase.NodeDto;
 import io.charg.chargstation.root.IAsyncCommand;
 import io.charg.chargstation.root.IStationFrgListener;
-import io.charg.chargstation.services.ChargeHubService;
-import io.charg.chargstation.services.FavouriteService;
+import io.charg.chargstation.services.remote.api.ChargeHubService;
+import io.charg.chargstation.services.local.FavouriteStationsRepository;
 import io.charg.chargstation.ui.fragments.BaseFragment;
 import io.charg.chargstation.ui.fragments.ChargeFrg;
 import io.charg.chargstation.ui.fragments.StationFrg;
@@ -33,7 +33,7 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
     private NodeDto mStation;
 
     private ChargeHubService mChargeHubService;
-    private FavouriteService mFavouriteService;
+    private FavouriteStationsRepository mFavouriteService;
 
     @BindView(R.id.view_pager)
     ViewPager mViewPager;
@@ -70,7 +70,7 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
 
     private void initServices() {
         mChargeHubService = new ChargeHubService();
-        mFavouriteService = new FavouriteService(this);
+        mFavouriteService = new FavouriteStationsRepository(this);
     }
 
     private void initToolbar() {

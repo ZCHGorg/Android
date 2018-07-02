@@ -1,4 +1,4 @@
-package io.charg.chargstation.services;
+package io.charg.chargstation.services.remote.contract;
 
 import android.annotation.SuppressLint;
 import android.app.Notification;
@@ -8,26 +8,22 @@ import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.AsyncTask;
-import android.util.Log;
 import android.widget.Toast;
 
 import org.web3j.crypto.Credentials;
 import org.web3j.protocol.Web3j;
 import org.web3j.protocol.Web3jFactory;
 import org.web3j.protocol.http.HttpService;
-import org.web3j.tuples.Tuple;
 import org.web3j.tuples.generated.Tuple6;
-import org.web3j.tx.Contract;
 
 import java.math.BigInteger;
 import java.util.Arrays;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
 
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.CommonData;
-
-import static org.web3j.tx.ManagedTransaction.GAS_PRICE;
+import io.charg.chargstation.services.local.AccountService;
+import io.charg.chargstation.services.local.SettingsProvider;
 
 /**
  * Created by worker on 30.11.2017.
@@ -36,7 +32,7 @@ import static org.web3j.tx.ManagedTransaction.GAS_PRICE;
 public class SmartContractManager {
 
     private final Context mContext;
-    private final Web3j web3 = Web3jFactory.build(new HttpService(CommonData.ETH_URL));
+    private final Web3j web3;
     private final AccountService mAccountService;
     private final ChargCoinContract contract;
     private final SettingsProvider mSettingsProvider;
@@ -45,6 +41,7 @@ public class SmartContractManager {
         mContext = context;
         mAccountService = new AccountService(context);
         mSettingsProvider = new SettingsProvider(context);
+        web3 = Web3jFactory.build(new HttpService(mSettingsProvider.getContractAddress()));
         Credentials credentials = Credentials.create(mAccountService.getPrivateKey());
         contract = ChargCoinContract.load(CommonData.SMART_CONTRACT_ADDRESS, web3, credentials, mSettingsProvider.getGasPrice(), mSettingsProvider.getGasLimit());
     }
@@ -130,11 +127,12 @@ public class SmartContractManager {
         }
     }
 
+    @SuppressLint("StaticFieldLeak")
     abstract class SmartContractAsyncTask extends AsyncTask<Void, String, String> {
 
         private Context mContext;
 
-        protected SmartContractAsyncTask(Context context) {
+        SmartContractAsyncTask(Context context) {
             mContext = context;
         }
 

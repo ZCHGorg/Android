@@ -17,7 +17,7 @@ public abstract class BaseFragment extends Fragment {
 
     protected abstract int getResourceId();
 
-    protected abstract void onActivate();
+    protected abstract void onExecute();
 
     public abstract CharSequence getTitle();
 
@@ -25,9 +25,13 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(getResourceId(), container, false);
-        ButterKnife.bind(this,  view);
-        onActivate();
+        ButterKnife.bind(this, view);
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        onExecute();
+    }
 }

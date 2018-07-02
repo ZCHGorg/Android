@@ -1,10 +1,12 @@
-package io.charg.chargstation.services;
+package io.charg.chargstation.services.local;
 
 import android.content.Context;
 
 import java.math.BigInteger;
+import java.util.Locale;
 
 import io.charg.chargstation.root.CommonData;
+import io.charg.chargstation.services.local.LocalDB;
 
 public class SettingsProvider {
 
@@ -52,5 +54,10 @@ public class SettingsProvider {
 
     public void setGasPrice(Long value) {
         mLocalDb.putLong(KEY_GAS_PRICE, value);
+    }
+
+    public String getEthConnectionUrl() {
+        return String.format(Locale.getDefault(), "https://%s.infura.io/Zp6evGImttk7WOe95WcW",
+                getNetwork() ? "mainnet" : "rinkeby");
     }
 }

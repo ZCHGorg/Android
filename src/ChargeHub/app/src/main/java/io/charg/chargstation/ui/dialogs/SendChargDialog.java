@@ -27,13 +27,9 @@ import java.util.Locale;
 
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.CommonData;
-import io.charg.chargstation.services.AccountService;
-import io.charg.chargstation.services.ChargCoinContract;
-import io.charg.chargstation.services.LocalDB;
-import io.charg.chargstation.services.SettingsProvider;
-import io.charg.chargstation.services.SmartContractManager;
-
-import static org.web3j.tx.ManagedTransaction.GAS_PRICE;
+import io.charg.chargstation.services.local.AccountService;
+import io.charg.chargstation.services.remote.contract.ChargCoinContract;
+import io.charg.chargstation.services.local.SettingsProvider;
 
 /**
  * Created by worker on 30.11.2017.
@@ -80,7 +76,7 @@ public class SendChargDialog {
 
             class SendChargAsyncTask extends AsyncTask<Object, Object, String> {
 
-                final Web3j web3 = Web3jFactory.build(new HttpService(CommonData.ETH_URL));
+                final Web3j web3 = Web3jFactory.build(new HttpService(mSettingsProvider.getEthConnectionUrl()));
 
                 @Override
                 protected void onPreExecute() {

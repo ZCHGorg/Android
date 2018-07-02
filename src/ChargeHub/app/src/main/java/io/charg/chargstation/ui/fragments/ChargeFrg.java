@@ -26,11 +26,11 @@ import io.charg.chargstation.R;
 import io.charg.chargstation.models.firebase.NodeDto;
 import io.charg.chargstation.root.CommonData;
 import io.charg.chargstation.root.IAsyncCommand;
-import io.charg.chargstation.services.AccountService;
-import io.charg.chargstation.services.ChargeHubService;
-import io.charg.chargstation.services.DialogHelper;
-import io.charg.chargstation.services.SmartContractManager;
-import io.charg.chargstation.services.StringHelper;
+import io.charg.chargstation.services.local.AccountService;
+import io.charg.chargstation.services.remote.api.ChargeHubService;
+import io.charg.chargstation.services.helpers.DialogHelper;
+import io.charg.chargstation.services.remote.contract.SmartContractManager;
+import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.ui.activities.StationActivity;
 import io.charg.chargstation.ui.dialogs.SendChargDialog;
 
@@ -116,7 +116,7 @@ public class ChargeFrg extends BaseFragment {
     }
 
     @Override
-    protected void onActivate() {
+    protected void onExecute() {
         readArgs();
         initServices();
         initNodeAsync();

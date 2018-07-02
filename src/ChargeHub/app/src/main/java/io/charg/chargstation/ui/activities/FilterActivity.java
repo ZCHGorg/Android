@@ -18,7 +18,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.charg.chargstation.R;
 import io.charg.chargstation.models.StationFilter;
-import io.charg.chargstation.services.FilteringService;
+import io.charg.chargstation.services.local.FilteringService;
 
 /**
  * Created by worker on 19.12.2017.

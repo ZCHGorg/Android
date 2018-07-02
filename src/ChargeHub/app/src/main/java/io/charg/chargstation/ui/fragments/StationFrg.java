@@ -18,9 +18,9 @@ import io.charg.chargstation.models.firebase.GeofireDto;
 import io.charg.chargstation.models.firebase.NodeDto;
 import io.charg.chargstation.root.IAsyncCommand;
 import io.charg.chargstation.root.IStationFrgListener;
-import io.charg.chargstation.services.ChargeHubService;
-import io.charg.chargstation.services.FilteringService;
-import io.charg.chargstation.services.StringHelper;
+import io.charg.chargstation.services.remote.api.ChargeHubService;
+import io.charg.chargstation.services.local.FilteringService;
+import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.ui.activities.StationActivity;
 
 /**
@@ -78,7 +78,7 @@ public class StationFrg extends BaseFragment {
     }
 
     @Override
-    protected void onActivate() {
+    protected void onExecute() {
         readArgs();
         initServices();
         loadStationAsync();

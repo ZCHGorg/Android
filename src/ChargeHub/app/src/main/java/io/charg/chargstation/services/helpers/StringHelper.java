@@ -1,4 +1,4 @@
-package io.charg.chargstation.services;
+package io.charg.chargstation.services.helpers;
 
 import java.util.Locale;
 

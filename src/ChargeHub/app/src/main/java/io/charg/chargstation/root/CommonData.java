@@ -25,7 +25,6 @@ public class CommonData {
     public static final String SMART_CONTRACT_ADDRESS = "0x0030740494631cd406e202fe2b91517c7d689259";*/
 
     //using
-    public static final String ETH_URL = "https://rinkeby.infura.io/Zp6evGImttk7WOe95WcW";
     public static final String SMART_CONTRACT_ADDRESS = "0x0030740494631cd406e202fe2b91517c7d689259";
 
     public static final float PRICE_CHG_USD = 1.5f;

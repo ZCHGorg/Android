@@ -1,7 +1,6 @@
 package io.charg.chargstation.ui.activities;
 
 import android.Manifest;
-import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
@@ -13,7 +12,6 @@ import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -58,12 +56,12 @@ import io.charg.chargstation.root.CommonData;
 import io.charg.chargstation.root.Helpers;
 import io.charg.chargstation.root.IAsyncCommand;
 import io.charg.chargstation.root.ICameraChangeListener;
-import io.charg.chargstation.services.AccountService;
-import io.charg.chargstation.services.ChargeHubService;
-import io.charg.chargstation.services.DialogHelper;
-import io.charg.chargstation.services.FilteringService;
-import io.charg.chargstation.services.LocalDB;
-import io.charg.chargstation.services.StringHelper;
+import io.charg.chargstation.services.local.AccountService;
+import io.charg.chargstation.services.remote.api.ChargeHubService;
+import io.charg.chargstation.services.helpers.DialogHelper;
+import io.charg.chargstation.services.local.FilteringService;
+import io.charg.chargstation.services.local.LocalDB;
+import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.ui.views.ChargeClusterManager;
 
 public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback, ICameraChangeListener, ClusterManager.OnClusterItemClickListener<ChargeStationMarker> {
@@ -111,7 +109,7 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
 
     @Override
     public void onActivate() {
-        Log.v(getClass().getName(), "onActivate");
+        Log.v(getClass().getName(), "onExecute");
 
         initServices();
         initIntent();

@@ -1,4 +1,4 @@
-package io.charg.chargstation.services;
+package io.charg.chargstation.services.local;
 
 import android.content.Context;
 
@@ -10,13 +10,13 @@ import java.util.List;
 
 import io.charg.chargstation.models.firebase.NodeDto;
 
-public class FavouriteService {
+public class FavouriteStationsRepository {
 
     private static final String FAVOURITE_STATIONS = "FAVOURITE_STATIONS";
 
     private LocalDB mLocalDb;
 
-    public FavouriteService(Context context) {
+    public FavouriteStationsRepository(Context context) {
         mLocalDb = new LocalDB(context);
     }
 
