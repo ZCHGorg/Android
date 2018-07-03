@@ -35,4 +35,5 @@
     <string name="from">From</string>
     <string name="to">To</string>
     <string name="sending_tokens_please_wait_for_some_time">Sending tokens. Please wait for some time</string>
+    <string name="status">Status</string>
 </resources>

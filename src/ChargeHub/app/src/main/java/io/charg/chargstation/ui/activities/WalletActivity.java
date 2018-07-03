@@ -26,14 +26,21 @@ import org.web3j.utils.Convert;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.CommonData;
+import io.charg.chargstation.root.ICallbackOnComplete;
+import io.charg.chargstation.root.ICallbackOnError;
+import io.charg.chargstation.root.ICallbackOnFinish;
+import io.charg.chargstation.root.ICallbackOnPrepare;
 import io.charg.chargstation.services.local.AccountService;
 import io.charg.chargstation.services.remote.contract.ChargCoinContract;
 import io.charg.chargstation.services.local.SettingsProvider;
+import io.charg.chargstation.services.remote.contract.tasks.GetBalanceChgTask;
+import io.charg.chargstation.services.remote.contract.tasks.GetBalanceEthTask;
 import io.charg.chargstation.ui.activities.sendCharg.SendChargActivity;
 
 /**
@@ -66,6 +73,9 @@ public class WalletActivity extends BaseActivity {
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
+    private GetBalanceChgTask mGetBalanceChgTask;
+    private GetBalanceEthTask mGetBalanceEthTask;
+
     @Override
     public int getResourceId() {
         return R.layout.activity_wallet;
@@ -75,6 +85,67 @@ public class WalletActivity extends BaseActivity {
     public void onActivate() {
         initServices();
         initToolbar();
+        initTasks();
+    }
+
+    private void initTasks() {
+        mGetBalanceChgTask = new GetBalanceChgTask(this, mAccountService.getEthAddress());
+        mGetBalanceChgTask.setCompleteListener(new ICallbackOnComplete<BigInteger>() {
+            @Override
+            public void onComplete(BigInteger result) {
+                String chgBalance = String.format(Locale.getDefault(), "%.3f", result.floatValue() / 1E18);
+                tvBalanceChg.setText(chgBalance);
+            }
+        });
+        mGetBalanceChgTask.setErrorListener(new ICallbackOnError<String>() {
+            @Override
+            public void onError(String message) {
+                Toast.makeText(WalletActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
+        mGetBalanceChgTask.setPrepareListener(new ICallbackOnPrepare() {
+            @Override
+            public void onPrepare() {
+                ltBalance.setVisibility(View.INVISIBLE);
+                prBalance.setVisibility(View.VISIBLE);
+            }
+        });
+        mGetBalanceChgTask.setFinishListener(new ICallbackOnFinish() {
+            @Override
+            public void onFinish() {
+                ltBalance.setVisibility(View.VISIBLE);
+                prBalance.setVisibility(View.INVISIBLE);
+            }
+        });
+
+        mGetBalanceEthTask = new GetBalanceEthTask(this, mAccountService.getEthAddress());
+        mGetBalanceEthTask.setCompleteListener(new ICallbackOnComplete<BigInteger>() {
+            @Override
+            public void onComplete(BigInteger result) {
+                String ethBalance = String.format(Locale.getDefault(), "%.3f", Convert.fromWei(result.toString(), Convert.Unit.ETHER).floatValue());
+                tvBalanceEth.setText(ethBalance);
+            }
+        });
+        mGetBalanceEthTask.setErrorListener(new ICallbackOnError<String>() {
+            @Override
+            public void onError(String message) {
+                Toast.makeText(WalletActivity.this, message, Toast.LENGTH_SHORT).show();
+            }
+        });
+        mGetBalanceEthTask.setPrepareListener(new ICallbackOnPrepare() {
+            @Override
+            public void onPrepare() {
+                ltBalance.setVisibility(View.INVISIBLE);
+                prBalance.setVisibility(View.VISIBLE);
+            }
+        });
+        mGetBalanceEthTask.setFinishListener(new ICallbackOnFinish() {
+            @Override
+            public void onFinish() {
+                ltBalance.setVisibility(View.VISIBLE);
+                prBalance.setVisibility(View.INVISIBLE);
+            }
+        });
     }
 
     @Override
@@ -99,7 +170,10 @@ public class WalletActivity extends BaseActivity {
     }
 
     private void loadBalanceAsync() {
-        new LoadBalanceAsyncTask().execute();
+        mGetBalanceChgTask.executeAsync();
+        mGetBalanceEthTask.executeAsync();
+
+        //new LoadBalanceAsyncTask().execute();
     }
 
     private void refreshUI() {

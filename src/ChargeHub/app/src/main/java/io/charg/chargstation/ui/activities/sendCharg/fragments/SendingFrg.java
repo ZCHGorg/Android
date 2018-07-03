@@ -1,5 +1,7 @@
 package io.charg.chargstation.ui.activities.sendCharg.fragments;
 
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.widget.Toast;
 
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
@@ -14,9 +16,37 @@ import io.charg.chargstation.ui.fragments.BaseFragment;
 
 public class SendingFrg extends BaseFragment {
 
+    private static final String KEY_ADDRESS = "KEY_ADDRESS";
+    private static final String KEY_AMOUNT = "KEY_AMOUNT";
+
+    private String mAddress;
+    private BigInteger mAmount;
+    private ICallbackOnComplete<TransactionReceipt> mCompleteListener;
+
+    public static SendingFrg newInstance(String address, long amount) {
+        SendingFrg frg = new SendingFrg();
+        Bundle bundle = new Bundle();
+        bundle.putString(KEY_ADDRESS, address);
+        bundle.putLong(KEY_AMOUNT, amount);
+        frg.setArguments(bundle);
+        return frg;
+    }
+
     @Override
     protected int getResourceId() {
         return R.layout.frg_send_charg_sending;
+    }
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle args = getArguments();
+        if (args == null) {
+            return;
+        }
+
+        mAddress = args.getString(KEY_ADDRESS);
+        mAmount = BigInteger.valueOf(args.getLong(KEY_AMOUNT));
     }
 
     @Override
@@ -30,10 +60,11 @@ public class SendingFrg extends BaseFragment {
     }
 
     public void execute() {
-        SendChgTask task = new SendChgTask(getActivity());
+        SendChgTask task = new SendChgTask(getActivity(), mAddress, mAmount);
         task.setCompleteListener(new ICallbackOnComplete<TransactionReceipt>() {
             @Override
             public void onComplete(TransactionReceipt result) {
+                invokeOnComplete(result);
                 Toast.makeText(getContext(), result.getGasUsed().toString(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -43,6 +74,16 @@ public class SendingFrg extends BaseFragment {
                 Toast.makeText(getContext(), message, Toast.LENGTH_SHORT).show();
             }
         });
-        task.executeAsync("0x08Ad6872F01C309330d997e3A3D0248681C6783a", BigInteger.valueOf((long) (10 * 1E18)));
+        task.executeAsync();
+    }
+
+    private void invokeOnComplete(TransactionReceipt result) {
+        if (mCompleteListener != null) {
+            mCompleteListener.onComplete(result);
+        }
+    }
+
+    public void setCompleteListener(ICallbackOnComplete<TransactionReceipt> completeListener) {
+        this.mCompleteListener = completeListener;
     }
 }

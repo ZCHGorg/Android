@@ -3,20 +3,18 @@ package io.charg.chargstation.services.remote.contract.tasks;
 import android.app.Activity;
 import android.os.AsyncTask;
 
-import org.web3j.protocol.core.methods.response.TransactionReceipt;
+import org.web3j.protocol.core.DefaultBlockParameterName;
 
 import java.math.BigInteger;
 import java.util.concurrent.ExecutionException;
 
-public class SendChgTask extends BaseContractTask<TransactionReceipt> {
+public class GetBalanceEthTask extends BaseContractTask<BigInteger> {
 
-    private String mTo;
-    private BigInteger mAmount;
+    private final String mAddress;
 
-    public SendChgTask(Activity activity, String to, BigInteger amount) {
+    public GetBalanceEthTask(Activity activity, String mAddress) {
         super(activity);
-        this.mTo = to;
-        this.mAmount = amount;
+        this.mAddress = mAddress;
     }
 
     @Override
@@ -25,14 +23,17 @@ public class SendChgTask extends BaseContractTask<TransactionReceipt> {
             @Override
             public void run() {
                 try {
-                    final TransactionReceipt result = mContract.transfer(mTo, mAmount).sendAsync().get();
+                    invokeOnPrepare();
+                    BigInteger result = mWeb3j.ethGetBalance(mAddress, DefaultBlockParameterName.LATEST).sendAsync().get().getBalance();
                     invokeOnComplete(result);
-                } catch (final InterruptedException e) {
+                } catch (InterruptedException e) {
                     invokeOnError(e.getMessage());
                     e.printStackTrace();
-                } catch (final ExecutionException e) {
+                } catch (ExecutionException e) {
                     invokeOnError(e.getMessage());
                     e.printStackTrace();
+                } finally {
+                    invokeOnFinish();
                 }
             }
         });

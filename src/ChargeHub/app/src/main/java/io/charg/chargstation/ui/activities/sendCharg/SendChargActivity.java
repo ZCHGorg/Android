@@ -1,20 +1,25 @@
 package io.charg.chargstation.ui.activities.sendCharg;
 
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
 
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
+
+import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
+import io.charg.chargstation.root.ICallbackOnComplete;
 import io.charg.chargstation.ui.activities.BaseAuthActivity;
 import io.charg.chargstation.ui.activities.sendCharg.fragments.ConfirmFrg;
+import io.charg.chargstation.ui.activities.sendCharg.fragments.ResultFrg;
 import io.charg.chargstation.ui.activities.sendCharg.fragments.SelectAmountFrg;
 import io.charg.chargstation.ui.activities.sendCharg.fragments.SelectDestinationFrg;
 import io.charg.chargstation.ui.activities.sendCharg.fragments.SendingFrg;
@@ -35,10 +40,10 @@ public class SendChargActivity extends BaseAuthActivity {
     private SelectAmountFrg mAmountFrg;
     private ConfirmFrg mConfirmFrg;
     private SendingFrg mSendingFrg;
+    private ResultFrg mResultFrg;
 
-    private String mDestEthAddress;
-    private float mAmount;
-
+    private String mDestEthAddress = "0x188C27a535ddF54fe8ADDD7976b3D65B0D3d5432";
+    private BigInteger mAmount = BigInteger.valueOf((long) (1 * 1E18));
 
     @Override
     public int getResourceId() {
@@ -57,7 +62,18 @@ public class SendChargActivity extends BaseAuthActivity {
         mFragments.add(mDestFrg = new SelectDestinationFrg());
         mFragments.add(mAmountFrg = new SelectAmountFrg());
         mFragments.add(mConfirmFrg = new ConfirmFrg());
-        mFragments.add(mSendingFrg = new SendingFrg());
+
+        mSendingFrg = SendingFrg.newInstance(mDestEthAddress, mAmount.longValue());
+        mSendingFrg.setCompleteListener(new ICallbackOnComplete<TransactionReceipt>() {
+            @Override
+            public void onComplete(TransactionReceipt result) {
+                Toast.makeText(SendChargActivity.this, result.getBlockHash(), Toast.LENGTH_SHORT).show();
+                mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1, true);
+            }
+        });
+        mFragments.add(mSendingFrg);
+
+        mFragments.add(mResultFrg = new ResultFrg());
 
         mViewPager.setAdapter(mAdapter = new FragmentPagerAdapter(getSupportFragmentManager()) {
             @Override
@@ -104,7 +120,7 @@ public class SendChargActivity extends BaseAuthActivity {
             if (!mAmountFrg.isValid()) {
                 return;
             }
-            mAmount = mAmountFrg.getAmount();
+            mAmount = BigInteger.valueOf(mAmountFrg.getAmount());
             mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1, true);
             return;
         }
@@ -112,11 +128,6 @@ public class SendChargActivity extends BaseAuthActivity {
         if (mAdapter.getItem(mViewPager.getCurrentItem()).equals(mConfirmFrg)) {
             mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1, true);
             mSendingFrg.execute();
-            return;
-        }
-
-        if (mAdapter.getItem(mViewPager.getCurrentItem()).equals(mSendingFrg)) {
-
             return;
         }
     }

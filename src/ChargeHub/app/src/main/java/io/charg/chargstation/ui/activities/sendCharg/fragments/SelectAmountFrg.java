@@ -11,7 +11,7 @@ public class SelectAmountFrg extends BaseFragment {
     @BindView(R.id.tv_amount)
     TextView mTvAmount;
 
-    private float mAmount = 1f;
+    private long mAmount = 10L;
 
     @Override
     protected int getResourceId() {
@@ -36,7 +36,7 @@ public class SelectAmountFrg extends BaseFragment {
         return true;
     }
 
-    public float getAmount() {
+    public long getAmount() {
         return mAmount;
     }
 }
