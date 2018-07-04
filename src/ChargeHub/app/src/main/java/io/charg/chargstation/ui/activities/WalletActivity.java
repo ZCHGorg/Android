@@ -10,6 +10,8 @@ import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -93,8 +95,7 @@ public class WalletActivity extends BaseActivity {
         mGetBalanceChgTask.setCompleteListener(new ICallbackOnComplete<BigInteger>() {
             @Override
             public void onComplete(BigInteger result) {
-                String chgBalance = String.format(Locale.getDefault(), "%.3f", result.floatValue() / 1E18);
-                tvBalanceChg.setText(chgBalance);
+                tvBalanceChg.setText(String.format(Locale.getDefault(), "%.0f", result.divide(BigInteger.valueOf((long) 1E18)).floatValue()));
             }
         });
         mGetBalanceChgTask.setErrorListener(new ICallbackOnError<String>() {
@@ -172,8 +173,6 @@ public class WalletActivity extends BaseActivity {
     private void loadBalanceAsync() {
         mGetBalanceChgTask.executeAsync();
         mGetBalanceEthTask.executeAsync();
-
-        //new LoadBalanceAsyncTask().execute();
     }
 
     private void refreshUI() {
@@ -186,6 +185,21 @@ public class WalletActivity extends BaseActivity {
             tvBalanceChg.setText(R.string.not_defined);
             tvBalanceEth.setText(R.string.not_defined);
         }
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuItem itemRefresh = menu.add("Refresh");
+        itemRefresh.setIcon(R.drawable.ic_cached);
+        itemRefresh.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+        itemRefresh.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                refreshUI();
+                return true;
+            }
+        });
+        return super.onCreateOptionsMenu(menu);
     }
 
     @OnClick(R.id.btn_copy_clipboard)
@@ -230,66 +244,6 @@ public class WalletActivity extends BaseActivity {
         onBackPressed();
         return true;
     }
-
-    @SuppressLint("StaticFieldLeak")
-    class LoadBalanceAsyncTask extends AsyncTask<Object, Object, LoadBalanceAsyncTask.ViewModel> {
-
-        final Web3j web3 = Web3jFactory.build(new HttpService(mSettingsProvider.getEthConnectionUrl()));
-
-        class ViewModel {
-            BigInteger chgBalance;
-            BigInteger ethBalance;
-
-            public ViewModel(BigInteger chgBalance, BigInteger ethBalance) {
-                this.chgBalance = chgBalance;
-                this.ethBalance = ethBalance;
-            }
-        }
-
-        @Override
-        protected void onPreExecute() {
-            super.onPreExecute();
-
-            ltBalance.setVisibility(View.INVISIBLE);
-            prBalance.setVisibility(View.VISIBLE);
-        }
-
-        @Override
-        protected ViewModel doInBackground(Object... objects) {
-            try {
-                ChargCoinContract contract = ChargCoinContract.load(CommonData.SMART_CONTRACT_ADDRESS, web3, Credentials.create(mAccountService.getPrivateKey()), mSettingsProvider.getGasPrice(), mSettingsProvider.getGasLimit());
-                BigInteger chgBalance = contract.balanceOf(mAccountService.getEthAddress()).sendAsync().get();
-                BigInteger ethBalance = web3.ethGetBalance(mAccountService.getEthAddress(), DefaultBlockParameterName.LATEST).sendAsync().get().getBalance();
-
-                Log.v(CommonData.TAG, String.valueOf(chgBalance));
-                Log.v(CommonData.TAG, String.valueOf(contract.name().sendAsync().get()));
-                Log.v(CommonData.TAG, String.valueOf(ethBalance));
-
-                return new ViewModel(chgBalance, ethBalance);
-            } catch (Exception ex) {
-                Log.v(CommonData.TAG, ex.getMessage());
-                ex.printStackTrace();
-                return null;
-            }
-        }
-
-        @Override
-        protected void onPostExecute(ViewModel vm) {
-            super.onPostExecute(vm);
-
-            ltBalance.setVisibility(View.VISIBLE);
-            prBalance.setVisibility(View.INVISIBLE);
-
-            if (vm == null) {
-                Snackbar.make(btnChangeWallet, R.string.err_loading_balance, Snackbar.LENGTH_SHORT).show();
-                return;
-            }
-
-            String chgBalance = String.format("%.3f", vm.chgBalance.floatValue() / 1E18);
-            tvBalanceChg.setText(chgBalance);
-
-            String ethBalance = String.format("%.3f", Convert.fromWei(BigDecimal.valueOf(vm.ethBalance.doubleValue()), Convert.Unit.ETHER));
-            tvBalanceEth.setText(ethBalance);
-        }
-    }
 }
+
+

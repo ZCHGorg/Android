@@ -17,6 +17,6 @@ public class ConfirmFrg extends BaseFragment {
 
     @Override
     public CharSequence getTitle() {
-        return null;
+        return getString(R.string.confirm);
     }
 }

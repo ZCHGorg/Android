@@ -64,7 +64,7 @@ public class EditTextDialog {
             mEtValue.setInputType(InputType.TYPE_CLASS_NUMBER);
             mSeekBar.setVisibility(View.VISIBLE);
             mSeekBar.setMax(mMax);
-            mSeekBar.setProgress(Integer.parseInt(mOldValue));
+            mSeekBar.setProgress(Integer.valueOf(mOldValue));
             mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
                 @Override
                 public void onProgressChanged(SeekBar seekBar, int i, boolean b) {

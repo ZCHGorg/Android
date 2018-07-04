@@ -1,5 +1,7 @@
 package io.charg.chargstation.ui.activities.sendCharg.fragments;
 
+import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.widget.TextView;
 
 import butterknife.BindView;
@@ -12,10 +14,20 @@ import io.charg.chargstation.ui.fragments.BaseFragment;
 
 public class SelectDestinationFrg extends BaseFragment {
 
+    private static final String KEY_ADDRESS = "KEY_ADDRESS";
     private String mEthAddress;
 
     @BindView(R.id.tv_eth_address)
     TextView mTvEthAddress;
+
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle args = getArguments();
+        if (args != null) {
+            mEthAddress = args.getString(KEY_ADDRESS);
+        }
+    }
 
     @Override
     protected int getResourceId() {
@@ -29,7 +41,7 @@ public class SelectDestinationFrg extends BaseFragment {
 
     @Override
     public CharSequence getTitle() {
-        return getString(R.string.destination);
+        return getContext().getString(R.string.destination);
     }
 
     @OnClick(R.id.btn_edit)
@@ -55,5 +67,13 @@ public class SelectDestinationFrg extends BaseFragment {
 
     public boolean isValid() {
         return !(mEthAddress == null || mEthAddress.isEmpty());
+    }
+
+    public static SelectDestinationFrg newInstance(String address) {
+        SelectDestinationFrg frg = new SelectDestinationFrg();
+        Bundle bundle = new Bundle();
+        bundle.putString(KEY_ADDRESS, address);
+        frg.setArguments(bundle);
+        return frg;
     }
 }

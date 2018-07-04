@@ -199,7 +199,7 @@ public class SettingsActivity extends BaseActivity {
             }
         });
 
-        dialog.setNumberRange(99, 1);
+        dialog.setNumberRange(900, 1);
         dialog.show();
     }
 

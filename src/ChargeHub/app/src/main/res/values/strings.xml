@@ -32,8 +32,15 @@
     <string name="destination">Destination</string>
     <string name="next">Next</string>
     <string name="amount">Amount</string>
-    <string name="from">From</string>
     <string name="to">To</string>
     <string name="sending_tokens_please_wait_for_some_time">Sending tokens. Please wait for some time</string>
     <string name="status">Status</string>
+    <string name="sending">Sending</string>
+    <string name="result">Result</string>
+    <string name="back">Back</string>
+    <string name="confirm">Confirm</string>
+    <string name="tx_hash">Tx hash</string>
+    <string name="from">From</string>
+    <string name="tx_fee">Tx fee</string>
+    <string name="gas_used">Gas used</string>
 </resources>
