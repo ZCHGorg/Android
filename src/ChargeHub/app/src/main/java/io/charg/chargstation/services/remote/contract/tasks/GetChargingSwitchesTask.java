@@ -3,16 +3,20 @@ package io.charg.chargstation.services.remote.contract.tasks;
 import android.app.Activity;
 import android.os.AsyncTask;
 
+import org.web3j.tuples.generated.Tuple6;
+
 import java.math.BigInteger;
 import java.util.concurrent.ExecutionException;
 
-public class GetBalanceChgTask extends ChgAsyncTask<BigInteger> {
+import io.charg.chargstation.services.remote.contract.models.ChargingSwitchesDto;
+
+public class GetChargingSwitchesTask extends ChgAsyncTask<ChargingSwitchesDto> {
 
     private String mAddress;
 
-    public GetBalanceChgTask(Activity activity, String mAddress) {
+    public GetChargingSwitchesTask(Activity activity, String address) {
         super(activity);
-        this.mAddress = mAddress;
+        mAddress = address;
     }
 
     @Override
@@ -23,12 +27,12 @@ public class GetBalanceChgTask extends ChgAsyncTask<BigInteger> {
                 invokeOnPrepare();
 
                 try {
-                    final BigInteger result = mContract.balanceOf(mAddress).sendAsync().get();
-                    invokeOnComplete(result);
-                } catch (final InterruptedException e) {
+                    Tuple6<String, BigInteger, BigInteger, BigInteger, Boolean, BigInteger> result = mContract.chargingSwitches(mAddress).sendAsync().get();
+                    invokeOnComplete(new ChargingSwitchesDto(result));
+                } catch (InterruptedException e) {
                     invokeOnError(e.getMessage());
                     e.printStackTrace();
-                } catch (final ExecutionException e) {
+                } catch (ExecutionException e) {
                     invokeOnError(e.getMessage());
                     e.printStackTrace();
                 }

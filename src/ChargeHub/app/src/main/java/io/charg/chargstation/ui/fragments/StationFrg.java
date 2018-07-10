@@ -15,13 +15,14 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.models.firebase.GeofireDto;
-import io.charg.chargstation.models.firebase.NodeDto;
+import io.charg.chargstation.models.firebase.StationDto;
 import io.charg.chargstation.root.IAsyncCommand;
 import io.charg.chargstation.root.IStationFrgListener;
 import io.charg.chargstation.services.remote.api.ChargeHubService;
 import io.charg.chargstation.services.local.FilteringService;
 import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.ui.activities.StationActivity;
+import io.charg.chargstation.ui.activities.chargeActivity.ChargeActivity;
 
 /**
  * Created by oleg on 04.11.2017.
@@ -34,7 +35,7 @@ public class StationFrg extends BaseFragment {
     private FilteringService mFilterService;
 
     private String mNodeEthAddress;
-    private NodeDto mStation;
+    private StationDto mStation;
 
     @BindView(R.id.tv_location)
     TextView tvLocation;
@@ -78,7 +79,7 @@ public class StationFrg extends BaseFragment {
     }
 
     @Override
-    protected void onExecute() {
+    protected void onShows() {
         readArgs();
         initServices();
         loadStationAsync();
@@ -99,7 +100,7 @@ public class StationFrg extends BaseFragment {
     }
 
     private void loadStationAsync() {
-        mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, NodeDto>() {
+        mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, StationDto>() {
 
             @Override
             public String getInputData() {
@@ -113,7 +114,7 @@ public class StationFrg extends BaseFragment {
             }
 
             @Override
-            public void onComplete(NodeDto result) {
+            public void onComplete(StationDto result) {
                 mStation = result;
                 refreshUI();
 
@@ -164,7 +165,8 @@ public class StationFrg extends BaseFragment {
 
     @OnClick(R.id.btn_charge)
     void onBtnChargeClick() {
-        mStationFrgListener.onChargeBtnClick();
+        startActivity(new Intent(getActivity(), ChargeActivity.class)
+                .putExtra(ChargeActivity.KEY_ETH_ADDRESS, mNodeEthAddress));
     }
 
     @Override

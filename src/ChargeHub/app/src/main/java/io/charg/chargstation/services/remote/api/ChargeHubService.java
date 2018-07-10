@@ -7,7 +7,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import io.charg.chargstation.models.firebase.GeofireDto;
-import io.charg.chargstation.models.firebase.NodeDto;
+import io.charg.chargstation.models.firebase.StationDto;
 import io.charg.chargstation.root.CommonData;
 import io.charg.chargstation.root.IAsyncCommand;
 
@@ -17,7 +17,9 @@ import io.charg.chargstation.root.IAsyncCommand;
 
 public class ChargeHubService {
 
-    public void getChargeNodeAsync(final IAsyncCommand<String, NodeDto> command) {
+    public void getChargeNodeAsync(final IAsyncCommand<String, StationDto> command) {
+
+        System.out.println("marker execute: " + command.getInputData());
 
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference dbRef = database.getReference(CommonData.FIREBASE_PATH_NODES);
@@ -33,13 +35,13 @@ public class ChargeHubService {
         dbNodeRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(DataSnapshot dataSnapshot) {
-                NodeDto nodeDto = dataSnapshot.getValue(NodeDto.class);
+                StationDto nodeDto = dataSnapshot.getValue(StationDto.class);
                 if (nodeDto == null) {
                     command.onError("Error while loading station " + command.getInputData());
                 } else {
                     command.onComplete(nodeDto);
                 }
-                dbNodeRef.removeEventListener(this);
+              //  dbNodeRef.removeEventListener(this);
             }
 
             @Override
@@ -49,7 +51,7 @@ public class ChargeHubService {
         });
     }
 
-    public void saveNode(String key, NodeDto nodeDto) {
+    public void saveNode(String key, StationDto nodeDto) {
         final FirebaseDatabase database = FirebaseDatabase.getInstance();
         DatabaseReference dbRef = database.getReference(CommonData.FIREBASE_PATH_NODES);
         dbRef.child(key).setValue(nodeDto);

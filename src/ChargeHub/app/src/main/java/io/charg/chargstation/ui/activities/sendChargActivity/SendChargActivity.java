@@ -1,11 +1,10 @@
-package io.charg.chargstation.ui.activities.sendCharg;
+package io.charg.chargstation.ui.activities.sendChargActivity;
 
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.widget.Toast;
 
 import com.shuhart.stepview.StepView;
 
@@ -20,15 +19,18 @@ import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.ICallbackOnComplete;
 import io.charg.chargstation.root.ICallbackOnError;
+import io.charg.chargstation.services.local.AccountService;
 import io.charg.chargstation.ui.activities.BaseAuthActivity;
-import io.charg.chargstation.ui.activities.sendCharg.fragments.ConfirmFrg;
-import io.charg.chargstation.ui.activities.sendCharg.fragments.ResultFrg;
-import io.charg.chargstation.ui.activities.sendCharg.fragments.SelectAmountFrg;
-import io.charg.chargstation.ui.activities.sendCharg.fragments.SelectDestinationFrg;
-import io.charg.chargstation.ui.activities.sendCharg.fragments.SendingFrg;
+import io.charg.chargstation.ui.activities.sendChargActivity.fragments.ConfirmFrg;
+import io.charg.chargstation.ui.activities.sendChargActivity.fragments.ResultFrg;
+import io.charg.chargstation.ui.activities.sendChargActivity.fragments.SelectAmountFrg;
+import io.charg.chargstation.ui.fragments.SelectDestinationFrg;
+import io.charg.chargstation.ui.activities.sendChargActivity.fragments.SendingFrg;
 import io.charg.chargstation.ui.fragments.BaseFragment;
 
 public class SendChargActivity extends BaseAuthActivity {
+
+    private AccountService mAccountService;
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
@@ -49,7 +51,7 @@ public class SendChargActivity extends BaseAuthActivity {
     private ResultFrg mResultFrg;
 
     private String mDestEthAddress;
-    private BigInteger mAmount = BigInteger.valueOf(0L);
+    private BigInteger mAmount;
 
     @Override
     public int getResourceId() {
@@ -58,8 +60,14 @@ public class SendChargActivity extends BaseAuthActivity {
 
     @Override
     public void onActivate() {
+        initServices();
         initToolbar();
+        initStepView();
         initViewPager();
+    }
+
+    private void initServices() {
+        mAccountService = new AccountService(this);
     }
 
     private void initStepView() {
@@ -85,7 +93,7 @@ public class SendChargActivity extends BaseAuthActivity {
         mDestFrg = SelectDestinationFrg.newInstance(mDestEthAddress);
         mFragments.add(mDestFrg);
 
-        mAmountFrg = SelectAmountFrg.newInstance(mAmount);
+        mAmountFrg = new SelectAmountFrg();
         mFragments.add(mAmountFrg);
 
         mConfirmFrg = new ConfirmFrg();
@@ -96,6 +104,7 @@ public class SendChargActivity extends BaseAuthActivity {
             @Override
             public void onComplete(TransactionReceipt result) {
                 mResultFrg.setResult(result);
+                mResultFrg.invalidate();
                 navigateTo(mResultFrg);
             }
         });
@@ -103,6 +112,7 @@ public class SendChargActivity extends BaseAuthActivity {
             @Override
             public void onError(String message) {
                 mResultFrg.setError(message);
+                mResultFrg.invalidate();
                 navigateTo(mResultFrg);
             }
         });
@@ -127,12 +137,6 @@ public class SendChargActivity extends BaseAuthActivity {
                 return mFragments.indexOf(object);
             }
         });
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        initStepView();
     }
 
     private void initToolbar() {
@@ -160,12 +164,18 @@ public class SendChargActivity extends BaseAuthActivity {
                 return;
             }
             mDestEthAddress = mDestFrg.getDestinationEth();
+            mAmountFrg.setAmount(mAmount);
+            mAmountFrg.invalidate();
             navigateTo(mAmountFrg);
         } else if (mCurrentFrg.equals(mAmountFrg)) {
             if (!mAmountFrg.isValid()) {
                 return;
             }
             mAmount = mAmountFrg.getAmount();
+            mConfirmFrg.setFrom(mAccountService.getEthAddress());
+            mConfirmFrg.setTo(mDestEthAddress);
+            mConfirmFrg.setAmount(mAmount);
+            mConfirmFrg.invalidate();
             navigateTo(mConfirmFrg);
         } else if (mCurrentFrg.equals(mConfirmFrg)) {
             mViewPager.setCurrentItem(mViewPager.getCurrentItem() + 1, true);

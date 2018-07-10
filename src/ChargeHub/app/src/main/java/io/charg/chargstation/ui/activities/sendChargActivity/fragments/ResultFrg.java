@@ -1,4 +1,4 @@
-package io.charg.chargstation.ui.activities.sendCharg.fragments;
+package io.charg.chargstation.ui.activities.sendChargActivity.fragments;
 
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -42,7 +42,7 @@ public class ResultFrg extends BaseFragment {
     }
 
     @Override
-    protected void onExecute() {
+    protected void onShows() {
 
     }
 
@@ -87,11 +87,13 @@ public class ResultFrg extends BaseFragment {
 
     public void setError(String error) {
         this.mError = error;
-        refreshUI();
     }
 
     public void setResult(TransactionReceipt result) {
         this.mResult = result;
+    }
+
+    public void invalidate() {
         refreshUI();
     }
 }

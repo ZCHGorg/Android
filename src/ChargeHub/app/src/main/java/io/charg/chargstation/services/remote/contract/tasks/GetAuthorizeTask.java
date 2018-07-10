@@ -6,13 +6,13 @@ import android.os.AsyncTask;
 import java.math.BigInteger;
 import java.util.concurrent.ExecutionException;
 
-public class GetBalanceChgTask extends ChgAsyncTask<BigInteger> {
+public class GetAuthorizeTask extends ChgAsyncTask<BigInteger> {
 
     private String mAddress;
 
-    public GetBalanceChgTask(Activity activity, String mAddress) {
+    public GetAuthorizeTask(Activity activity, String address) {
         super(activity);
-        this.mAddress = mAddress;
+        this.mAddress = address;
     }
 
     @Override
@@ -20,20 +20,16 @@ public class GetBalanceChgTask extends ChgAsyncTask<BigInteger> {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
-                invokeOnPrepare();
-
                 try {
-                    final BigInteger result = mContract.balanceOf(mAddress).sendAsync().get();
+                    BigInteger result = mContract.authorized(mAddress).sendAsync().get();
                     invokeOnComplete(result);
-                } catch (final InterruptedException e) {
+                } catch (InterruptedException e) {
                     invokeOnError(e.getMessage());
                     e.printStackTrace();
-                } catch (final ExecutionException e) {
+                } catch (ExecutionException e) {
                     invokeOnError(e.getMessage());
                     e.printStackTrace();
                 }
-
-                invokeOnFinish();
             }
         });
     }

@@ -8,7 +8,7 @@ import org.web3j.protocol.core.DefaultBlockParameterName;
 import java.math.BigInteger;
 import java.util.concurrent.ExecutionException;
 
-public class GetBalanceEthTask extends BaseContractTask<BigInteger> {
+public class GetBalanceEthTask extends ChgAsyncTask<BigInteger> {
 
     private final String mAddress;
 
@@ -22,8 +22,9 @@ public class GetBalanceEthTask extends BaseContractTask<BigInteger> {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
+                invokeOnPrepare();
+
                 try {
-                    invokeOnPrepare();
                     BigInteger result = mWeb3j.ethGetBalance(mAddress, DefaultBlockParameterName.LATEST).sendAsync().get().getBalance();
                     invokeOnComplete(result);
                 } catch (InterruptedException e) {
@@ -32,9 +33,9 @@ public class GetBalanceEthTask extends BaseContractTask<BigInteger> {
                 } catch (ExecutionException e) {
                     invokeOnError(e.getMessage());
                     e.printStackTrace();
-                } finally {
-                    invokeOnFinish();
                 }
+
+                invokeOnFinish();
             }
         });
     }

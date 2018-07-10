@@ -1,7 +1,6 @@
 package io.charg.chargstation.ui.dialogs;
 
 import android.content.Context;
-import android.content.Intent;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.AppCompatSeekBar;
 import android.text.InputType;
@@ -15,10 +14,9 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
-import io.charg.chargstation.root.IAsyncCommand;
 import io.charg.chargstation.root.ICallbackOnComplete;
 
-public class EditTextDialog {
+public class EditNumberDialog {
 
     @BindView(R.id.tv_message)
     TextView mTvMessage;
@@ -26,15 +24,20 @@ public class EditTextDialog {
     @BindView(R.id.edt_value)
     EditText mEtValue;
 
+    @BindView(R.id.seek_bar)
+    AppCompatSeekBar mSeekBar;
+
     private Context mContext;
     private AlertDialog mDialog;
 
     private String mTitle;
-    private String mOldValue;
+    private double mOldValue;
+    private int mMin;
+    private int mMax;
 
-    private ICallbackOnComplete<String> mOnComplete;
+    private ICallbackOnComplete<Double> mOnComplete;
 
-    public EditTextDialog(Context context, String title, String oldValue) {
+    public EditNumberDialog(Context context, String title, double oldValue) {
         mContext = context;
         mTitle = title;
         mOldValue = oldValue;
@@ -46,7 +49,7 @@ public class EditTextDialog {
         ButterKnife.bind(this, view);
 
         mTvMessage.setText(mTitle);
-        mEtValue.setText(mOldValue);
+        mEtValue.setText(String.valueOf(mOldValue));
 
         mDialog = new AlertDialog.Builder(mContext)
                 .setView(view)
@@ -54,13 +57,40 @@ public class EditTextDialog {
     }
 
     public void show() {
+
+        mEtValue.setInputType(InputType.TYPE_CLASS_NUMBER);
+        mSeekBar.setVisibility(View.VISIBLE);
+        mSeekBar.setMax(mMax);
+        mSeekBar.setProgress((int) mOldValue);
+        mSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int i, boolean b) {
+                mEtValue.setText(String.valueOf(i));
+            }
+
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
+
         mDialog.show();
+    }
+
+    public void setNumberRange(int max, int min) {
+        mMin = min;
+        mMax = max;
     }
 
     @OnClick(R.id.btn_yes)
     void onBtnSaveClicked() {
         if (mOnComplete != null) {
-            mOnComplete.onComplete(mEtValue.getText().toString());
+            mOnComplete.onComplete(Double.valueOf(mEtValue.getText().toString()));
         }
         mDialog.dismiss();
     }
@@ -70,7 +100,8 @@ public class EditTextDialog {
         mDialog.dismiss();
     }
 
-    public void setOnComplete(ICallbackOnComplete<String> onComplete) {
+    public void setOnComplete(ICallbackOnComplete<Double> onComplete) {
         mOnComplete = onComplete;
     }
+
 }

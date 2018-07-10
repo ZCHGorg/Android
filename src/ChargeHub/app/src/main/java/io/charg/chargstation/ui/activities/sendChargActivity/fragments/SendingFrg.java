@@ -1,4 +1,4 @@
-package io.charg.chargstation.ui.activities.sendCharg.fragments;
+package io.charg.chargstation.ui.activities.sendChargActivity.fragments;
 
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
@@ -23,7 +23,7 @@ public class SendingFrg extends BaseFragment {
     }
 
     @Override
-    protected void onExecute() {
+    protected void onShows() {
 
     }
 

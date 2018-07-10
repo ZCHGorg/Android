@@ -3,16 +3,20 @@ package io.charg.chargstation.services.remote.contract.tasks;
 import android.app.Activity;
 import android.os.AsyncTask;
 
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
+
 import java.math.BigInteger;
 import java.util.concurrent.ExecutionException;
 
-public class GetBalanceChgTask extends ChgAsyncTask<BigInteger> {
+public class ChargeOnTask extends ChgAsyncTask<TransactionReceipt> {
 
+    private BigInteger mTime;
     private String mAddress;
 
-    public GetBalanceChgTask(Activity activity, String mAddress) {
+    public ChargeOnTask(Activity activity, String address, BigInteger time) {
         super(activity);
-        this.mAddress = mAddress;
+        mTime = time;
+        mAddress = address;
     }
 
     @Override
@@ -21,18 +25,16 @@ public class GetBalanceChgTask extends ChgAsyncTask<BigInteger> {
             @Override
             public void run() {
                 invokeOnPrepare();
-
                 try {
-                    final BigInteger result = mContract.balanceOf(mAddress).sendAsync().get();
+                    TransactionReceipt result = mContract.chargeOn(mAddress, mTime).sendAsync().get();
                     invokeOnComplete(result);
-                } catch (final InterruptedException e) {
+                } catch (InterruptedException e) {
                     invokeOnError(e.getMessage());
                     e.printStackTrace();
-                } catch (final ExecutionException e) {
+                } catch (ExecutionException e) {
                     invokeOnError(e.getMessage());
                     e.printStackTrace();
                 }
-
                 invokeOnFinish();
             }
         });

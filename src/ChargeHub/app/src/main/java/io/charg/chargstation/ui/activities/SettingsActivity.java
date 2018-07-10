@@ -23,6 +23,7 @@ import io.charg.chargstation.root.ICallbackOnComplete;
 import io.charg.chargstation.services.helpers.DialogHelper;
 import io.charg.chargstation.services.local.SettingsProvider;
 import io.charg.chargstation.services.helpers.StringHelper;
+import io.charg.chargstation.ui.dialogs.EditNumberDialog;
 import io.charg.chargstation.ui.dialogs.EditTextDialog;
 
 public class SettingsActivity extends BaseActivity {
@@ -163,15 +164,15 @@ public class SettingsActivity extends BaseActivity {
 
     @OnClick(R.id.btn_edit_gas_limit)
     void onBtnEditGasLimitClicked() {
-        EditTextDialog dlg = new EditTextDialog(this, getString(R.string.gas_limit), mSettingsProvider.getGasLimit().toString());
-        dlg.setOnComplete(new ICallbackOnComplete<String>() {
+        EditNumberDialog dlg = new EditNumberDialog(this, getString(R.string.gas_limit), mSettingsProvider.getGasLimit().doubleValue());
+        dlg.setOnComplete(new ICallbackOnComplete<Double>() {
             @Override
-            public void onComplete(String result) {
-                mSettingsProvider.setGasLimit(Long.valueOf(result));
+            public void onComplete(Double result) {
+                mSettingsProvider.setGasLimit(result.longValue());
                 onSettingsChanged();
             }
         });
-        dlg.setNumberRange(100000, 30000);
+        dlg.setNumberRange(350000, 30000);
         dlg.show();
     }
 
@@ -188,13 +189,13 @@ public class SettingsActivity extends BaseActivity {
 
     @OnClick(R.id.btn_edit_gas_price)
     void onBtnEditGasPriceClicked() {
-        EditTextDialog dialog = new EditTextDialog(this, getString(R.string.gas_price),
-                String.valueOf(Convert.fromWei(mSettingsProvider.getGasPrice().toString(), Convert.Unit.GWEI)));
+        EditNumberDialog dialog = new EditNumberDialog(this, getString(R.string.gas_price),
+                Convert.fromWei(mSettingsProvider.getGasPrice().toString(), Convert.Unit.GWEI).doubleValue());
 
-        dialog.setOnComplete(new ICallbackOnComplete<String>() {
+        dialog.setOnComplete(new ICallbackOnComplete<Double>() {
             @Override
-            public void onComplete(String result) {
-                mSettingsProvider.setGasPrice(Convert.toWei(result, Convert.Unit.GWEI).longValue());
+            public void onComplete(Double result) {
+                mSettingsProvider.setGasPrice(Convert.toWei(BigDecimal.valueOf(result), Convert.Unit.GWEI).longValue());
                 onSettingsChanged();
             }
         });

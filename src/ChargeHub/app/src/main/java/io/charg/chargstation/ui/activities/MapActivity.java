@@ -51,10 +51,11 @@ import io.charg.chargstation.R;
 import io.charg.chargstation.models.ChargeStationMarker;
 import io.charg.chargstation.models.GeoFireRequest;
 import io.charg.chargstation.models.firebase.GeofireDto;
-import io.charg.chargstation.models.firebase.NodeDto;
+import io.charg.chargstation.models.firebase.StationDto;
 import io.charg.chargstation.root.CommonData;
 import io.charg.chargstation.root.Helpers;
 import io.charg.chargstation.root.IAsyncCommand;
+import io.charg.chargstation.root.ICallbackOnComplete;
 import io.charg.chargstation.root.ICameraChangeListener;
 import io.charg.chargstation.services.local.AccountService;
 import io.charg.chargstation.services.remote.api.ChargeHubService;
@@ -62,6 +63,8 @@ import io.charg.chargstation.services.helpers.DialogHelper;
 import io.charg.chargstation.services.local.FilteringService;
 import io.charg.chargstation.services.local.LocalDB;
 import io.charg.chargstation.services.helpers.StringHelper;
+import io.charg.chargstation.services.remote.firebase.ChargeDbApi;
+import io.charg.chargstation.ui.activities.chargeActivity.ChargeActivity;
 import io.charg.chargstation.ui.views.ChargeClusterManager;
 
 public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback, ICameraChangeListener, ClusterManager.OnClusterItemClickListener<ChargeStationMarker> {
@@ -78,6 +81,7 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
     private GoogleMap mGoogleMap;
     private ClusterManager<ChargeStationMarker> mClusterManager;
 
+    private ChargeDbApi mChargeCoinApi;
     private GeoFire mGeoFire;
     private GeoQuery mGeoQuery;
     private FilteringService mFilteringService;
@@ -86,7 +90,7 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
     private LocalDB mLocalDb;
     private SupportMapFragment mMapFragment;
 
-    private List<String> mKeys = new ArrayList<>();
+    private List<String> mStationKeys = new ArrayList<>();
 
     @BindView(R.id.nav_view)
     NavigationView mNavigationView;
@@ -109,7 +113,7 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
 
     @Override
     public void onActivate() {
-        Log.v(getClass().getName(), "onExecute");
+        Log.v(getClass().getName(), "onShows");
 
         initServices();
         initIntent();
@@ -127,13 +131,6 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
     }
 
     @Override
-    protected void onRestoreInstanceState(Bundle savedInstanceState) {
-        super.onRestoreInstanceState(savedInstanceState);
-        Log.v(getClass().getName(), "onRestoreInstanceState");
-        Log.v(getClass().getName(), "onRestoreInstanceState bundle=" + String.valueOf(savedInstanceState == null));
-    }
-
-    @Override
     protected void onResume() {
         super.onResume();
         Log.v(getClass().getName(), "onResume");
@@ -142,6 +139,7 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
 
     private void initServices() {
         initGeoFire();
+        mChargeCoinApi = new ChargeDbApi();
         mFilteringService = new FilteringService(this);
         mChargeHubService = new ChargeHubService();
         mAccountService = new AccountService(this);
@@ -193,6 +191,12 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
                         return true;
                     case R.id.menu_wallet:
                         startActivity(new Intent(MapActivity.this, WalletActivity.class));
+                        return true;
+                    case R.id.menu_contract:
+                        startActivity(new Intent(MapActivity.this, ContractActivity.class));
+                        return true;
+                    case R.id.menu_charge:
+                        startActivity(new Intent(MapActivity.this, ChargeActivity.class));
                         return true;
                     case R.id.menu_qr_code:
                         startActivity(new Intent(MapActivity.this, ChangeWalletActivity.class));
@@ -250,7 +254,10 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mGoogleMap = googleMap;
-        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mGoogleMap.getCameraPosition().target.latitude, mGoogleMap.getCameraPosition().target.longitude), INITIAL_ZOOM_LEVEL));
+        mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(
+                new LatLng(mGoogleMap.getCameraPosition().target.latitude,
+                        mGoogleMap.getCameraPosition().target.longitude),
+                INITIAL_ZOOM_LEVEL));
 
         UiSettings uiSettings = mGoogleMap.getUiSettings();
         uiSettings.setZoomControlsEnabled(true);
@@ -284,11 +291,11 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
             public void onKeyEntered(final String key, final GeoLocation location) {
                 System.out.println(String.format("Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
 
-                if (mKeys.contains(key)) {
+                if (mStationKeys.contains(key)) {
                     return;
                 }
 
-                mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, NodeDto>() {
+                mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, StationDto>() {
                     @Override
                     public String getInputData() {
                         return key;
@@ -300,11 +307,11 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
                     }
 
                     @Override
-                    public void onComplete(NodeDto result) {
+                    public void onComplete(StationDto result) {
                         if (!mFilteringService.isValid(result)) {
                             return;
                         }
-                        mKeys.add(key);
+                        mStationKeys.add(key);
                         mClusterManager.addItem(new ChargeStationMarker(location.latitude, location.longitude, key));
                         mClusterManager.cluster();
                     }
@@ -407,29 +414,18 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
             return true;
         }
 
-        mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, NodeDto>() {
+        mChargeCoinApi.getStationAsync(marker.getKey(), new ICallbackOnComplete<StationDto>() {
             @Override
-            public String getInputData() {
-                return marker.getKey();
-            }
+            public void onComplete(StationDto result) {
 
-            @Override
-            public void onPrepare() {
-            }
-
-            @Override
-            public void onComplete(NodeDto result) {
-                Intent intent = new Intent(MapActivity.this, StationActivity.class);
-                intent.putExtra(StationActivity.ARG_STATION_KEY, result.getEth_address());
-                startActivity(intent);
-            }
-
-            @Override
-            public void onError(String error) {
-                Toast.makeText(MapActivity.this, error, Toast.LENGTH_SHORT).show();
+                if (result == null) {
+                    Toast.makeText(MapActivity.this, R.string.error_loading_data, Toast.LENGTH_SHORT).show();
+                } else {
+                    startActivity(new Intent(MapActivity.this, StationActivity.class)
+                            .putExtra(StationActivity.ARG_STATION_KEY, marker.getKey()));
+                }
             }
         });
-
         return true;
     }
 
@@ -448,8 +444,8 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
         mClusterManager.clearItems();
         mClusterManager.cluster();
 
-        for (final String item : mKeys) {
-            mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, NodeDto>() {
+        for (final String item : mStationKeys) {
+            mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, StationDto>() {
                 @Override
                 public String getInputData() {
                     return item;
@@ -461,7 +457,7 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
                 }
 
                 @Override
-                public void onComplete(final NodeDto result) {
+                public void onComplete(final StationDto result) {
                     if (mFilteringService.isValid(result)) {
 
                         mChargeHubService.getLocationAsync(new IAsyncCommand<String, GeofireDto>() {

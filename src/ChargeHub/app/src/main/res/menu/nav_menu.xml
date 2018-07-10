@@ -25,6 +25,16 @@
             android:title="Filter" />
 
         <item
+            android:id="@+id/menu_contract"
+            android:icon="@drawable/ic_contract"
+            android:title="@string/contract" />
+
+        <item
+            android:id="@+id/menu_charge"
+            android:icon="@drawable/ic_power"
+            android:title="@string/charge" />
+
+        <item
             android:id="@+id/menu_qr_code"
             android:icon="@drawable/ic_camera"
             android:title="QR Code Scanner" />

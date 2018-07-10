@@ -15,19 +15,19 @@ import io.charg.chargstation.services.local.AccountService;
 import io.charg.chargstation.services.local.SettingsProvider;
 import io.charg.chargstation.services.remote.contract.ChargCoinContract;
 
-abstract class BaseContractTask<T> {
+public abstract class ChgAsyncTask<T> {
 
-    private ICallbackOnComplete<T> mCompleteListener;
-    private ICallbackOnError<String> mErrorListener;
-    private ICallbackOnPrepare mPrepareListener;
-    private ICallbackOnFinish mFinishListener;
+    protected ICallbackOnComplete<T> mCompleteListener;
+    protected ICallbackOnError<String> mErrorListener;
+    protected ICallbackOnPrepare mPrepareListener;
+    protected ICallbackOnFinish mFinishListener;
 
     final Web3j mWeb3j;
     final ChargCoinContract mContract;
 
     Activity mActivity;
 
-    public BaseContractTask(Activity activity) {
+    public ChgAsyncTask(Activity activity) {
         SettingsProvider mSettings = new SettingsProvider(activity);
         AccountService mAccountService = new AccountService(activity);
 

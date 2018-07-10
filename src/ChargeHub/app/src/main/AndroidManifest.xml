@@ -30,7 +30,9 @@
         <activity android:name=".ui.activities.BuyChargActivity" />
         <activity android:name=".ui.activities.FavoritesActivity" />
         <activity android:name=".ui.activities.SettingsActivity" />
-        <activity android:name=".ui.activities.sendCharg.SendChargActivity" />
+        <activity android:name=".ui.activities.sendChargActivity.SendChargActivity" />
+        <activity android:name=".ui.activities.ContractActivity" />
+        <activity android:name=".ui.activities.chargeActivity.ChargeActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

@@ -17,7 +17,7 @@ public abstract class BaseFragment extends Fragment {
 
     protected abstract int getResourceId();
 
-    protected abstract void onExecute();
+    protected abstract void onShows();
 
     public abstract CharSequence getTitle();
 
@@ -32,6 +32,6 @@ public abstract class BaseFragment extends Fragment {
     @Override
     public void onResume() {
         super.onResume();
-        onExecute();
+        onShows();
     }
 }

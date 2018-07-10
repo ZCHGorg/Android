@@ -4,7 +4,7 @@ package io.charg.chargstation.models.firebase;
  * Created by worker on 01.03.2018.
  */
 
-public class NodeDto {
+public class StationDto {
 
     public static final String STATION_STATE_IDLE = "idle";
     public static final String STATION_STATE_READY = "ready";
@@ -27,7 +27,7 @@ public class NodeDto {
     private String client_state;
     private String station_state;
 
-    public NodeDto() {
+    public StationDto() {
     }
 
     public String getAddress() {

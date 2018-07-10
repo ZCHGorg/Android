@@ -1,16 +1,17 @@
-package io.charg.chargstation.ui.activities.sendCharg.fragments;
+package io.charg.chargstation.ui.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.ICallbackOnComplete;
+import io.charg.chargstation.services.helpers.DialogHelper;
 import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.ui.dialogs.EditTextDialog;
-import io.charg.chargstation.ui.fragments.BaseFragment;
 
 public class SelectDestinationFrg extends BaseFragment {
 
@@ -35,7 +36,7 @@ public class SelectDestinationFrg extends BaseFragment {
     }
 
     @Override
-    protected void onExecute() {
+    protected void onShows() {
         refreshUI();
     }
 
@@ -66,7 +67,11 @@ public class SelectDestinationFrg extends BaseFragment {
     }
 
     public boolean isValid() {
-        return !(mEthAddress == null || mEthAddress.isEmpty());
+        boolean valid = !(mEthAddress == null || mEthAddress.isEmpty());
+        if (!valid) {
+            Toast.makeText(getActivity(), R.string.eth_address_empty, Toast.LENGTH_SHORT).show();
+        }
+        return valid;
     }
 
     public static SelectDestinationFrg newInstance(String address) {

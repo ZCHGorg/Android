@@ -8,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import io.charg.chargstation.models.StationFilter;
-import io.charg.chargstation.models.firebase.NodeDto;
+import io.charg.chargstation.models.firebase.StationDto;
 
 /**
  * Created by worker on 20.12.2017.
@@ -92,7 +92,7 @@ public class FilteringService {
         return res;
     }
 
-    public boolean isValid(NodeDto station) {
+    public boolean isValid(StationDto station) {
         if (station == null) {
             return true;
         }

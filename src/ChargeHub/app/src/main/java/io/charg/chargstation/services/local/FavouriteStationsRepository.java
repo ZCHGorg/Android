@@ -8,8 +8,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import io.charg.chargstation.models.firebase.NodeDto;
-
 public class FavouriteStationsRepository {
 
     private static final String FAVOURITE_STATIONS = "FAVOURITE_STATIONS";
@@ -20,34 +18,22 @@ public class FavouriteStationsRepository {
         mLocalDb = new LocalDB(context);
     }
 
-    public void addToFavorites(NodeDto station) {
-        if (station == null) {
-            return;
-        }
+    public void addToFavorites(String ethAddress) {
 
         List<String> ids = getIds();
-        ids.add(station.getEth_address());
+        ids.add(ethAddress);
 
         mLocalDb.putValue(FAVOURITE_STATIONS, new Gson().toJson(ids));
     }
 
-    public void removeFromFavorites(NodeDto mStation) {
-        if (mStation == null) {
-            return;
-        }
-
+    public void removeFromFavorites(String ethAddress) {
         List<String> ids = getIds();
-        ids.remove(mStation.getEth_address());
-
+        ids.remove(ethAddress);
         mLocalDb.putValue(FAVOURITE_STATIONS, new Gson().toJson(ids));
     }
 
-    public boolean isFavourite(NodeDto mStation) {
-        if (mStation == null) {
-            return false;
-        }
-
-        return getIds().contains(mStation.getEth_address());
+    public boolean isFavourite(String ethAddress) {
+        return getIds().contains(ethAddress);
     }
 
     public List<String> getIds() {

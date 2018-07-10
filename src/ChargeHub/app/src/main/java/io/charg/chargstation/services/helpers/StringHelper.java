@@ -33,4 +33,16 @@ public class StringHelper {
     public static String getCostStr(double value) {
         return String.format(Locale.getDefault(), "%.2f $/MIN", value);
     }
+
+    public static String getRateChgStr(double value) {
+        return String.format(Locale.getDefault(), "%f CHG/sec", value);
+    }
+
+    public static String getTimeStr(long value) {
+        return String.format(Locale.getDefault(), "%d seconds", value);
+    }
+
+    public static String getBalanceChgStr(double value) {
+        return String.format(Locale.getDefault(), "%.3f CHG", value);
+    }
 }

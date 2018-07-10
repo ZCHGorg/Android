@@ -1,15 +1,12 @@
 package io.charg.chargstation.ui.activities;
 
-import android.annotation.SuppressLint;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -19,31 +16,25 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import org.web3j.crypto.Credentials;
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.Web3jFactory;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.http.HttpService;
 import org.web3j.utils.Convert;
 
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Locale;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
-import io.charg.chargstation.root.CommonData;
 import io.charg.chargstation.root.ICallbackOnComplete;
 import io.charg.chargstation.root.ICallbackOnError;
 import io.charg.chargstation.root.ICallbackOnFinish;
 import io.charg.chargstation.root.ICallbackOnPrepare;
+import io.charg.chargstation.services.helpers.ContractHelper;
+import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.services.local.AccountService;
-import io.charg.chargstation.services.remote.contract.ChargCoinContract;
 import io.charg.chargstation.services.local.SettingsProvider;
 import io.charg.chargstation.services.remote.contract.tasks.GetBalanceChgTask;
 import io.charg.chargstation.services.remote.contract.tasks.GetBalanceEthTask;
-import io.charg.chargstation.ui.activities.sendCharg.SendChargActivity;
+import io.charg.chargstation.ui.activities.sendChargActivity.SendChargActivity;
 
 /**
  * Created by worker on 13.11.2017.
@@ -87,7 +78,6 @@ public class WalletActivity extends BaseActivity {
     public void onActivate() {
         initServices();
         initToolbar();
-        initTasks();
     }
 
     private void initTasks() {
@@ -95,7 +85,7 @@ public class WalletActivity extends BaseActivity {
         mGetBalanceChgTask.setCompleteListener(new ICallbackOnComplete<BigInteger>() {
             @Override
             public void onComplete(BigInteger result) {
-                tvBalanceChg.setText(String.format(Locale.getDefault(), "%.0f", result.divide(BigInteger.valueOf((long) 1E18)).floatValue()));
+                tvBalanceChg.setText(String.format(Locale.getDefault(), "%.3f", ContractHelper.getChgFromWei(result)));
             }
         });
         mGetBalanceChgTask.setErrorListener(new ICallbackOnError<String>() {
@@ -179,6 +169,7 @@ public class WalletActivity extends BaseActivity {
         String ethAddress = mAccountService.getEthAddress();
         if (ethAddress != null) {
             tvEthAddress.setText(ethAddress);
+            initTasks();
             loadBalanceAsync();
         } else {
             tvEthAddress.setText(R.string.not_defined);
@@ -205,10 +196,12 @@ public class WalletActivity extends BaseActivity {
     @OnClick(R.id.btn_copy_clipboard)
     void onBtnCopyClipboardClicked() {
         try {
-            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
             ClipData clip = ClipData.newPlainText("address", mAccountService.getEthAddress());
-            clipboard.setPrimaryClip(clip);
-            Toast.makeText(this, R.string.eth_address_copied, Toast.LENGTH_SHORT).show();
+            ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+            if (clipboard != null) {
+                clipboard.setPrimaryClip(clip);
+                Toast.makeText(this, R.string.eth_address_copied, Toast.LENGTH_SHORT).show();
+            }
         } catch (Exception ex) {
             Toast.makeText(this, ex.getMessage(), Toast.LENGTH_SHORT).show();
         }

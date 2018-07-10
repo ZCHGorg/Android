@@ -10,7 +10,7 @@ import io.charg.chargstation.services.local.LocalDB;
 
 public class SettingsProvider {
 
-    public static final long DEFAULT_GAS_LIMIT = 70000L;
+    public static final long DEFAULT_GAS_LIMIT = 200000L;
     public static final long DEFAULT_GAS_PRICE = 48000000000L;
 
     private static final String KEY_SMART_CONTRACT_ADDRESS = "KEY_SMART_CONTRACT_ADDRESS";

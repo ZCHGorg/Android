@@ -15,7 +15,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.charg.chargstation.R;
 import io.charg.chargstation.models.firebase.GeofireDto;
-import io.charg.chargstation.models.firebase.NodeDto;
+import io.charg.chargstation.models.firebase.StationDto;
 import io.charg.chargstation.root.IAsyncCommand;
 import io.charg.chargstation.services.remote.api.ChargeHubService;
 import io.charg.chargstation.services.helpers.StringHelper;
@@ -43,7 +43,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
         final String id = mItems.get(position);
         holder.mTvEthAddress.setText(StringHelper.getShortEthAddress(id));
 
-        mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, NodeDto>() {
+        mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, StationDto>() {
             @Override
             public String getInputData() {
                 return id;
@@ -55,7 +55,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
             }
 
             @Override
-            public void onComplete(NodeDto result) {
+            public void onComplete(StationDto result) {
                 holder.mTvLoading.setText(new StringBuilder()
                         .append(result.getTitle())
                         .append("; ")

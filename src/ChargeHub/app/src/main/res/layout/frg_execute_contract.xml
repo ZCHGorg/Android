@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:gravity="center_vertical"
+    android:orientation="vertical"
+    tools:background="@color/colorPrimaryDark">
+
+    <TextView
+        style="@style/TextViewKey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/operation" />
+
+    <TextView
+        android:id="@+id/tv_operation"
+        style="@style/TextViewValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="@string/charge_on" />
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/dark_gray" />
+
+    <TextView
+        style="@style/TextViewKey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/gas_limit" />
+
+    <TextView
+        android:id="@+id/tv_gas_limit"
+        style="@style/TextViewValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        style="@style/TextViewKey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/gas_price" />
+
+    <TextView
+        android:id="@+id/tv_gas_price"
+        style="@style/TextViewValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <TextView
+        style="@style/TextViewKey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/max_fee" />
+
+    <TextView
+        android:id="@+id/tv_max_fee"
+        style="@style/TextViewValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/btn_execute"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/execute" />
+
+    <TextView
+        style="@style/TextViewKey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/result" />
+
+    <TextView
+        android:id="@+id/tv_result"
+        style="@style/TextViewValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/not_executed_yet"
+        tools:text="@string/success" />
+
+</LinearLayout>

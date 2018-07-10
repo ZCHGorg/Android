@@ -8,7 +8,7 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import java.math.BigInteger;
 import java.util.concurrent.ExecutionException;
 
-public class SendChgTask extends BaseContractTask<TransactionReceipt> {
+public class SendChgTask extends ChgAsyncTask<TransactionReceipt> {
 
     private String mTo;
     private BigInteger mAmount;
@@ -24,6 +24,8 @@ public class SendChgTask extends BaseContractTask<TransactionReceipt> {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
+                invokeOnPrepare();
+
                 try {
                     final TransactionReceipt result = mContract.transfer(mTo, mAmount).sendAsync().get();
                     invokeOnComplete(result);
@@ -34,6 +36,8 @@ public class SendChgTask extends BaseContractTask<TransactionReceipt> {
                     invokeOnError(e.getMessage());
                     e.printStackTrace();
                 }
+
+                invokeOnFinish();
             }
         });
     }

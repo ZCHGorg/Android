@@ -14,7 +14,7 @@ import java.util.List;
 
 import butterknife.BindView;
 import io.charg.chargstation.R;
-import io.charg.chargstation.models.firebase.NodeDto;
+import io.charg.chargstation.models.firebase.StationDto;
 import io.charg.chargstation.root.IAsyncCommand;
 import io.charg.chargstation.root.IStationFrgListener;
 import io.charg.chargstation.services.remote.api.ChargeHubService;
@@ -30,7 +30,8 @@ import io.charg.chargstation.ui.fragments.StationFrg;
 public class StationActivity extends BaseActivity implements IStationFrgListener {
 
     public static final String ARG_STATION_KEY = "ARG_STATION_KEY";
-    private NodeDto mStation;
+    private StationDto mStation;
+    private String mEthAddress;
 
     private ChargeHubService mChargeHubService;
     private FavouriteStationsRepository mFavouriteService;
@@ -63,7 +64,7 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
         if (menuFavourite == null) {
             return;
         }
-        menuFavourite.setIcon(mFavouriteService.isFavourite(mStation)
+        menuFavourite.setIcon(mFavouriteService.isFavourite(mEthAddress)
                 ? R.drawable.ic_favorite
                 : R.drawable.ic_favorite_border);
     }
@@ -93,10 +94,10 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
         menuFavourite.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
             @Override
             public boolean onMenuItemClick(MenuItem menuItem) {
-                if (mFavouriteService.isFavourite(mStation)) {
-                    mFavouriteService.removeFromFavorites(mStation);
+                if (mFavouriteService.isFavourite(mEthAddress)) {
+                    mFavouriteService.removeFromFavorites(mEthAddress);
                 } else {
-                    mFavouriteService.addToFavorites(mStation);
+                    mFavouriteService.addToFavorites(mEthAddress);
                 }
                 refreshMenu();
                 return false;
@@ -117,8 +118,8 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
         }
 
         final List<BaseFragment> fragments = new ArrayList<BaseFragment>() {{
-            add(StationFrg.newInstance(mStation.getEth_address()));
-            add(ChargeFrg.newInstance(mStation.getEth_address()));
+            add(StationFrg.newInstance(mEthAddress));
+            add(ChargeFrg.newInstance(mEthAddress));
         }};
 
         mViewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
@@ -140,13 +141,13 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
     }
 
     private void readIntentAsync() {
-        final String mStationEth = getIntent().getStringExtra(ARG_STATION_KEY);
+        mEthAddress = getIntent().getStringExtra(ARG_STATION_KEY);
 
-        mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, NodeDto>() {
+        mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, StationDto>() {
 
             @Override
             public String getInputData() {
-                return mStationEth;
+                return mEthAddress;
             }
 
             @Override
@@ -155,7 +156,7 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
             }
 
             @Override
-            public void onComplete(NodeDto result) {
+            public void onComplete(StationDto result) {
                 if (result == null) {
                     finish();
                     return;

@@ -4,15 +4,14 @@ import android.app.Activity;
 import android.os.AsyncTask;
 
 import java.math.BigInteger;
-import java.util.concurrent.ExecutionException;
 
-public class GetBalanceChgTask extends ChgAsyncTask<BigInteger> {
+public class GetRateOfCharging extends ChgAsyncTask<BigInteger> {
 
     private String mAddress;
 
-    public GetBalanceChgTask(Activity activity, String mAddress) {
+    public GetRateOfCharging(Activity activity, String address) {
         super(activity);
-        this.mAddress = mAddress;
+        mAddress = address;
     }
 
     @Override
@@ -23,12 +22,9 @@ public class GetBalanceChgTask extends ChgAsyncTask<BigInteger> {
                 invokeOnPrepare();
 
                 try {
-                    final BigInteger result = mContract.balanceOf(mAddress).sendAsync().get();
+                    BigInteger result = mContract.rateOfCharging(mAddress).sendAsync().get();
                     invokeOnComplete(result);
-                } catch (final InterruptedException e) {
-                    invokeOnError(e.getMessage());
-                    e.printStackTrace();
-                } catch (final ExecutionException e) {
+                } catch (Exception e) {
                     invokeOnError(e.getMessage());
                     e.printStackTrace();
                 }
