@@ -72,4 +72,5 @@
     <string name="station_not_idle">Station is not idle</string>
     <string name="station_not_ready">Station is not ready</string>
     <string name="unknown_station_state">Unknown station state</string>
+    <string name="cancel_user">Cancelled by user</string>
 </resources>

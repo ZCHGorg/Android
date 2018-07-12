@@ -60,6 +60,10 @@ dependencies {
 
     //stepview
     implementation 'com.github.shuhart:StepView:v1.2.8'
+
+    //braintree
+    implementation 'com.braintreepayments.api:drop-in:3.4.0'
+
 }
 
 apply plugin: 'com.google.gms.google-services'

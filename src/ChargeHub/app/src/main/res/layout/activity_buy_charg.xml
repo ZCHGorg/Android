@@ -34,8 +34,8 @@
                 android:layout_weight="1"
                 android:drawableLeft="@drawable/ic_flash"
                 android:drawablePadding="8dp"
-                android:inputType="number"
-                android:hint="How much CHG do you want to buy?" />
+                android:hint="How much CHG do you want to buy?"
+                android:inputType="number" />
 
             <TextView
                 style="@style/TextViewValue"
@@ -83,7 +83,6 @@
 
         </LinearLayout>
 
-
         <View
             android:layout_width="match_parent"
             android:layout_height="0.2dp"
@@ -97,6 +96,18 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Use credit card" />
+
+        <TextView
+            style="@style/TextViewKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="@string/result" />
+
+        <TextView
+            android:id="@+id/tv_result"
+            style="@style/TextViewValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 
