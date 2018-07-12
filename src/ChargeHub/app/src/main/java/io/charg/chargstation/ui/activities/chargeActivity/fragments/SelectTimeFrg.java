@@ -20,8 +20,9 @@ import io.charg.chargstation.services.remote.contract.tasks.GetBalanceChgTask;
 import io.charg.chargstation.services.remote.contract.tasks.GetRateOfCharging;
 import io.charg.chargstation.ui.dialogs.EditNumberDialog;
 import io.charg.chargstation.ui.fragments.BaseFragment;
+import io.charg.chargstation.ui.fragments.BaseNavFragment;
 
-public class SelectTimeFrg extends BaseFragment {
+public class SelectTimeFrg extends BaseNavFragment {
 
     private static final String KEY_ADDRESS = "KEY_ADDRESS";
     private String mNodeAddress;
@@ -130,6 +131,17 @@ public class SelectTimeFrg extends BaseFragment {
         return null;
     }
 
+    @Override
+    public boolean canBack() {
+        return true;
+    }
+
+    @Override
+    public boolean canNext() {
+        return true;
+    }
+
+    @Override
     public boolean isValid() {
         boolean valid = mTime.doubleValue() > 0;
         if (!valid) {

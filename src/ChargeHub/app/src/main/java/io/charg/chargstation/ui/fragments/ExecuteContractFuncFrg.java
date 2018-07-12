@@ -1,5 +1,6 @@
 package io.charg.chargstation.ui.fragments;
 
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -22,7 +23,7 @@ import io.charg.chargstation.services.local.SettingsProvider;
 import io.charg.chargstation.services.remote.contract.tasks.ChgAsyncTask;
 import io.charg.chargstation.ui.dialogs.TxWaitDialog;
 
-public class ExecuteContractFuncFrg extends BaseFragment {
+public class ExecuteContractFuncFrg extends BaseNavFragment {
 
     private SettingsProvider mSettingsProvider;
     private String mOperationName;
@@ -34,6 +35,9 @@ public class ExecuteContractFuncFrg extends BaseFragment {
 
     @BindView(R.id.tv_result)
     TextView mTvResult;
+
+    @BindView(R.id.iv_result)
+    ImageView mIvResult;
 
     @BindView(R.id.tv_gas_limit)
     TextView mTvGasLimit;
@@ -84,6 +88,17 @@ public class ExecuteContractFuncFrg extends BaseFragment {
                 Convert.fromWei(new BigDecimal(mSettingsProvider.getGasLimit().multiply(mSettingsProvider.getGasPrice())), Convert.Unit.ETHER)));
     }
 
+    @Override
+    public boolean canBack() {
+        return true;
+    }
+
+    @Override
+    public boolean canNext() {
+        return true;
+    }
+
+    @Override
     public boolean isValid() {
         if (!mSuccess) {
             Toast.makeText(getContext(), R.string.contract_result_not_success, Toast.LENGTH_SHORT).show();
@@ -116,6 +131,7 @@ public class ExecuteContractFuncFrg extends BaseFragment {
             @Override
             public void onComplete(TransactionReceipt result) {
                 mTvResult.setText(ContractHelper.getStatus(result));
+                mIvResult.setImageResource(ContractHelper.isStatusOK(result) ? R.drawable.ic_ok : R.drawable.ic_error);
                 mSuccess = ContractHelper.isStatusOK(result);
             }
         });

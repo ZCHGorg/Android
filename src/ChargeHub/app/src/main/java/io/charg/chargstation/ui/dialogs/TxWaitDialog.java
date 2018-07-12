@@ -2,6 +2,11 @@ package io.charg.chargstation.ui.dialogs;
 
 import android.content.Context;
 import android.support.v7.app.AlertDialog;
+import android.view.Gravity;
+import android.view.View;
+import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import io.charg.chargstation.R;
 
@@ -10,10 +15,23 @@ public class TxWaitDialog {
     private final AlertDialog mDlgLoading;
 
     public TxWaitDialog(Context context) {
+        TextView tvText = new TextView(context);
+        tvText.setText(R.string.transferring);
+        tvText.setPadding(8, 0, 0, 0);
+
+        ProgressBar prBar = new ProgressBar(context);
+        prBar.setIndeterminate(true);
+
+        LinearLayout layout = new LinearLayout(context);
+        layout.setPadding(16, 16, 16, 16);
+        layout.setGravity(Gravity.CENTER_VERTICAL);
+        layout.addView(prBar);
+        layout.addView(tvText);
+
         mDlgLoading = new AlertDialog.Builder(context)
-                .setMessage(R.string.transferring)
                 .setIcon(R.mipmap.ic_launcher)
                 .setTitle(R.string.app_name)
+                .setView(layout)
                 .setCancelable(false)
                 .create();
     }
