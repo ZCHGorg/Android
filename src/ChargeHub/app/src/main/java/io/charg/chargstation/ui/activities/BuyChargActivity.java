@@ -98,7 +98,7 @@ public class BuyChargActivity extends BaseAuthActivity {
         if (requestCode == REQUEST_CODE_BRAINTREE) {
             if (resultCode == Activity.RESULT_OK) {
                 DropInResult result = data.getParcelableExtra(DropInResult.EXTRA_DROP_IN_RESULT);
-                mTvResult.setText(result.getPaymentMethodNonce().getNonce());
+                mTvResult.setText(result.getPaymentMethodNonce().toString());
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 mTvResult.setText(R.string.cancel_user);
             } else {
