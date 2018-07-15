@@ -1,10 +1,12 @@
 package io.charg.chargstation.ui.activities.chargeActivity;
 
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
 
 import com.shuhart.stepview.StepView;
 
@@ -21,6 +23,7 @@ import io.charg.chargstation.services.remote.contract.tasks.ChargeOffTask;
 import io.charg.chargstation.services.remote.contract.tasks.ChargeOnForceTask;
 import io.charg.chargstation.ui.activities.BaseAuthActivity;
 import io.charg.chargstation.ui.activities.chargeActivity.fragments.ChargingFrg;
+import io.charg.chargstation.ui.fragments.BaseNavFragment;
 import io.charg.chargstation.ui.fragments.ExecuteContractFuncFrg;
 import io.charg.chargstation.ui.activities.chargeActivity.fragments.SelectTimeFrg;
 import io.charg.chargstation.ui.activities.sendChargActivity.fragments.ResultFrg;
@@ -40,13 +43,11 @@ public class ChargeActivity extends BaseAuthActivity {
     @BindView(R.id.view_pager)
     ViewPager mViewPager;
 
-    private List<BaseFragment> mFragments;
+    private List<BaseNavFragment> mFragments;
     private FragmentPagerAdapter mAdapter;
 
     private String mDestAddress;
     private BigInteger mTime;
-
-    private AccountService mAccountService;
 
     private SelectDestinationFrg mDestFrg;
     private SelectTimeFrg mTimeFrg;
@@ -66,6 +67,7 @@ public class ChargeActivity extends BaseAuthActivity {
         initToolbar();
         initStepView();
         initViewPager();
+        navigateTo(mDestFrg);
     }
 
     private void readIntent() {
@@ -73,7 +75,7 @@ public class ChargeActivity extends BaseAuthActivity {
     }
 
     private void initServices() {
-        mAccountService = new AccountService(this);
+
     }
 
     private void initViewPager() {
@@ -106,8 +108,9 @@ public class ChargeActivity extends BaseAuthActivity {
             }
 
             @Override
-            public int getItemPosition(Object object) {
-                return mFragments.indexOf(object);
+            public int getItemPosition(@NonNull Object object) {
+                BaseNavFragment frg = (BaseNavFragment) object;
+                return mFragments.indexOf(frg);
             }
         });
     }
@@ -143,7 +146,7 @@ public class ChargeActivity extends BaseAuthActivity {
     void onBtnBackClicked() {
         int position = mViewPager.getCurrentItem() - 1;
         if (position >= 0) {
-            navigateTo(mAdapter.getItem(position));
+            navigateTo((BaseNavFragment) mAdapter.getItem(position));
         }
     }
 
@@ -187,9 +190,11 @@ public class ChargeActivity extends BaseAuthActivity {
         }
     }
 
-    private void navigateTo(Fragment frg) {
+    private void navigateTo(BaseNavFragment frg) {
         int position = mAdapter.getItemPosition(frg);
         mViewPager.setCurrentItem(position, true);
         mStepView.go(position, true);
+        findViewById(R.id.btn_next).setVisibility(frg.canNext() ? View.VISIBLE : View.GONE);
+        findViewById(R.id.btn_back).setVisibility(frg.canBack() ? View.VISIBLE : View.GONE);
     }
 }

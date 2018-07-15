@@ -13,7 +13,7 @@ import io.charg.chargstation.services.helpers.DialogHelper;
 import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.ui.dialogs.EditTextDialog;
 
-public class SelectDestinationFrg extends BaseFragment {
+public class SelectDestinationFrg extends BaseNavFragment {
 
     private static final String KEY_ADDRESS = "KEY_ADDRESS";
     private String mEthAddress;
@@ -66,12 +66,28 @@ public class SelectDestinationFrg extends BaseFragment {
         return mEthAddress;
     }
 
+    @Override
+    public boolean canBack() {
+        return false;
+    }
+
+    @Override
+    public boolean canNext() {
+        return true;
+    }
+
+    @Override
     public boolean isValid() {
         boolean valid = !(mEthAddress == null || mEthAddress.isEmpty());
         if (!valid) {
             Toast.makeText(getActivity(), R.string.eth_address_empty, Toast.LENGTH_SHORT).show();
         }
         return valid;
+    }
+
+    @Override
+    public void invalidate() {
+        refreshUI();
     }
 
     public static SelectDestinationFrg newInstance(String address) {

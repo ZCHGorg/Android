@@ -20,8 +20,9 @@ import io.charg.chargstation.services.local.AccountService;
 import io.charg.chargstation.services.remote.contract.models.ChargingSwitchesDto;
 import io.charg.chargstation.services.remote.contract.tasks.GetChargingSwitchesTask;
 import io.charg.chargstation.ui.fragments.BaseFragment;
+import io.charg.chargstation.ui.fragments.BaseNavFragment;
 
-public class ChargingFrg extends BaseFragment {
+public class ChargingFrg extends BaseNavFragment {
 
     private boolean mEnded;
 
@@ -153,6 +154,17 @@ public class ChargingFrg extends BaseFragment {
         task.executeAsync();
     }
 
+    @Override
+    public boolean canBack() {
+        return false;
+    }
+
+    @Override
+    public boolean canNext() {
+        return true;
+    }
+
+    @Override
     public boolean isValid() {
         if (!mEnded) {
             Toast.makeText(getActivity(), R.string.you_must_stop_charging, Toast.LENGTH_SHORT).show();
