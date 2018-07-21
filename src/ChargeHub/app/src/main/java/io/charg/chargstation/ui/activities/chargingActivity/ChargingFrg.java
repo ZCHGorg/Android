@@ -1,4 +1,4 @@
-package io.charg.chargstation.ui.activities.chargeActivity.fragments;
+package io.charg.chargstation.ui.activities.chargingActivity;
 
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -19,7 +19,6 @@ import io.charg.chargstation.root.ICallbackOnComplete;
 import io.charg.chargstation.services.local.AccountService;
 import io.charg.chargstation.services.remote.contract.models.ChargingSwitchesDto;
 import io.charg.chargstation.services.remote.contract.tasks.GetChargingSwitchesTask;
-import io.charg.chargstation.ui.fragments.BaseFragment;
 import io.charg.chargstation.ui.fragments.BaseNavFragment;
 
 public class ChargingFrg extends BaseNavFragment {

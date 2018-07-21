@@ -64,7 +64,8 @@ import io.charg.chargstation.services.local.FilteringService;
 import io.charg.chargstation.services.local.LocalDB;
 import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.services.remote.firebase.ChargeDbApi;
-import io.charg.chargstation.ui.activities.chargeActivity.ChargeActivity;
+import io.charg.chargstation.ui.activities.chargingActivity.ChargingActivity;
+import io.charg.chargstation.ui.activities.parkingActivity.ParkingActivity;
 import io.charg.chargstation.ui.views.ChargeClusterManager;
 
 public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback, ICameraChangeListener, ClusterManager.OnClusterItemClickListener<ChargeStationMarker> {
@@ -195,8 +196,14 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
                     case R.id.menu_contract:
                         startActivity(new Intent(MapActivity.this, ContractActivity.class));
                         return true;
+                    case R.id.menu_become_station_owner:
+                        startActivity(new Intent(MapActivity.this, BecomeOwnerActivity.class));
+                        return true;
                     case R.id.menu_charge:
-                        startActivity(new Intent(MapActivity.this, ChargeActivity.class));
+                        startActivity(new Intent(MapActivity.this, ChargingActivity.class));
+                        return true;
+                    case R.id.menu_parking:
+                        startActivity(new Intent(MapActivity.this, ParkingActivity.class));
                         return true;
                     case R.id.menu_qr_code:
                         startActivity(new Intent(MapActivity.this, ChangeWalletActivity.class));

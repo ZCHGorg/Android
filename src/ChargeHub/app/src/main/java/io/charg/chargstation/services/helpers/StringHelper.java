@@ -35,7 +35,7 @@ public class StringHelper {
     }
 
     public static String getRateChgStr(double value) {
-        return String.format(Locale.getDefault(), "%f CHG/sec", value);
+        return String.format(Locale.getDefault(), "%.2f CHG/sec", value);
     }
 
     public static String getTimeStr(long value) {

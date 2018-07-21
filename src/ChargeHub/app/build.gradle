@@ -64,6 +64,9 @@ dependencies {
     //braintree
     implementation 'com.braintreepayments.api:drop-in:3.4.0'
 
+    //pdf reader
+    compile 'com.github.barteksc:android-pdf-viewer:2.8.2'
+
 }
 
 apply plugin: 'com.google.gms.google-services'

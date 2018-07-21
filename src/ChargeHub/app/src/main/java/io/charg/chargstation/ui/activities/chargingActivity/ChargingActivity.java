@@ -1,4 +1,4 @@
-package io.charg.chargstation.ui.activities.chargeActivity;
+package io.charg.chargstation.ui.activities.chargingActivity;
 
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
@@ -17,20 +17,14 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
-import io.charg.chargstation.services.local.AccountService;
 import io.charg.chargstation.services.remote.contract.tasks.ChargeOffForceTask;
-import io.charg.chargstation.services.remote.contract.tasks.ChargeOffTask;
 import io.charg.chargstation.services.remote.contract.tasks.ChargeOnForceTask;
 import io.charg.chargstation.ui.activities.BaseAuthActivity;
-import io.charg.chargstation.ui.activities.chargeActivity.fragments.ChargingFrg;
 import io.charg.chargstation.ui.fragments.BaseNavFragment;
 import io.charg.chargstation.ui.fragments.ExecuteContractFuncFrg;
-import io.charg.chargstation.ui.activities.chargeActivity.fragments.SelectTimeFrg;
-import io.charg.chargstation.ui.activities.sendChargActivity.fragments.ResultFrg;
 import io.charg.chargstation.ui.fragments.SelectDestinationFrg;
-import io.charg.chargstation.ui.fragments.BaseFragment;
 
-public class ChargeActivity extends BaseAuthActivity {
+public class ChargingActivity extends BaseAuthActivity {
 
     public static final String KEY_ETH_ADDRESS = "KEY_ETH_ADDRESS";
 
@@ -50,7 +44,7 @@ public class ChargeActivity extends BaseAuthActivity {
     private BigInteger mTime;
 
     private SelectDestinationFrg mDestFrg;
-    private SelectTimeFrg mTimeFrg;
+    private SelectChargingTimeFrg mTimeFrg;
     private ExecuteContractFuncFrg mChargeOnFrg;
     private ChargingFrg mChargingFrg;
     private ExecuteContractFuncFrg mChargeOffFrg;
@@ -84,7 +78,7 @@ public class ChargeActivity extends BaseAuthActivity {
         mDestFrg = SelectDestinationFrg.newInstance(mDestAddress);
         mFragments.add(mDestFrg);
 
-        mTimeFrg = SelectTimeFrg.newInstance(mDestAddress);
+        mTimeFrg = SelectChargingTimeFrg.newInstance(mDestAddress);
         mFragments.add(mTimeFrg);
 
         mChargeOnFrg = new ExecuteContractFuncFrg();
@@ -169,7 +163,7 @@ public class ChargeActivity extends BaseAuthActivity {
             mTime = mTimeFrg.getTimeSeconds();
 
             mChargeOnFrg.setOperationName(getString(R.string.charge_on));
-            mChargeOnFrg.setTask(new ChargeOnForceTask(ChargeActivity.this, mDestAddress, mTime));
+            mChargeOnFrg.setTask(new ChargeOnForceTask(ChargingActivity.this, mDestAddress, mTime));
             mChargeOnFrg.invalidate();
             navigateTo(mChargeOnFrg);
         } else if (mCurrentFrg.equals(mChargeOnFrg)) {
@@ -184,7 +178,7 @@ public class ChargeActivity extends BaseAuthActivity {
             }
 
             mChargeOffFrg.setOperationName(getString(R.string.charge_off));
-            mChargeOffFrg.setTask(new ChargeOffForceTask(ChargeActivity.this, mDestAddress));
+            mChargeOffFrg.setTask(new ChargeOffForceTask(ChargingActivity.this, mDestAddress));
             mChargeOffFrg.invalidate();
             navigateTo(mChargeOffFrg);
         }

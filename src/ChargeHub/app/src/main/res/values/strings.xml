@@ -8,7 +8,7 @@
     <string name="eth_address_copied">Ethereum address was copied to clipboard</string>
     <string name="err_loading_balance">Error while loading balance</string>
     <string name="not_implemented_yet">Arriving March, 2018</string>
-    <string name="eth_address_empty">Eth address is empty!!!</string>
+    <string name="eth_address_empty">You must set ethereum address</string>
     <string name="eth_private_key_empty">Private kay is empty</string>
     <string name="eth_address">Eth address</string>
     <string name="save">Save</string>
@@ -73,4 +73,9 @@
     <string name="station_not_ready">Station is not ready</string>
     <string name="unknown_station_state">Unknown station state</string>
     <string name="cancel_user">Cancelled by user</string>
+    <string name="become_station_owner">Become station owner</string>
+    <string name="buy_charg">Buy charg</string>
+    <string name="get_more_charg">Get more charg</string>
+    <string name="not_enough_chg">You have not enough CHG tokens</string>
+    <string name="parking">Parking</string>
 </resources>

@@ -35,6 +35,16 @@
             android:title="@string/charge" />
 
         <item
+            android:id="@+id/menu_parking"
+            android:icon="@drawable/ic_parking_24dp"
+            android:title="@string/parking" />
+
+        <item
+            android:id="@+id/menu_become_station_owner"
+            android:icon="@drawable/ic_ev_station"
+            android:title="@string/become_station_owner" />
+
+        <item
             android:id="@+id/menu_qr_code"
             android:icon="@drawable/ic_camera"
             android:title="QR Code Scanner" />

@@ -32,7 +32,7 @@
         <activity android:name=".ui.activities.SettingsActivity" />
         <activity android:name=".ui.activities.sendChargActivity.SendChargActivity" />
         <activity android:name=".ui.activities.ContractActivity" />
-        <activity android:name=".ui.activities.chargeActivity.ChargeActivity" />
+        <activity android:name=".ui.activities.chargingActivity.ChargingActivity" />
 
         <activity android:name="com.braintreepayments.api.BraintreeBrowserSwitchActivity"
             android:launchMode="singleTask">
@@ -43,6 +43,8 @@
                 <data android:scheme="${applicationId}.braintree" />
             </intent-filter>
         </activity>
+        <activity android:name=".ui.activities.BecomeOwnerActivity" />
+        <activity android:name=".ui.activities.parkingActivity.ParkingActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

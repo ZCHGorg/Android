@@ -2,6 +2,7 @@ package io.charg.chargstation.ui.fragments;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.design.widget.Snackbar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -80,7 +81,7 @@ public class SelectDestinationFrg extends BaseNavFragment {
     public boolean isValid() {
         boolean valid = !(mEthAddress == null || mEthAddress.isEmpty());
         if (!valid) {
-            Toast.makeText(getActivity(), R.string.eth_address_empty, Toast.LENGTH_SHORT).show();
+            Snackbar.make(mTvEthAddress, R.string.eth_address_empty, Snackbar.LENGTH_SHORT).show();
         }
         return valid;
     }
