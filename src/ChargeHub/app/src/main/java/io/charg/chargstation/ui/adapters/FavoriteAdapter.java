@@ -17,7 +17,7 @@ import io.charg.chargstation.R;
 import io.charg.chargstation.models.firebase.GeofireDto;
 import io.charg.chargstation.models.firebase.StationDto;
 import io.charg.chargstation.root.IAsyncCommand;
-import io.charg.chargstation.services.remote.api.ChargeHubService;
+import io.charg.chargstation.services.remote.firebase.ChargeHubService;
 import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.ui.activities.MapActivity;
 

@@ -1,4 +1,4 @@
-package io.charg.chargstation.services.remote.api;
+package io.charg.chargstation.services.remote.firebase;
 
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;

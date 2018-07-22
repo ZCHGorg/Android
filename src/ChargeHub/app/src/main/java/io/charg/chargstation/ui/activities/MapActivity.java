@@ -58,7 +58,7 @@ import io.charg.chargstation.root.IAsyncCommand;
 import io.charg.chargstation.root.ICallbackOnComplete;
 import io.charg.chargstation.root.ICameraChangeListener;
 import io.charg.chargstation.services.local.AccountService;
-import io.charg.chargstation.services.remote.api.ChargeHubService;
+import io.charg.chargstation.services.remote.firebase.ChargeHubService;
 import io.charg.chargstation.services.helpers.DialogHelper;
 import io.charg.chargstation.services.local.FilteringService;
 import io.charg.chargstation.services.local.LocalDB;

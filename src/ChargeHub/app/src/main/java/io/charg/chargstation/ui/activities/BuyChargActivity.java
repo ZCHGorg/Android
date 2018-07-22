@@ -2,6 +2,7 @@ package io.charg.chargstation.ui.activities;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.design.widget.Snackbar;
 import android.support.v7.widget.Toolbar;
 import android.view.KeyEvent;
 import android.view.View;
@@ -11,11 +12,25 @@ import android.widget.TextView;
 import com.braintreepayments.api.dropin.DropInActivity;
 import com.braintreepayments.api.dropin.DropInRequest;
 import com.braintreepayments.api.dropin.DropInResult;
+import com.braintreepayments.api.models.PaymentMethodNonce;
+
+import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.CommonData;
+import io.charg.chargstation.services.remote.api.wecharg.BrainTreeResponseDto;
+import io.charg.chargstation.services.remote.api.wecharg.BraintreeTransactionRequest;
+import io.charg.chargstation.services.remote.api.wecharg.CartItemRequestDto;
+import io.charg.chargstation.services.remote.api.wecharg.CartItemResponseDto;
+import io.charg.chargstation.services.remote.api.wecharg.PaymentInformationDto;
+import io.charg.chargstation.services.remote.api.wecharg.TokenRequestDto;
+import io.charg.chargstation.services.remote.api.wecharg.WeChargApi;
+import io.charg.chargstation.services.remote.api.wecharg.WeChargProvider;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class BuyChargActivity extends BaseAuthActivity {
 
@@ -33,6 +48,14 @@ public class BuyChargActivity extends BaseAuthActivity {
     @BindView(R.id.tv_result)
     TextView mTvResult;
 
+    private WeChargApi mWeChargApi;
+
+    private String mClientToken;
+    private String mQuoteId;
+    private String mBraintreeToken;
+    private String mNonce;
+    private String mOrderId;
+
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
@@ -46,8 +69,13 @@ public class BuyChargActivity extends BaseAuthActivity {
 
     @Override
     public void onActivate() {
+        initServices();
         initToolbar();
         initEtAmountChg();
+    }
+
+    private void initServices() {
+        mWeChargApi = WeChargProvider.getWeChargApi();
     }
 
     private void initToolbar() {
@@ -88,11 +116,94 @@ public class BuyChargActivity extends BaseAuthActivity {
     }
 
     public void invokeBraintree() {
-        DropInRequest dropInRequest = new DropInRequest()
-                .amount("15 CHG")
-                .clientToken("eyJ2ZXJzaW9uIjoyLCJhdXRob3JpemF0aW9uRmluZ2VycHJpbnQiOiIwNWY2YTg5N2ZkNzhhYWE4ZTlhYmI1ZTMwZjA2NjM1Nzc4MGUxOTQ3NTk2OWYwMzY0OGMwMmM4MzgzMGM5NDU1fGNyZWF0ZWRfYXQ9MjAxOC0wNy0xOVQxNDozNDo1NS43MjYxOTQwODQrMDAwMFx1MDAyNm1lcmNoYW50X2lkPTd3dzJtcTV3c2Rua3Q1a2ZcdTAwMjZwdWJsaWNfa2V5PXM0eXp0NDRwcm03eXM5anQiLCJjb25maWdVcmwiOiJodHRwczovL2FwaS5zYW5kYm94LmJyYWludHJlZWdhdGV3YXkuY29tOjQ0My9tZXJjaGFudHMvN3d3Mm1xNXdzZG5rdDVrZi9jbGllbnRfYXBpL3YxL2NvbmZpZ3VyYXRpb24iLCJjaGFsbGVuZ2VzIjpbXSwiZW52aXJvbm1lbnQiOiJzYW5kYm94IiwiY2xpZW50QXBpVXJsIjoiaHR0cHM6Ly9hcGkuc2FuZGJveC5icmFpbnRyZWVnYXRld2F5LmNvbTo0NDMvbWVyY2hhbnRzLzd3dzJtcTV3c2Rua3Q1a2YvY2xpZW50X2FwaSIsImFzc2V0c1VybCI6Imh0dHBzOi8vYXNzZXRzLmJyYWludHJlZWdhdGV3YXkuY29tIiwiYXV0aFVybCI6Imh0dHBzOi8vYXV0aC52ZW5tby5zYW5kYm94LmJyYWludHJlZWdhdGV3YXkuY29tIiwiYW5hbHl0aWNzIjp7InVybCI6Imh0dHBzOi8vb3JpZ2luLWFuYWx5dGljcy1zYW5kLnNhbmRib3guYnJhaW50cmVlLWFwaS5jb20vN3d3Mm1xNXdzZG5rdDVrZiJ9LCJ0aHJlZURTZWN1cmVFbmFibGVkIjp0cnVlLCJwYXlwYWxFbmFibGVkIjp0cnVlLCJwYXlwYWwiOnsiZGlzcGxheU5hbWUiOiJ0ZXN0Y2VkY29tbWVyY2UiLCJjbGllbnRJZCI6bnVsbCwicHJpdmFjeVVybCI6Imh0dHA6Ly9leGFtcGxlLmNvbS9wcCIsInVzZXJBZ3JlZW1lbnRVcmwiOiJodHRwOi8vZXhhbXBsZS5jb20vdG9zIiwiYmFzZVVybCI6Imh0dHBzOi8vYXNzZXRzLmJyYWludHJlZWdhdGV3YXkuY29tIiwiYXNzZXRzVXJsIjoiaHR0cHM6Ly9jaGVja291dC5wYXlwYWwuY29tIiwiZGlyZWN0QmFzZVVybCI6bnVsbCwiYWxsb3dIdHRwIjp0cnVlLCJlbnZpcm9ubWVudE5vTmV0d29yayI6dHJ1ZSwiZW52aXJvbm1lbnQiOiJvZmZsaW5lIiwidW52ZXR0ZWRNZXJjaGFudCI6ZmFsc2UsImJyYWludHJlZUNsaWVudElkIjoibWFzdGVyY2xpZW50MyIsImJpbGxpbmdBZ3JlZW1lbnRzRW5hYmxlZCI6dHJ1ZSwibWVyY2hhbnRBY2NvdW50SWQiOiI3d3cybXE1d3Nkbmt0NWtmIiwiY3VycmVuY3lJc29Db2RlIjoiVVNEIn0sIm1lcmNoYW50SWQiOiI3d3cybXE1d3Nkbmt0NWtmIiwidmVubW8iOiJvZmYifQ==");
 
-        startActivityForResult(dropInRequest.getIntent(this), REQUEST_CODE_BRAINTREE);
+        mWeChargApi.getTokenAsync(new TokenRequestDto("jdoe@example.com", "Password1"))
+                .enqueue(new Callback<String>() {
+                    @Override
+                    public void onResponse(Call<String> call, Response<String> response) {
+                        final String clientToken = response.body();
+                        System.out.println("token client " + clientToken);
+
+                        if (clientToken == null || clientToken.isEmpty()) {
+                            Snackbar.make(mToolbar, R.string.invalid_token, Snackbar.LENGTH_SHORT).show();
+                            return;
+                        }
+                        mClientToken = clientToken;
+                        createQuoteAsync();
+                    }
+
+                    @Override
+                    public void onFailure(Call<String> call, Throwable t) {
+                        Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void createQuoteAsync() {
+        mWeChargApi.createQuoteAsync("bearer " + mClientToken).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                final String quoteId = response.body();
+                System.out.println("quote " + quoteId);
+
+                if (quoteId == null || quoteId.isEmpty()) {
+                    Snackbar.make(mToolbar, R.string.eror_create_quote, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+                mQuoteId = quoteId;
+                addItemToQuoteAsync();
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void addItemToQuoteAsync() {
+        mWeChargApi.addItemToCart("bearer " + mClientToken, new CartItemRequestDto(mQuoteId)).enqueue(new Callback<CartItemResponseDto>() {
+            @Override
+            public void onResponse(Call<CartItemResponseDto> call, Response<CartItemResponseDto> response) {
+                CartItemResponseDto cart = response.body();
+                if (cart == null) {
+                    Snackbar.make(mToolbar, R.string.erro_add_item_to_cart, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+
+                System.out.println("cart " + cart.toString());
+                generateBraintreeTokenAsync();
+            }
+
+            @Override
+            public void onFailure(Call<CartItemResponseDto> call, Throwable t) {
+                Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void generateBraintreeTokenAsync() {
+        mWeChargApi.getBrainTreeTokenAsync("bearer " + mClientToken).enqueue(new Callback<List<BrainTreeResponseDto>>() {
+            @Override
+            public void onResponse(Call<List<BrainTreeResponseDto>> call, Response<List<BrainTreeResponseDto>> response) {
+                List<BrainTreeResponseDto> body = response.body();
+                if (body == null || body.size() == 0) {
+                    Snackbar.make(mToolbar, R.string.error_generating_token_braintree, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+
+                mBraintreeToken = body.get(0).Message;
+                DropInRequest dropInRequest = new DropInRequest()
+                        .clientToken(mBraintreeToken);
+
+                startActivityForResult(dropInRequest.getIntent(BuyChargActivity.this), REQUEST_CODE_BRAINTREE);
+            }
+
+            @Override
+            public void onFailure(Call<List<BrainTreeResponseDto>> call, Throwable t) {
+                Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -100,8 +211,15 @@ public class BuyChargActivity extends BaseAuthActivity {
         if (requestCode == REQUEST_CODE_BRAINTREE) {
             if (resultCode == Activity.RESULT_OK) {
                 DropInResult result = data.getParcelableExtra(DropInResult.EXTRA_DROP_IN_RESULT);
-                mTvResult.setText(result.getPaymentMethodNonce().getNonce());
-                System.out.println("token: " + result.getPaymentMethodNonce().getNonce());
+
+                PaymentMethodNonce nonce = result.getPaymentMethodNonce();
+                if (nonce == null) {
+                    mTvResult.setText(R.string.cancel_user);
+                    return;
+                }
+
+                mNonce = nonce.getNonce();
+                createOrderAsync();
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 mTvResult.setText(R.string.cancel_user);
             } else {
@@ -109,5 +227,53 @@ public class BuyChargActivity extends BaseAuthActivity {
                 mTvResult.setText(error.getMessage());
             }
         }
+    }
+
+    private void postBrainTreeTransactionAsync() {
+
+        BraintreeTransactionRequest request = new BraintreeTransactionRequest();
+        request.Parameters = new BraintreeTransactionRequest.ParametersDto();
+        request.Parameters.Amount = "15";
+        request.Parameters.OrderId = mOrderId;
+        request.Parameters.PaymentNonce = mNonce;
+        request.Parameters.Token = mBraintreeToken;
+
+        mWeChargApi.postBrainTransactionAsync("bearer " + mClientToken, request).enqueue(new Callback<List<BrainTreeResponseDto>>() {
+            @Override
+            public void onResponse(Call<List<BrainTreeResponseDto>> call, Response<List<BrainTreeResponseDto>> response) {
+                Snackbar.make(mToolbar, response.body().get(0).Message, Snackbar.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(Call<List<BrainTreeResponseDto>> call, Throwable t) {
+                Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void createOrderAsync() {
+        PaymentInformationDto payment = new PaymentInformationDto(mQuoteId);
+        payment.PaymentMethod.Method = "braintree";
+        payment.PaymentMethod.AdditionalData.Nonce = mNonce;
+
+        mWeChargApi.createOrderAsync("bearer " + mClientToken, payment).enqueue(new Callback<String>() {
+            @Override
+            public void onResponse(Call<String> call, Response<String> response) {
+                final String orderId = response.body();
+                if (orderId == null || orderId.isEmpty()) {
+                    Snackbar.make(mToolbar, R.string.error_while_creating_order, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+
+                System.out.println("Order " + orderId);
+                mOrderId = orderId;
+                //postBrainTreeTransactionAsync();
+            }
+
+            @Override
+            public void onFailure(Call<String> call, Throwable t) {
+                Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
+            }
+        });
     }
 }

@@ -78,4 +78,9 @@
     <string name="get_more_charg">Get more charg</string>
     <string name="not_enough_chg">You have not enough CHG tokens</string>
     <string name="parking">Parking</string>
+    <string name="invalid_token">Invalid authorization token</string>
+    <string name="eror_create_quote">Error while create quote</string>
+    <string name="erro_add_item_to_cart">Error while adding item to cart</string>
+    <string name="error_while_creating_order">Error while creating order</string>
+    <string name="error_generating_token_braintree">Error while generating braintree token</string>
 </resources>
