@@ -8,6 +8,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import org.web3j.tx.Contract;
+
 import java.math.BigInteger;
 
 import butterknife.BindView;
@@ -19,6 +21,7 @@ import io.charg.chargstation.root.ICallbackOnPrepare;
 import io.charg.chargstation.services.helpers.ContractHelper;
 import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.services.local.AccountService;
+import io.charg.chargstation.services.remote.contract.tasks.GetAuthorizeTask;
 import io.charg.chargstation.services.remote.contract.tasks.GetBalanceChgTask;
 import io.charg.chargstation.services.remote.contract.tasks.GetRateOfCharging;
 import io.charg.chargstation.ui.dialogs.EditNumberDialog;
@@ -97,61 +100,73 @@ public class SelectChargingTimeFrg extends BaseNavFragment {
     private void refreshUI() {
         mTvTime.setText(StringHelper.getTimeStr(mTime.longValue()));
 
-        final GetRateOfCharging getRateTask = new GetRateOfCharging(getActivity(), mNodeAddress);
-        getRateTask.setPrepareListener(new ICallbackOnPrepare() {
+        GetAuthorizeTask getAuthTask = new GetAuthorizeTask(getActivity(), mNodeAddress);
+        getAuthTask.setCompleteListener(new ICallbackOnComplete<Boolean>() {
             @Override
-            public void onPrepare() {
-                mTvCost.setText(R.string.loading);
-                mTvChargingRate.setText(R.string.loading);
-            }
-        });
-        getRateTask.setErrorListener(new ICallbackOnError<String>() {
-            @Override
-            public void onError(String message) {
-                mTvCost.setText(message);
-                mTvChargingRate.setText(message);
-            }
-        });
-        getRateTask.setCompleteListener(new ICallbackOnComplete<BigInteger>() {
-            @Override
-            public void onComplete(BigInteger result) {
-                mTvCost.setText(StringHelper.getBalanceChgStr(ContractHelper.getChgFromWei(mCost = mTime.multiply(result))));
-                mTvChargingRate.setText(StringHelper.getRateChgStr(ContractHelper.getChgFromWei(result)));
-                if (mBalance.compareTo(mCost) < 0) {
-                    mTvStatus.setText(R.string.not_enough_chg);
-                    mBtnGetMoreChg.setVisibility(View.VISIBLE);
-                    mIvStatus.setImageResource(R.drawable.ic_error);
-                } else {
-                    mTvStatus.setText(R.string.success);
-                    mBtnGetMoreChg.setVisibility(View.INVISIBLE);
-                    mIvStatus.setImageResource(R.drawable.ic_ok);
+            public void onComplete(Boolean result) {
+                if (!result) {
+                    mTvStatus.setText(R.string.node_is_not_auth);
+                    return;
                 }
-            }
-        });
 
-        GetBalanceChgTask getBalanceTask = new GetBalanceChgTask(getActivity(), mAccountService.getEthAddress());
-        getBalanceTask.setPrepareListener(new ICallbackOnPrepare() {
-            @Override
-            public void onPrepare() {
-                mTvBalanceChg.setText(R.string.loading);
-            }
-        });
-        getBalanceTask.setErrorListener(new ICallbackOnError<String>() {
-            @Override
-            public void onError(String message) {
-                mTvBalanceChg.setText(message);
-            }
-        });
-        getBalanceTask.setCompleteListener(new ICallbackOnComplete<BigInteger>() {
-            @Override
-            public void onComplete(BigInteger result) {
-                mBalance = result;
-                mTvBalanceChg.setText(StringHelper.getBalanceChgStr(ContractHelper.getChgFromWei(result)));
-                getRateTask.executeAsync();
-            }
-        });
-        getBalanceTask.executeAsync();
+                final GetRateOfCharging getRateTask = new GetRateOfCharging(getActivity(), mNodeAddress);
+                getRateTask.setPrepareListener(new ICallbackOnPrepare() {
+                    @Override
+                    public void onPrepare() {
+                        mTvCost.setText(R.string.loading);
+                        mTvChargingRate.setText(R.string.loading);
+                    }
+                });
+                getRateTask.setErrorListener(new ICallbackOnError<String>() {
+                    @Override
+                    public void onError(String message) {
+                        mTvCost.setText(message);
+                        mTvChargingRate.setText(message);
+                    }
+                });
+                getRateTask.setCompleteListener(new ICallbackOnComplete<BigInteger>() {
+                    @Override
+                    public void onComplete(BigInteger result) {
+                        mTvCost.setText(StringHelper.getBalanceChgStr(ContractHelper.getChgFromWei(mCost = mTime.multiply(result))));
+                        mTvChargingRate.setText(StringHelper.getRateChgStr(ContractHelper.getChgFromWei(result)));
+                        if (mBalance.compareTo(mCost) < 0) {
+                            mTvStatus.setText(R.string.not_enough_chg);
+                            mBtnGetMoreChg.setVisibility(View.VISIBLE);
+                            mIvStatus.setImageResource(R.drawable.ic_error);
+                        } else {
+                            mTvStatus.setText(R.string.success);
+                            mBtnGetMoreChg.setVisibility(View.INVISIBLE);
+                            mIvStatus.setImageResource(R.drawable.ic_ok);
+                        }
+                    }
+                });
 
+                GetBalanceChgTask getBalanceTask = new GetBalanceChgTask(getActivity(), mAccountService.getEthAddress());
+                getBalanceTask.setPrepareListener(new ICallbackOnPrepare() {
+                    @Override
+                    public void onPrepare() {
+                        mTvBalanceChg.setText(R.string.loading);
+                    }
+                });
+                getBalanceTask.setErrorListener(new ICallbackOnError<String>() {
+                    @Override
+                    public void onError(String message) {
+                        mTvBalanceChg.setText(message);
+                    }
+                });
+                getBalanceTask.setCompleteListener(new ICallbackOnComplete<BigInteger>() {
+                    @Override
+                    public void onComplete(BigInteger result) {
+                        mBalance = result;
+                        mTvBalanceChg.setText(StringHelper.getBalanceChgStr(ContractHelper.getChgFromWei(result)));
+                        getRateTask.executeAsync();
+                    }
+                });
+                getBalanceTask.executeAsync();
+
+            }
+        });
+        getAuthTask.executeAsync();
     }
 
     @Override

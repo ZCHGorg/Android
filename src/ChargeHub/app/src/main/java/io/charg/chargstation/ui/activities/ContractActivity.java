@@ -17,7 +17,7 @@ import io.charg.chargstation.root.ICallbackOnPrepare;
 import io.charg.chargstation.services.helpers.ContractHelper;
 import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.services.local.AccountService;
-import io.charg.chargstation.services.remote.contract.models.ChargingSwitchesDto;
+import io.charg.chargstation.services.remote.contract.dto.ChargingSwitchesDto;
 import io.charg.chargstation.services.remote.contract.tasks.ChargeOffTask;
 import io.charg.chargstation.services.remote.contract.tasks.ChargeOnTask;
 import io.charg.chargstation.services.remote.contract.tasks.GetAuthorizeTask;
@@ -138,10 +138,10 @@ public class ContractActivity extends BaseAuthActivity {
                 task.setPrepareListener(mPrepareListener);
                 task.setFinishListener(mFinishListener);
                 task.setErrorListener(mErrorListener);
-                task.setCompleteListener(new ICallbackOnComplete<BigInteger>() {
+                task.setCompleteListener(new ICallbackOnComplete<Boolean>() {
                     @Override
-                    public void onComplete(BigInteger result) {
-                        String res = StringHelper.getShortEthAddress(address) + " - " + (result.intValue() == 1 ? "Authorized" : "Not authorized");
+                    public void onComplete(Boolean result) {
+                        String res = StringHelper.getShortEthAddress(address) + " - " + (result ? "Authorized" : "Not authorized");
                         mTvStatus.setText(res);
                     }
                 });
