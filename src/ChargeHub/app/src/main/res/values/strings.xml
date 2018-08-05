@@ -83,4 +83,5 @@
     <string name="erro_add_item_to_cart">Error while adding item to cart</string>
     <string name="error_while_creating_order">Error while creating order</string>
     <string name="error_generating_token_braintree">Error while generating braintree token</string>
+    <string name="node_is_not_auth">Node is not authorized</string>
 </resources>
