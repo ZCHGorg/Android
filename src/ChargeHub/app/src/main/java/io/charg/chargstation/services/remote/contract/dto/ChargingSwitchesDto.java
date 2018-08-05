@@ -1,4 +1,4 @@
-package io.charg.chargstation.services.remote.contract.models;
+package io.charg.chargstation.services.remote.contract.dto;
 
 import org.web3j.tuples.generated.Tuple6;
 
