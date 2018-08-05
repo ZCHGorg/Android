@@ -8,7 +8,7 @@ import org.web3j.tuples.generated.Tuple6;
 import java.math.BigInteger;
 import java.util.concurrent.ExecutionException;
 
-import io.charg.chargstation.services.remote.contract.models.ChargingSwitchesDto;
+import io.charg.chargstation.services.remote.contract.dto.ChargingSwitchesDto;
 
 public class GetChargingSwitchesTask extends ChgAsyncTask<ChargingSwitchesDto> {
 

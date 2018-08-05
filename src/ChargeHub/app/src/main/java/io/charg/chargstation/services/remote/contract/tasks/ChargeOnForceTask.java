@@ -7,12 +7,9 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import java.math.BigInteger;
 import java.util.Calendar;
 
-import io.charg.chargstation.R;
-import io.charg.chargstation.models.firebase.StationDto;
 import io.charg.chargstation.root.ICallbackOnComplete;
 import io.charg.chargstation.services.local.AccountService;
-import io.charg.chargstation.services.remote.contract.models.ChargingSwitchesDto;
-import io.charg.chargstation.services.remote.firebase.ChargeDbApi;
+import io.charg.chargstation.services.remote.contract.dto.ChargingSwitchesDto;
 
 public class ChargeOnForceTask extends ChgAsyncTask<TransactionReceipt> {
 

@@ -6,7 +6,9 @@ import android.os.AsyncTask;
 import java.math.BigInteger;
 import java.util.concurrent.ExecutionException;
 
-public class GetAuthorizeTask extends ChgAsyncTask<BigInteger> {
+import io.charg.chargstation.services.helpers.ContractHelper;
+
+public class GetAuthorizeTask extends ChgAsyncTask<Boolean> {
 
     private String mAddress;
 
@@ -22,7 +24,7 @@ public class GetAuthorizeTask extends ChgAsyncTask<BigInteger> {
             public void run() {
                 try {
                     BigInteger result = mContract.authorized(mAddress).sendAsync().get();
-                    invokeOnComplete(result);
+                    invokeOnComplete(ContractHelper.getResult(result));
                 } catch (InterruptedException e) {
                     invokeOnError(e.getMessage());
                     e.printStackTrace();
