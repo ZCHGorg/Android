@@ -4,7 +4,6 @@ import java.util.List;
 
 import retrofit2.Call;
 import retrofit2.http.Body;
-import retrofit2.http.GET;
 import retrofit2.http.Header;
 import retrofit2.http.POST;
 
@@ -24,7 +23,4 @@ public interface WeChargApi {
 
     @POST("charg/payment/generate")
     Call<List<Object>> getBrainTreeTokenAsync(@Header("Authorization") String auth);
-
-    @POST("mobiconnect/mobibrain/transaction")
-    Call<List<BrainTreeResponseDto>> postBrainTransactionAsync(@Header("Authorization") String auth, @Body BraintreeTransactionRequest body);
 }

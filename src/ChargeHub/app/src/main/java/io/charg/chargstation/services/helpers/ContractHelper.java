@@ -34,4 +34,8 @@ public class ContractHelper {
     public static BigInteger getWeiFromChg(double value) {
         return BigDecimal.valueOf(value * 1E18).toBigInteger();
     }
+
+    public static Boolean getResult(BigInteger result) {
+        return BigInteger.ONE.equals(result);
+    }
 }
