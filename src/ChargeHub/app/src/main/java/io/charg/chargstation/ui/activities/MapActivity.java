@@ -191,7 +191,9 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
                         startActivityForResult(intent, FILTER_ACTIVITY_REQUEST_CODE);
                         return true;
                     case R.id.menu_wallet:
-                        startActivity(new Intent(MapActivity.this, WalletActivity.class));
+                        if (checkWallet()) {
+                            startActivity(new Intent(MapActivity.this, WalletActivity.class));
+                        }
                         return true;
                     case R.id.menu_contract:
                         startActivity(new Intent(MapActivity.this, ContractActivity.class));

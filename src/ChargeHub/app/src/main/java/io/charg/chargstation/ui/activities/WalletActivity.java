@@ -40,10 +40,9 @@ import io.charg.chargstation.ui.activities.sendChargActivity.SendChargActivity;
  * Created by worker on 13.11.2017.
  */
 
-public class WalletActivity extends BaseActivity {
+public class WalletActivity extends BaseAuthActivity {
 
     private AccountService mAccountService;
-    private SettingsProvider mSettingsProvider;
 
     @BindView(R.id.tv_eth_address)
     TextView tvEthAddress;
@@ -147,7 +146,6 @@ public class WalletActivity extends BaseActivity {
 
     private void initServices() {
         mAccountService = new AccountService(this);
-        mSettingsProvider = new SettingsProvider(this);
     }
 
     private void initToolbar() {
