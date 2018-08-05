@@ -22,8 +22,8 @@ public interface WeChargApi {
     @POST("carts/mine/payment-information")
     Call<String> createOrderAsync(@Header("Authorization") String auth, @Body PaymentInformationDto body);
 
-    @GET("mobiconnect/mobibrain/generatetoken")
-    Call<List<BrainTreeResponseDto>> getBrainTreeTokenAsync(@Header("Authorization") String auth);
+    @POST("charg/payment/generate")
+    Call<List<Object>> getBrainTreeTokenAsync(@Header("Authorization") String auth);
 
     @POST("mobiconnect/mobibrain/transaction")
     Call<List<BrainTreeResponseDto>> postBrainTransactionAsync(@Header("Authorization") String auth, @Body BraintreeTransactionRequest body);
