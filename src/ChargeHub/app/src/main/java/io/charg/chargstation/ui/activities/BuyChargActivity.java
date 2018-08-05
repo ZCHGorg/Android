@@ -21,6 +21,7 @@ import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.CommonData;
 import io.charg.chargstation.services.remote.api.wecharg.BrainTreeResponseDto;
+import io.charg.chargstation.services.remote.api.wecharg.BraintreeTokenResponse;
 import io.charg.chargstation.services.remote.api.wecharg.BraintreeTransactionRequest;
 import io.charg.chargstation.services.remote.api.wecharg.CartItemRequestDto;
 import io.charg.chargstation.services.remote.api.wecharg.CartItemResponseDto;
@@ -112,10 +113,10 @@ public class BuyChargActivity extends BaseAuthActivity {
 
     @OnClick(R.id.btn_credit)
     void onBtnCreditClicked() {
-        invokeBraintree();
+        executeBuy();
     }
 
-    public void invokeBraintree() {
+    public void executeBuy() {
 
         mWeChargApi.getTokenAsync(new TokenRequestDto("jdoe@example.com", "Password1"))
                 .enqueue(new Callback<String>() {
@@ -183,16 +184,16 @@ public class BuyChargActivity extends BaseAuthActivity {
     }
 
     private void generateBraintreeTokenAsync() {
-        mWeChargApi.getBrainTreeTokenAsync("bearer " + mClientToken).enqueue(new Callback<List<BrainTreeResponseDto>>() {
+        mWeChargApi.getBrainTreeTokenAsync("bearer " + mClientToken).enqueue(new Callback<List<Object>>() {
             @Override
-            public void onResponse(Call<List<BrainTreeResponseDto>> call, Response<List<BrainTreeResponseDto>> response) {
-                List<BrainTreeResponseDto> body = response.body();
-                if (body == null || body.size() == 0) {
+            public void onResponse(Call<List<Object>> call, Response<List<Object>> response) {
+                List<Object> body = response.body();
+                if (body == null || body.size() < 2) {
                     Snackbar.make(mToolbar, R.string.error_generating_token_braintree, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
 
-                mBraintreeToken = body.get(0).Message;
+                mBraintreeToken = body.get(1).toString();
                 DropInRequest dropInRequest = new DropInRequest()
                         .clientToken(mBraintreeToken);
 
@@ -200,7 +201,7 @@ public class BuyChargActivity extends BaseAuthActivity {
             }
 
             @Override
-            public void onFailure(Call<List<BrainTreeResponseDto>> call, Throwable t) {
+            public void onFailure(Call<List<Object>> call, Throwable t) {
                 Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
             }
         });
@@ -229,28 +230,6 @@ public class BuyChargActivity extends BaseAuthActivity {
         }
     }
 
-    private void postBrainTreeTransactionAsync() {
-
-        BraintreeTransactionRequest request = new BraintreeTransactionRequest();
-        request.Parameters = new BraintreeTransactionRequest.ParametersDto();
-        request.Parameters.Amount = "15";
-        request.Parameters.OrderId = mOrderId;
-        request.Parameters.PaymentNonce = mNonce;
-        request.Parameters.Token = mBraintreeToken;
-
-        mWeChargApi.postBrainTransactionAsync("bearer " + mClientToken, request).enqueue(new Callback<List<BrainTreeResponseDto>>() {
-            @Override
-            public void onResponse(Call<List<BrainTreeResponseDto>> call, Response<List<BrainTreeResponseDto>> response) {
-                Snackbar.make(mToolbar, response.body().get(0).Message, Snackbar.LENGTH_SHORT).show();
-            }
-
-            @Override
-            public void onFailure(Call<List<BrainTreeResponseDto>> call, Throwable t) {
-                Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
-            }
-        });
-    }
-
     private void createOrderAsync() {
         PaymentInformationDto payment = new PaymentInformationDto(mQuoteId);
         payment.PaymentMethod.Method = "braintree";
@@ -265,13 +244,15 @@ public class BuyChargActivity extends BaseAuthActivity {
                     return;
                 }
 
-                System.out.println("Order " + orderId);
+                System.out.println("Order: " + orderId);
                 mOrderId = orderId;
-                //postBrainTreeTransactionAsync();
+
+                mTvResult.setText("Order: " + mOrderId);
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
+                mTvResult.setText(t.getMessage());
                 Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
             }
         });
