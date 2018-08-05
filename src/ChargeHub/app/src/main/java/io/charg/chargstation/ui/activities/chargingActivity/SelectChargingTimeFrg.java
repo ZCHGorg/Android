@@ -6,9 +6,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
-import android.widget.Toast;
-
-import org.web3j.tx.Contract;
 
 import java.math.BigInteger;
 
@@ -37,6 +34,7 @@ public class SelectChargingTimeFrg extends BaseNavFragment {
 
     private BigInteger mCost;
     private BigInteger mBalance;
+    private boolean mValid;
 
     @BindView(R.id.tv_time)
     TextView mTvTime;
@@ -106,6 +104,7 @@ public class SelectChargingTimeFrg extends BaseNavFragment {
             public void onComplete(Boolean result) {
                 if (!result) {
                     mTvStatus.setText(R.string.node_is_not_auth);
+                    mIvStatus.setImageResource(R.drawable.ic_error);
                     return;
                 }
 
@@ -163,7 +162,6 @@ public class SelectChargingTimeFrg extends BaseNavFragment {
                     }
                 });
                 getBalanceTask.executeAsync();
-
             }
         });
         getAuthTask.executeAsync();
@@ -186,11 +184,7 @@ public class SelectChargingTimeFrg extends BaseNavFragment {
 
     @Override
     public boolean isValid() {
-        boolean valid = mTime.doubleValue() > 0;
-        if (!valid) {
-            Toast.makeText(getActivity(), R.string.time_not_defined, Toast.LENGTH_SHORT).show();
-        }
-        return valid;
+        return mValid;
     }
 
     public BigInteger getTimeSeconds() {
