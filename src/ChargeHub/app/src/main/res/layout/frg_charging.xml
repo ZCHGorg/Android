@@ -37,7 +37,7 @@
         android:padding="8dp">
 
         <FrameLayout
-            android:id="@+id/lt_charged"
+            android:id="@+id/lt_ended"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="invisible"
@@ -58,7 +58,7 @@
         </FrameLayout>
 
         <FrameLayout
-            android:id="@+id/lt_charging"
+            android:id="@+id/lt_processing"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:visibility="invisible"
@@ -96,7 +96,7 @@
         android:layout_height="wrap_content" />
 
     <Button
-        android:id="@+id/btn_stop_charge"
+        android:id="@+id/btn_stop"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/stop_charge" />
