@@ -8,7 +8,7 @@ import java.util.Date;
 import io.charg.chargstation.services.helpers.ContractHelper;
 import io.charg.chargstation.services.helpers.StringHelper;
 
-public class ChargingSwitchesDto {
+public class SwitchesDto {
 
     public String Node;
 
@@ -22,7 +22,7 @@ public class ChargingSwitchesDto {
 
     public BigInteger PredefinedAmount;
 
-    public ChargingSwitchesDto(Tuple6<String, BigInteger, BigInteger, BigInteger, Boolean, BigInteger> tuple) {
+    public SwitchesDto(Tuple6<String, BigInteger, BigInteger, BigInteger, Boolean, BigInteger> tuple) {
         Node = tuple.getValue1();
         StartTime = tuple.getValue2();
         EndTime = tuple.getValue3();

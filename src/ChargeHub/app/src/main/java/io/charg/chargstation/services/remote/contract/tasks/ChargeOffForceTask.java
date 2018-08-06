@@ -6,7 +6,7 @@ import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import io.charg.chargstation.root.ICallbackOnComplete;
 import io.charg.chargstation.services.local.AccountService;
-import io.charg.chargstation.services.remote.contract.dto.ChargingSwitchesDto;
+import io.charg.chargstation.services.remote.contract.dto.SwitchesDto;
 
 public class ChargeOffForceTask extends ChgAsyncTask<TransactionReceipt> {
 
@@ -36,9 +36,9 @@ public class ChargeOffForceTask extends ChgAsyncTask<TransactionReceipt> {
         switchTask.setPrepareListener(mPrepareListener);
         switchTask.setFinishListener(mFinishListener);
         switchTask.setErrorListener(mErrorListener);
-        switchTask.setCompleteListener(new ICallbackOnComplete<ChargingSwitchesDto>() {
+        switchTask.setCompleteListener(new ICallbackOnComplete<SwitchesDto>() {
             @Override
-            public void onComplete(ChargingSwitchesDto result) {
+            public void onComplete(SwitchesDto result) {
                 if (!result.Initialized) {
                     TransactionReceipt tx = new TransactionReceipt();
                     tx.setStatus("0x1");

@@ -8,9 +8,9 @@ import org.web3j.tuples.generated.Tuple6;
 import java.math.BigInteger;
 import java.util.concurrent.ExecutionException;
 
-import io.charg.chargstation.services.remote.contract.dto.ChargingSwitchesDto;
+import io.charg.chargstation.services.remote.contract.dto.SwitchesDto;
 
-public class GetChargingSwitchesTask extends ChgAsyncTask<ChargingSwitchesDto> {
+public class GetChargingSwitchesTask extends ChgAsyncTask<SwitchesDto> {
 
     private String mAddress;
 
@@ -28,7 +28,7 @@ public class GetChargingSwitchesTask extends ChgAsyncTask<ChargingSwitchesDto> {
 
                 try {
                     Tuple6<String, BigInteger, BigInteger, BigInteger, Boolean, BigInteger> result = mContract.chargingSwitches(mAddress).sendAsync().get();
-                    invokeOnComplete(new ChargingSwitchesDto(result));
+                    invokeOnComplete(new SwitchesDto(result));
                 } catch (InterruptedException e) {
                     invokeOnError(e.getMessage());
                     e.printStackTrace();
