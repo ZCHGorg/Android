@@ -22,6 +22,7 @@ public class GetAuthorizeTask extends ChgAsyncTask<Boolean> {
         AsyncTask.execute(new Runnable() {
             @Override
             public void run() {
+                invokeOnPrepare();
                 try {
                     BigInteger result = mContract.authorized(mAddress).sendAsync().get();
                     invokeOnComplete(ContractHelper.getResult(result));
@@ -32,6 +33,7 @@ public class GetAuthorizeTask extends ChgAsyncTask<Boolean> {
                     invokeOnError(e.getMessage());
                     e.printStackTrace();
                 }
+                invokeOnFinish();
             }
         });
     }
