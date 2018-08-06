@@ -1,7 +1,5 @@
 package io.charg.chargstation.services.remote.api.wecharg;
 
-import java.util.List;
-
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Header;
@@ -22,5 +20,5 @@ public interface WeChargApi {
     Call<String> createOrderAsync(@Header("Authorization") String auth, @Body PaymentInformationDto body);
 
     @POST("charg/payment/generate")
-    Call<List<Object>> getBrainTreeTokenAsync(@Header("Authorization") String auth);
+    Call<BraintreeTokenDto> getBrainTreeTokenAsync(@Header("Authorization") String auth);
 }

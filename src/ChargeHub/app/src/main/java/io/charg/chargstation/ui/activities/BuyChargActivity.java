@@ -20,6 +20,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.CommonData;
+import io.charg.chargstation.services.remote.api.wecharg.BraintreeTokenDto;
 import io.charg.chargstation.services.remote.api.wecharg.CartItemRequestDto;
 import io.charg.chargstation.services.remote.api.wecharg.CartItemResponseDto;
 import io.charg.chargstation.services.remote.api.wecharg.PaymentInformationDto;
@@ -181,16 +182,16 @@ public class BuyChargActivity extends BaseAuthActivity {
     }
 
     private void generateBraintreeTokenAsync() {
-        mWeChargApi.getBrainTreeTokenAsync("bearer " + mClientToken).enqueue(new Callback<List<Object>>() {
+        mWeChargApi.getBrainTreeTokenAsync("bearer " + mClientToken).enqueue(new Callback<BraintreeTokenDto>() {
             @Override
-            public void onResponse(Call<List<Object>> call, Response<List<Object>> response) {
-                List<Object> body = response.body();
-                if (body == null || body.size() < 2) {
+            public void onResponse(Call<BraintreeTokenDto> call, Response<BraintreeTokenDto> response) {
+                BraintreeTokenDto body = response.body();
+                if (body == null || !body.Success) {
                     Snackbar.make(mToolbar, R.string.error_generating_token_braintree, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
 
-                mBraintreeToken = body.get(1).toString();
+                mBraintreeToken = body.Message;
                 DropInRequest dropInRequest = new DropInRequest()
                         .clientToken(mBraintreeToken);
 
@@ -198,7 +199,7 @@ public class BuyChargActivity extends BaseAuthActivity {
             }
 
             @Override
-            public void onFailure(Call<List<Object>> call, Throwable t) {
+            public void onFailure(Call<BraintreeTokenDto> call, Throwable t) {
                 Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
             }
         });
