@@ -3,7 +3,6 @@ package io.charg.chargstation.ui.dialogs;
 import android.content.Context;
 import android.support.v7.app.AlertDialog;
 import android.view.Gravity;
-import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -16,7 +15,7 @@ public class TxWaitDialog {
 
     public TxWaitDialog(Context context) {
         TextView tvText = new TextView(context);
-        tvText.setText(R.string.transferring);
+        tvText.setText(R.string.executing_smart_contract);
         tvText.setPadding(8, 0, 0, 0);
 
         ProgressBar prBar = new ProgressBar(context);

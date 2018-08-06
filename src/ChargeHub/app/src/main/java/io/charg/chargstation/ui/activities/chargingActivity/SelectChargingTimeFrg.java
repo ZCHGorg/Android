@@ -61,7 +61,7 @@ public class SelectChargingTimeFrg extends BaseNavFragment {
 
     @Override
     protected int getResourceId() {
-        return R.layout.frg_select_time;
+        return R.layout.frg_select_charging_time;
     }
 
     public static SelectChargingTimeFrg newInstance(String address) {

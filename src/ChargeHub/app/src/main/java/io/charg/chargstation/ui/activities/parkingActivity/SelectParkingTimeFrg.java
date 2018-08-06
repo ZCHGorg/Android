@@ -21,6 +21,7 @@ import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.services.local.AccountService;
 import io.charg.chargstation.services.remote.contract.tasks.GetBalanceChgTask;
 import io.charg.chargstation.services.remote.contract.tasks.GetRateOfCharging;
+import io.charg.chargstation.services.remote.contract.tasks.GetRateOfParking;
 import io.charg.chargstation.ui.dialogs.EditNumberDialog;
 import io.charg.chargstation.ui.fragments.BaseNavFragment;
 
@@ -60,7 +61,7 @@ public class SelectParkingTimeFrg extends BaseNavFragment {
 
     @Override
     protected int getResourceId() {
-        return R.layout.frg_select_time;
+        return R.layout.frg_select_parking_time;
     }
 
     public static SelectParkingTimeFrg newInstance(String address) {
@@ -97,7 +98,7 @@ public class SelectParkingTimeFrg extends BaseNavFragment {
     private void refreshUI() {
         mTvTime.setText(StringHelper.getTimeStr(mTime.longValue()));
 
-        final GetRateOfCharging getRateTask = new GetRateOfCharging(getActivity(), mNodeAddress);
+        final GetRateOfParking getRateTask = new GetRateOfParking(getActivity(), mNodeAddress);
         getRateTask.setPrepareListener(new ICallbackOnPrepare() {
             @Override
             public void onPrepare() {

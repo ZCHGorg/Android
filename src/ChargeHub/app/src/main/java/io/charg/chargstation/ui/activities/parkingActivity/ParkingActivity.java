@@ -19,6 +19,8 @@ import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.services.remote.contract.tasks.ChargeOffForceTask;
 import io.charg.chargstation.services.remote.contract.tasks.ChargeOnForceTask;
+import io.charg.chargstation.services.remote.contract.tasks.ParkingOffForceTask;
+import io.charg.chargstation.services.remote.contract.tasks.ParkingOnForceTask;
 import io.charg.chargstation.ui.activities.BaseActivity;
 import io.charg.chargstation.ui.fragments.BaseNavFragment;
 import io.charg.chargstation.ui.fragments.ExecuteContractFuncFrg;
@@ -171,7 +173,7 @@ public class ParkingActivity extends BaseActivity {
             mTime = mTimeFrg.getTimeSeconds();
 
             mParkOnFrg.setOperationName(getString(R.string.on));
-            mParkOnFrg.setTask(new ChargeOnForceTask(ParkingActivity.this, mDestAddress, mTime));
+            mParkOnFrg.setTask(new ParkingOnForceTask(ParkingActivity.this, mDestAddress, mTime));
             mParkOnFrg.invalidate();
             navigateTo(mParkOnFrg);
         } else if (mCurrentFrg.equals(mParkOnFrg)) {
@@ -185,8 +187,8 @@ public class ParkingActivity extends BaseActivity {
                 return;
             }
 
-            mParkOffFrg.setOperationName(getString(R.string.charge_off));
-            mParkOffFrg.setTask(new ChargeOffForceTask(ParkingActivity.this, mDestAddress));
+            mParkOffFrg.setOperationName(getString(R.string.parking_off));
+            mParkOffFrg.setTask(new ParkingOffForceTask(ParkingActivity.this, mDestAddress));
             mParkOffFrg.invalidate();
             navigateTo(mParkOffFrg);
         }

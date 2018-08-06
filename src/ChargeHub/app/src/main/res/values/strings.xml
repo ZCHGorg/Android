@@ -47,7 +47,7 @@
     <string name="charge">Charge</string>
     <string name="time">Time</string>
     <string name="charging">Charging</string>
-    <string name="transferring">Transferring data in ethereum network…</string>
+    <string name="executing_smart_contract">Executing smart contract function…</string>
     <string name="charge_on">Charge on</string>
     <string name="charge_off">Charge off</string>
     <string name="balance">Balance</string>
@@ -84,4 +84,9 @@
     <string name="error_while_creating_order">Error while creating order</string>
     <string name="error_generating_token_braintree">Error while generating braintree token</string>
     <string name="node_is_not_auth">Node is not authorized</string>
+    <string name="charging_rate">Charging rate</string>
+    <string name="parking_rate">Parking rate</string>
+    <string name="you_must_stop_parking">You must stop parking</string>
+    <string name="stop">Stop</string>
+    <string name="parking_off">Parking off</string>
 </resources>

@@ -82,7 +82,7 @@ public class ChargeFrg extends BaseFragment {
     @BindView(R.id.btn_charge)
     Button btnCharge;
 
-    @BindView(R.id.btn_stop_charge)
+    @BindView(R.id.btn_stop)
     Button btnStopCharge;
 
     @BindView(R.id.tv_charged_time)
@@ -391,7 +391,7 @@ public class ChargeFrg extends BaseFragment {
         });
     }
 
-    @OnClick(R.id.btn_stop_charge)
+    @OnClick(R.id.btn_stop)
     void onBtnStopChargeClick() {
         mSmartContractManager.chargeOffAsync(mChargeStation.getEth_address());
 

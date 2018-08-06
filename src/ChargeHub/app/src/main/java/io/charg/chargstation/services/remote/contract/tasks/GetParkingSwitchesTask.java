@@ -10,11 +10,11 @@ import java.util.concurrent.ExecutionException;
 
 import io.charg.chargstation.services.remote.contract.dto.SwitchesDto;
 
-public class GetChargingSwitchesTask extends ChgAsyncTask<SwitchesDto> {
+public class GetParkingSwitchesTask extends ChgAsyncTask<SwitchesDto> {
 
     private String mAddress;
 
-    public GetChargingSwitchesTask(Activity activity, String address) {
+    public GetParkingSwitchesTask(Activity activity, String address) {
         super(activity);
         mAddress = address;
     }
@@ -27,7 +27,7 @@ public class GetChargingSwitchesTask extends ChgAsyncTask<SwitchesDto> {
                 invokeOnPrepare();
 
                 try {
-                    Tuple6<String, BigInteger, BigInteger, BigInteger, Boolean, BigInteger> result = mContract.chargingSwitches(mAddress).sendAsync().get();
+                    Tuple6<String, BigInteger, BigInteger, BigInteger, Boolean, BigInteger> result = mContract.parkingSwitches(mAddress).sendAsync().get();
                     invokeOnComplete(new SwitchesDto(result));
                 } catch (InterruptedException e) {
                     invokeOnError(e.getMessage());

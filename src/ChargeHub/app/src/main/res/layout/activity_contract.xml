@@ -27,48 +27,126 @@
             android:layout_height="wrap_content"
             tools:text="Select smart contract function" />
 
-        <Button
-            android:id="@+id/btn_check_authorize"
+        <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Check authorize" />
+            android:layout_height="match_parent">
 
-        <Button
-            android:id="@+id/btn_register_node"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Register node" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
 
-        <Button
-            android:id="@+id/btn_get_rate_charging"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Get rate charging" />
+                <TextView
+                    style="@style/TextViewKey"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Registration functions" />
 
-        <Button
-            android:id="@+id/btn_update_rate_charging"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Update rate charging" />
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
 
-        <Button
-            android:id="@+id/btn_charging_switches"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Charging switches" />
+                    <Button
+                        android:id="@+id/btn_check_authorize"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Check authorize" />
 
-        <Button
-            android:id="@+id/btn_charge_on"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Charge on" />
+                    <Button
+                        android:id="@+id/btn_register_node"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Register node" />
 
-        <Button
-            android:id="@+id/btn_charge_off"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Charge off" />
+                </LinearLayout>
 
+                <TextView
+                    style="@style/TextViewKey"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Charging functions" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_get_rate_charging"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Get rate charging" />
+
+                    <Button
+                        android:id="@+id/btn_update_rate_charging"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Update rate charging" />
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_charge_on"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Charge on" />
+
+                    <Button
+                        android:id="@+id/btn_charge_off"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Charge off" />
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btn_charging_switches"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Charging switches" />
+
+                <TextView
+                    style="@style/TextViewKey"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Parking functions" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_get_rate_parking"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="@string/parking_rate" />
+
+                    <Button
+                        android:id="@+id/btn_update_rate_parking"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Update parking rate" />
+
+                </LinearLayout>
+
+            </LinearLayout>
+
+        </android.support.v4.widget.NestedScrollView>
 
     </LinearLayout>
 

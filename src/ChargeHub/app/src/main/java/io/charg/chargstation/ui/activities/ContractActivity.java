@@ -1,5 +1,6 @@
 package io.charg.chargstation.ui.activities;
 
+import android.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 
@@ -17,14 +18,16 @@ import io.charg.chargstation.root.ICallbackOnPrepare;
 import io.charg.chargstation.services.helpers.ContractHelper;
 import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.services.local.AccountService;
-import io.charg.chargstation.services.remote.contract.dto.ChargingSwitchesDto;
+import io.charg.chargstation.services.remote.contract.dto.SwitchesDto;
 import io.charg.chargstation.services.remote.contract.tasks.ChargeOffTask;
 import io.charg.chargstation.services.remote.contract.tasks.ChargeOnTask;
 import io.charg.chargstation.services.remote.contract.tasks.GetAuthorizeTask;
 import io.charg.chargstation.services.remote.contract.tasks.GetChargingSwitchesTask;
 import io.charg.chargstation.services.remote.contract.tasks.GetRateOfCharging;
+import io.charg.chargstation.services.remote.contract.tasks.GetRateOfParking;
 import io.charg.chargstation.services.remote.contract.tasks.RegisterNodeTask;
 import io.charg.chargstation.services.remote.contract.tasks.UpdateChargingRateTask;
+import io.charg.chargstation.services.remote.contract.tasks.UpdateParkingRateTask;
 import io.charg.chargstation.ui.dialogs.EditNumberDialog;
 import io.charg.chargstation.ui.dialogs.EditTextDialog;
 import io.charg.chargstation.ui.dialogs.TxWaitDialog;
@@ -83,8 +86,11 @@ public class ContractActivity extends BaseAuthActivity {
 
     private void initToolbar() {
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        ActionBar actionBar = getActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
     }
 
     @Override
@@ -161,9 +167,9 @@ public class ContractActivity extends BaseAuthActivity {
                 task.setPrepareListener(mPrepareListener);
                 task.setFinishListener(mFinishListener);
                 task.setErrorListener(mErrorListener);
-                task.setCompleteListener(new ICallbackOnComplete<ChargingSwitchesDto>() {
+                task.setCompleteListener(new ICallbackOnComplete<SwitchesDto>() {
                     @Override
-                    public void onComplete(ChargingSwitchesDto result) {
+                    public void onComplete(SwitchesDto result) {
                         mTvStatus.setText(result.toString());
                     }
                 });
@@ -267,6 +273,57 @@ public class ContractActivity extends BaseAuthActivity {
             }
         });
         chargingRateTask.executeAsync();
+    }
 
+    @OnClick(R.id.btn_get_rate_parking)
+    void onBtnGetRateParkingClicked() {
+        EditTextDialog dlg = new EditTextDialog(this, getString(R.string.eth_address), mAccountService.getEthAddress());
+        dlg.setOnComplete(new ICallbackOnComplete<String>() {
+            @Override
+            public void onComplete(String address) {
+                GetRateOfParking task = new GetRateOfParking(ContractActivity.this, address);
+                task.setPrepareListener(mPrepareListener);
+                task.setFinishListener(mFinishListener);
+                task.setErrorListener(mErrorListener);
+                task.setCompleteListener(new ICallbackOnComplete<BigInteger>() {
+                    @Override
+                    public void onComplete(BigInteger result) {
+                        mTvStatus.setText(StringHelper.getRateChgStr(ContractHelper.getChgFromWei(result)));
+                    }
+                });
+                task.executeAsync();
+            }
+        });
+        dlg.show();
+    }
+
+    @OnClick(R.id.btn_update_rate_parking)
+    void onBtnUpdateRateParkingClicked() {
+        GetRateOfParking rateTask = new GetRateOfParking(this, mAccountService.getEthAddress());
+        rateTask.setCompleteListener(new ICallbackOnComplete<BigInteger>() {
+            @Override
+            public void onComplete(BigInteger result) {
+                EditNumberDialog dlg = new EditNumberDialog(ContractActivity.this, getString(R.string.amount), ContractHelper.getChgFromWei(result));
+                dlg.setNumberRange(100, 0);
+                dlg.setOnComplete(new ICallbackOnComplete<Double>() {
+                    @Override
+                    public void onComplete(Double result) {
+                        UpdateParkingRateTask updateTask = new UpdateParkingRateTask(ContractActivity.this, ContractHelper.getWeiFromChg(result));
+                        updateTask.setPrepareListener(mPrepareListener);
+                        updateTask.setFinishListener(mFinishListener);
+                        updateTask.setErrorListener(mErrorListener);
+                        updateTask.setCompleteListener(new ICallbackOnComplete<TransactionReceipt>() {
+                            @Override
+                            public void onComplete(TransactionReceipt result) {
+                                mTvStatus.setText(ContractHelper.getStatus(result));
+                            }
+                        });
+                        updateTask.executeAsync();
+                    }
+                });
+                dlg.show();
+            }
+        });
+        rateTask.executeAsync();
     }
 }

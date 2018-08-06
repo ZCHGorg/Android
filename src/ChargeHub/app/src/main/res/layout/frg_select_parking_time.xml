@@ -38,7 +38,7 @@
         style="@style/TextViewKey"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Charging rate" />
+        android:text="@string/parking_rate" />
 
     <TextView
         android:id="@+id/tv_charging_rate"

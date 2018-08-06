@@ -3,20 +3,18 @@ package io.charg.chargstation.services.remote.contract.tasks;
 import android.app.Activity;
 import android.os.AsyncTask;
 
-import org.web3j.tuples.generated.Tuple6;
+import org.web3j.protocol.core.methods.response.TransactionReceipt;
 
 import java.math.BigInteger;
 import java.util.concurrent.ExecutionException;
 
-import io.charg.chargstation.services.remote.contract.dto.SwitchesDto;
+public class UpdateParkingRateTask extends ChgAsyncTask<TransactionReceipt> {
 
-public class GetChargingSwitchesTask extends ChgAsyncTask<SwitchesDto> {
+    private BigInteger mRate;
 
-    private String mAddress;
-
-    public GetChargingSwitchesTask(Activity activity, String address) {
+    public UpdateParkingRateTask(Activity activity, BigInteger rate) {
         super(activity);
-        mAddress = address;
+        mRate = rate;
     }
 
     @Override
@@ -27,8 +25,8 @@ public class GetChargingSwitchesTask extends ChgAsyncTask<SwitchesDto> {
                 invokeOnPrepare();
 
                 try {
-                    Tuple6<String, BigInteger, BigInteger, BigInteger, Boolean, BigInteger> result = mContract.chargingSwitches(mAddress).sendAsync().get();
-                    invokeOnComplete(new SwitchesDto(result));
+                    TransactionReceipt result = mContract.updateParkingRate(mRate).sendAsync().get();
+                    invokeOnComplete(result);
                 } catch (InterruptedException e) {
                     invokeOnError(e.getMessage());
                     e.printStackTrace();

@@ -8,31 +8,31 @@ import io.charg.chargstation.root.ICallbackOnComplete;
 import io.charg.chargstation.services.local.AccountService;
 import io.charg.chargstation.services.remote.contract.dto.SwitchesDto;
 
-public class ChargeOffForceTask extends ChgAsyncTask<TransactionReceipt> {
+public class ParkingOffForceTask extends ChgAsyncTask<TransactionReceipt> {
 
-    private ChargeOffTask mChargeOffTask;
+    private ParkingOffTask mParkingOffTask;
     private String mAddress;
     private AccountService mAccountService;
 
-    public ChargeOffForceTask(Activity activity, String address) {
+    public ParkingOffForceTask(Activity activity, String address) {
         super(activity);
         mAddress = address;
         mAccountService = new AccountService(activity);
 
-        initChargeOffTask();
+        initParkingOffTask();
     }
 
-    private void initChargeOffTask() {
-        mChargeOffTask = new ChargeOffTask(mActivity, mAddress);
-        mChargeOffTask.setPrepareListener(mPrepareListener);
-        mChargeOffTask.setFinishListener(mFinishListener);
-        mChargeOffTask.setErrorListener(mErrorListener);
-        mChargeOffTask.setCompleteListener(mCompleteListener);
+    private void initParkingOffTask() {
+        mParkingOffTask = new ParkingOffTask(mActivity, mAddress);
+        mParkingOffTask.setPrepareListener(mPrepareListener);
+        mParkingOffTask.setFinishListener(mFinishListener);
+        mParkingOffTask.setErrorListener(mErrorListener);
+        mParkingOffTask.setCompleteListener(mCompleteListener);
     }
 
     @Override
     public void executeAsync() {
-        GetChargingSwitchesTask switchTask = new GetChargingSwitchesTask(mActivity, mAccountService.getEthAddress());
+        GetParkingSwitchesTask switchTask = new GetParkingSwitchesTask(mActivity, mAccountService.getEthAddress());
         switchTask.setPrepareListener(mPrepareListener);
         switchTask.setFinishListener(mFinishListener);
         switchTask.setErrorListener(mErrorListener);
@@ -44,8 +44,8 @@ public class ChargeOffForceTask extends ChgAsyncTask<TransactionReceipt> {
                     tx.setStatus("0x1");
                     invokeOnComplete(tx);
                 } else {
-                    initChargeOffTask();
-                    mChargeOffTask.executeAsync();
+                    initParkingOffTask();
+                    mParkingOffTask.executeAsync();
                 }
             }
         });
