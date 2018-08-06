@@ -97,8 +97,21 @@ public class SelectChargingTimeFrg extends BaseNavFragment {
 
     private void refreshUI() {
         mTvTime.setText(StringHelper.getTimeStr(mTime.longValue()));
+        mValid = false;
 
         GetAuthorizeTask getAuthTask = new GetAuthorizeTask(getActivity(), mNodeAddress);
+        getAuthTask.setPrepareListener(new ICallbackOnPrepare() {
+            @Override
+            public void onPrepare() {
+                mTvStatus.setText(R.string.loading);
+            }
+        });
+        getAuthTask.setErrorListener(new ICallbackOnError<String>() {
+            @Override
+            public void onError(String message) {
+                mTvStatus.setText(message);
+            }
+        });
         getAuthTask.setCompleteListener(new ICallbackOnComplete<Boolean>() {
             @Override
             public void onComplete(Boolean result) {
@@ -129,10 +142,12 @@ public class SelectChargingTimeFrg extends BaseNavFragment {
                         mTvCost.setText(StringHelper.getBalanceChgStr(ContractHelper.getChgFromWei(mCost = mTime.multiply(result))));
                         mTvChargingRate.setText(StringHelper.getRateChgStr(ContractHelper.getChgFromWei(result)));
                         if (mBalance.compareTo(mCost) < 0) {
+                            mValid = false;
                             mTvStatus.setText(R.string.not_enough_chg);
                             mBtnGetMoreChg.setVisibility(View.VISIBLE);
                             mIvStatus.setImageResource(R.drawable.ic_error);
                         } else {
+                            mValid = true;
                             mTvStatus.setText(R.string.success);
                             mBtnGetMoreChg.setVisibility(View.INVISIBLE);
                             mIvStatus.setImageResource(R.drawable.ic_ok);
