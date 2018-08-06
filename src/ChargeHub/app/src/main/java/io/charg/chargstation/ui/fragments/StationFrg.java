@@ -23,6 +23,7 @@ import io.charg.chargstation.services.local.FilteringService;
 import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.ui.activities.StationActivity;
 import io.charg.chargstation.ui.activities.chargingActivity.ChargingActivity;
+import io.charg.chargstation.ui.activities.parkingActivity.ParkingActivity;
 
 /**
  * Created by oleg on 04.11.2017.
@@ -167,6 +168,12 @@ public class StationFrg extends BaseFragment {
     void onBtnChargeClick() {
         startActivity(new Intent(getActivity(), ChargingActivity.class)
                 .putExtra(ChargingActivity.KEY_ETH_ADDRESS, mNodeEthAddress));
+    }
+
+    @OnClick(R.id.btn_park)
+    void onBtnParkClick() {
+        startActivity(new Intent(getActivity(), ParkingActivity.class)
+                .putExtra(ParkingActivity.KEY_ETH_ADDRESS, mNodeEthAddress));
     }
 
     @Override
