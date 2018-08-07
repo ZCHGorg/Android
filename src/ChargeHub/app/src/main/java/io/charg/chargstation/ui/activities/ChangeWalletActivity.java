@@ -1,6 +1,7 @@
 package io.charg.chargstation.ui.activities;
 
 import android.content.Intent;
+import android.support.v7.app.ActionBar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.view.View;
@@ -12,6 +13,7 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import org.web3j.crypto.Credentials;
+import org.web3j.protocol.core.methods.response.EthGasPrice;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -26,7 +28,6 @@ import io.charg.chargstation.services.helpers.StringHelper;
 
 public class ChangeWalletActivity extends BaseActivity {
 
-    public static final String QR_MODE_PUBLIC_KEY = "QR_MODE_PUBLIC_KEY";
     public static final String QR_MODE_PRIVATE_KEY = "QR_MODE_PRIVATE_KEY";
 
     @BindView(R.id.tv_cur_eth_address)
@@ -79,47 +80,12 @@ public class ChangeWalletActivity extends BaseActivity {
 
     private void initToolbar() {
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
-    }
 
-    @OnClick(R.id.btn_load_qr_pub_key)
-    void onBtnLoadQrCodePubClicked() {
-        mQrMode = QR_MODE_PUBLIC_KEY;
-        new IntentIntegrator(this).initiateScan();
-    }
-
-    //TODO delete this shit
-    @OnClick(R.id.btn_change_pub_key)
-    void onBtnChangePubClicked() {
-        View view = getLayoutInflater().inflate(R.layout.dlg_change_text, null, false);
-
-        final AlertDialog dialog = DialogHelper.createDialogFromView(this, view);
-
-        TextView tvMessage = view.findViewById(R.id.tv_message);
-        tvMessage.setText(R.string.eth_address);
-
-        final EditText edtValue = view.findViewById(R.id.edt_value);
-        //edtValue.setText(mNewEthAddress);
-
-        view.findViewById(R.id.btn_yes).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String val = edtValue.getText().toString();
-                //                mNewEthAddress = val;
-                dialog.dismiss();
-                refreshUI();
-            }
-        });
-
-        view.findViewById(R.id.btn_no).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                dialog.dismiss();
-            }
-        });
-
-        dialog.show();
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
     }
 
     @OnClick(R.id.btn_change_prv_key)
@@ -192,10 +158,15 @@ public class ChangeWalletActivity extends BaseActivity {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
         if (result != null) {
             if (result.getContents() != null) {
-                if (mQrMode.equals(QR_MODE_PUBLIC_KEY)) {
-                    //mNewEthAddress = result.getContents();
-                } else if (mQrMode.equals(QR_MODE_PRIVATE_KEY)) {
-                    mNewPrivateKey = result.getContents();
+                if (mQrMode.equals(QR_MODE_PRIVATE_KEY)) {
+                    String privateKey = result.getContents();
+
+                    try {
+                        Credentials.create(privateKey);
+                        mNewPrivateKey = privateKey;
+                    } catch (Exception ex) {
+                        Toast.makeText(this, privateKey + " - is not valid private key", Toast.LENGTH_SHORT).show();
+                    }
                 }
 
                 refreshUI();

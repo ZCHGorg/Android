@@ -4,17 +4,26 @@ import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
 import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.Point;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
+import android.view.Display;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import com.google.zxing.BarcodeFormat;
+import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import org.web3j.utils.Convert;
 
@@ -166,7 +175,7 @@ public class WalletActivity extends BaseAuthActivity {
     private void refreshUI() {
         String ethAddress = mAccountService.getEthAddress();
         if (ethAddress != null) {
-            tvEthAddress.setText(ethAddress);
+            tvEthAddress.setText(StringHelper.getShortEthAddress(ethAddress));
             initTasks();
             loadBalanceAsync();
         } else {
@@ -228,6 +237,53 @@ public class WalletActivity extends BaseAuthActivity {
     @OnClick(R.id.btn_send_eth)
     void onBtnSendEthClicked() {
         Snackbar.make(btnChangeWallet, R.string.not_implemented_yet, Snackbar.LENGTH_SHORT).show();
+    }
+
+    @OnClick(R.id.btn_show_qr_code)
+    void onBtnShowQrCodeClicked() {
+        showQrCode(mAccountService.getEthAddress());
+    }
+
+    private void showQrCode(final String address) {
+
+        WindowManager manager = (WindowManager) getSystemService(WINDOW_SERVICE);
+        Display display = manager.getDefaultDisplay();
+        Point point = new Point();
+        display.getSize(point);
+        int width = point.x;
+        int height = point.y;
+        int smallerDimension = width < height ? width : height;
+        smallerDimension = smallerDimension * 3 / 4;
+
+        try {
+
+            View dlgView = getLayoutInflater().inflate(R.layout.dlg_qr, null);
+
+            ImageView imQr = dlgView.findViewById(R.id.iv_qr);
+            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+            Bitmap bitmap = barcodeEncoder.encodeBitmap(address, BarcodeFormat.QR_CODE, smallerDimension, smallerDimension);
+            imQr.setImageBitmap(bitmap);
+
+            TextView tvAddress = dlgView.findViewById(R.id.tv_address);
+            tvAddress.setText(StringHelper.getShortEthAddress(address));
+
+            ImageView btnCopy = dlgView.findViewById(R.id.btn_copy);
+            btnCopy.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    ClipboardManager clipboard = (ClipboardManager) getSystemService(Context.CLIPBOARD_SERVICE);
+                    clipboard.setText(address);
+                    Toast.makeText(WalletActivity.this, "Your address copied to clipboard", Toast.LENGTH_SHORT).show();
+                }
+            });
+
+            new AlertDialog.Builder(this)
+                    .setView(dlgView)
+                    .show();
+
+        } catch (Exception e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
     }
 
     @Override

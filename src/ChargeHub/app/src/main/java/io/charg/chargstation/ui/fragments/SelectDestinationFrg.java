@@ -1,20 +1,29 @@
 package io.charg.chargstation.ui.fragments;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.design.widget.Snackbar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.zxing.integration.android.IntentIntegrator;
+import com.google.zxing.integration.android.IntentResult;
+
+import org.web3j.crypto.Credentials;
+
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.ICallbackOnComplete;
-import io.charg.chargstation.services.helpers.DialogHelper;
 import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.ui.dialogs.EditTextDialog;
 
 public class SelectDestinationFrg extends BaseNavFragment {
+
+    public static final String QR_MODE_SCAN_ETH = "QR_MODE_SCAN_ETH";
+
+    private String mQrMode;
 
     private static final String KEY_ADDRESS = "KEY_ADDRESS";
     private String mEthAddress;
@@ -33,7 +42,7 @@ public class SelectDestinationFrg extends BaseNavFragment {
 
     @Override
     protected int getResourceId() {
-        return R.layout.frg_send_charg_selest_destination;
+        return R.layout.frg_send_charg_select_destination;
     }
 
     @Override
@@ -57,6 +66,36 @@ public class SelectDestinationFrg extends BaseNavFragment {
             }
         });
         dialog.show();
+    }
+
+    @OnClick(R.id.btn_load_from_qr)
+    void onBtnLoadFromQrClicked() {
+        mQrMode = QR_MODE_SCAN_ETH;
+        IntentIntegrator.forSupportFragment(this).initiateScan();
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        operateQrCodeResult(requestCode, resultCode, data);
+    }
+
+    private void operateQrCodeResult(int requestCode, int resultCode, Intent data) {
+        IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
+        if (result != null) {
+            if (result.getContents() != null) {
+                if (mQrMode.equals(QR_MODE_SCAN_ETH)) {
+                    String ethAddress = result.getContents();
+                    if (!ethAddress.contains("0x")) {
+                        Toast.makeText(getContext(), ethAddress + " - is not valid eth address", Toast.LENGTH_SHORT).show();
+                    } else {
+                        mEthAddress = ethAddress;
+                    }
+                }
+            }
+            refreshUI();
+        } else {
+            super.onActivityResult(requestCode, resultCode, data);
+        }
     }
 
     private void refreshUI() {
