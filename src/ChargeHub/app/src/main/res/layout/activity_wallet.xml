@@ -54,11 +54,17 @@
             </LinearLayout>
 
             <ImageButton
+                android:id="@+id/btn_show_qr_code"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="center_vertical"
+                android:src="@drawable/ic_fingerprint" />
+
+            <ImageButton
                 android:id="@+id/btn_copy_clipboard"
                 android:layout_width="48dp"
                 android:layout_height="48dp"
                 android:layout_gravity="center_vertical"
-                android:background="@android:color/transparent"
                 android:src="@drawable/ic_copy" />
 
         </LinearLayout>
