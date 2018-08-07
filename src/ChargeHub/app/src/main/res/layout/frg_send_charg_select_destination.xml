@@ -34,12 +34,11 @@
         android:text="Edit" />
 
     <Button
-        android:id="@+id/btn_load_camera"
+        android:id="@+id/btn_load_from_qr"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:drawableLeft="@drawable/ic_camera"
         android:text="Load from qr code"
-        android:visibility="gone"
         tools:visibility="visible" />
 
     <Button
