@@ -79,14 +79,14 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Get rate charging" />
+                        android:text="Charging rate" />
 
                     <Button
                         android:id="@+id/btn_update_rate_charging"
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Update rate charging" />
+                        android:text="Update charging rate" />
 
                 </LinearLayout>
 
@@ -143,6 +143,33 @@
                         android:text="Update parking rate" />
 
                 </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <Button
+                        android:id="@+id/btn_parking_on"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Parking on" />
+
+                    <Button
+                        android:id="@+id/btn_parking_off"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:text="Parking off" />
+
+                </LinearLayout>
+
+                <Button
+                    android:id="@+id/btn_parking_switches"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="Parking switches" />
 
             </LinearLayout>
 

@@ -1,6 +1,6 @@
 package io.charg.chargstation.ui.activities;
 
-import android.app.ActionBar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 
@@ -86,7 +86,7 @@ public class ContractActivity extends BaseAuthActivity {
 
     private void initToolbar() {
         setSupportActionBar(mToolbar);
-        ActionBar actionBar = getActionBar();
+        ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
