@@ -17,7 +17,6 @@
         <activity android:name=".ui.activities.SplashActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
@@ -43,8 +42,10 @@
                 <data android:scheme="${applicationId}.braintree" />
             </intent-filter>
         </activity>
-        <activity android:name=".ui.activities.BecomeOwnerActivity" />
+
         <activity android:name=".ui.activities.parkingActivity.ParkingActivity" />
+        <activity android:name=".ui.activities.becomeOwner.FamilyPlanActivity" />
+        <activity android:name=".ui.activities.becomeOwner.BecomeOwnerActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

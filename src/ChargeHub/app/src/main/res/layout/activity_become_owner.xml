@@ -6,9 +6,31 @@
 
     <include layout="@layout/action_bar_main" />
 
-    <com.github.barteksc.pdfviewer.PDFView
-        android:id="@+id/pdf_view"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="match_parent"
+        android:background="@color/colorPrimaryDark"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btn_show_family_plan"
+            android:layout_width="match_parent"
+            android:layout_height="96dp"
+            android:layout_margin="36dp"
+            android:drawableLeft="@drawable/ic_persons"
+            android:padding="24dp"
+            android:text="Charg family plan" />
+
+        <Button
+            android:id="@+id/btn_show_demo_video"
+            android:layout_width="match_parent"
+            android:layout_height="96dp"
+            android:layout_margin="36dp"
+            android:drawableLeft="@drawable/ic_video"
+            android:padding="24dp"
+            android:text="Demo video" />
+
+    </LinearLayout>
 
 </LinearLayout>

@@ -61,20 +61,21 @@ import io.charg.chargstation.root.Helpers;
 import io.charg.chargstation.root.IAsyncCommand;
 import io.charg.chargstation.root.ICallbackOnComplete;
 import io.charg.chargstation.root.ICameraChangeListener;
-import io.charg.chargstation.services.local.AccountService;
-import io.charg.chargstation.services.remote.firebase.ChargeHubService;
 import io.charg.chargstation.services.helpers.DialogHelper;
+import io.charg.chargstation.services.helpers.StringHelper;
+import io.charg.chargstation.services.local.AccountService;
 import io.charg.chargstation.services.local.FilteringService;
 import io.charg.chargstation.services.local.LocalDB;
-import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.services.remote.firebase.ChargeDbApi;
+import io.charg.chargstation.services.remote.firebase.ChargeHubService;
+import io.charg.chargstation.ui.activities.becomeOwner.BecomeOwnerActivity;
 import io.charg.chargstation.ui.activities.chargingActivity.ChargingActivity;
 import io.charg.chargstation.ui.activities.parkingActivity.ParkingActivity;
 import io.charg.chargstation.ui.views.ChargeClusterManager;
 
 public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback, ICameraChangeListener, ClusterManager.OnClusterItemClickListener<ChargeStationMarker> {
 
-    private static final int INITIAL_ZOOM_LEVEL = 7;
+    private static final int INITIAL_ZOOM_LEVEL = 8;
     private static final int SEARCH_ZOOM_LEVEL = 13;
     private static final int STATION_ZOOM_LEVEL = 20;
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1000;
@@ -382,11 +383,12 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
             return;
         }
 
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new LocationListener() {
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
             @Override
             public void onLocationChanged(Location location) {
                 Log.d("app", "Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
-                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), mGoogleMap.getCameraPosition().zoom));
+                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()),
+                        INITIAL_ZOOM_LEVEL));
                 mGoogleMap.addMarker(new MarkerOptions()
                         .position(new LatLng(location.getLatitude(), location.getLongitude()))
                         .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_location))));
@@ -409,12 +411,13 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
             }
         });
 
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         if (location != null) {
             mGoogleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(location.getLatitude(), location.getLongitude()))
                     .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_location))));
-            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), mGoogleMap.getCameraPosition().zoom));
+            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()),
+                    INITIAL_ZOOM_LEVEL));
         }
     }
 
