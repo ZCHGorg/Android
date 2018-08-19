@@ -3,6 +3,7 @@ package io.charg.chargstation.ui.activities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -33,8 +34,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -45,6 +48,7 @@ import com.google.zxing.integration.android.IntentResult;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import butterknife.BindView;
 import io.charg.chargstation.R;
@@ -298,7 +302,7 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
         mGeoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(final String key, final GeoLocation location) {
-                System.out.println(String.format("Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
+                System.out.println(String.format(Locale.getDefault(), "Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
 
                 if (mStationKeys.contains(key)) {
                     return;
@@ -339,7 +343,7 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
 
             @Override
             public void onKeyMoved(String key, GeoLocation location) {
-                System.out.println(String.format("Key %s moved within the search area to [%f,%f]", key, location.latitude, location.longitude));
+                System.out.println(String.format(Locale.getDefault(), "Key %s moved within the search area to [%f,%f]", key, location.latitude, location.longitude));
             }
 
             @Override
@@ -383,6 +387,9 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
             public void onLocationChanged(Location location) {
                 Log.d("app", "Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
                 mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), mGoogleMap.getCameraPosition().zoom));
+                mGoogleMap.addMarker(new MarkerOptions()
+                        .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                        .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_location))));
                 locationManager.removeUpdates(this);
             }
 
@@ -404,6 +411,9 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
 
         Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
         if (location != null) {
+            mGoogleMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                    .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_location))));
             mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), mGoogleMap.getCameraPosition().zoom));
         }
     }
