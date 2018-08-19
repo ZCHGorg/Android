@@ -14,22 +14,10 @@
         android:orientation="vertical"
         android:padding="16dp">
 
-        <TextView
-            style="@style/TextViewKey"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Result" />
-
-        <TextView
-            android:id="@+id/tv_status"
-            style="@style/TextViewValue"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            tools:text="Select smart contract function" />
-
         <android.support.v4.widget.NestedScrollView
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="0dp"
+            android:layout_weight="1">
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -86,7 +74,7 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Update charging rate" />
+                        android:text="Update rate" />
 
                 </LinearLayout>
 
@@ -140,7 +128,8 @@
                         android:layout_width="0dp"
                         android:layout_height="wrap_content"
                         android:layout_weight="1"
-                        android:text="Update parking rate" />
+                        android:enabled="false"
+                        android:text="Update rate" />
 
                 </LinearLayout>
 
@@ -174,6 +163,24 @@
             </LinearLayout>
 
         </android.support.v4.widget.NestedScrollView>
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="@color/dark_gray" />
+
+        <TextView
+            style="@style/TextViewKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Result" />
+
+        <TextView
+            android:id="@+id/tv_status"
+            style="@style/TextViewValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Select smart contract function" />
 
     </LinearLayout>
 
