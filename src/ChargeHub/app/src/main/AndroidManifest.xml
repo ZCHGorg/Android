@@ -44,8 +44,8 @@
         </activity>
 
         <activity android:name=".ui.activities.parkingActivity.ParkingActivity" />
-        <activity android:name=".ui.activities.becomeOwner.FamilyPlanActivity" />
         <activity android:name=".ui.activities.becomeOwner.BecomeOwnerActivity" />
+        <activity android:name=".ui.activities.becomeOwner.FamilyPlanActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

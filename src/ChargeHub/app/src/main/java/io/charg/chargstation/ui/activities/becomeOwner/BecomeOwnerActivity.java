@@ -1,6 +1,7 @@
 package io.charg.chargstation.ui.activities.becomeOwner;
 
 import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 
@@ -36,6 +37,11 @@ public class BecomeOwnerActivity extends BaseActivity {
     @OnClick(R.id.btn_show_family_plan)
     void onBtnShowFamilyPlanClicked() {
         startActivity(new Intent(this, FamilyPlanActivity.class));
+    }
+
+    @OnClick(R.id.btn_show_demo_video)
+    void onBtnShowDemoVideoClicked() {
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=_tDKp1fo5HA")));
     }
 
     @Override
