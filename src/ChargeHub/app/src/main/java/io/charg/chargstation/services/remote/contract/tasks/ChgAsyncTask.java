@@ -17,10 +17,10 @@ import io.charg.chargstation.services.remote.contract.ChargCoinContract;
 
 public abstract class ChgAsyncTask<T> {
 
-    protected ICallbackOnComplete<T> mCompleteListener;
-    protected ICallbackOnError<String> mErrorListener;
-    protected ICallbackOnPrepare mPrepareListener;
-    protected ICallbackOnFinish mFinishListener;
+    ICallbackOnComplete<T> mCompleteListener;
+    ICallbackOnError<String> mErrorListener;
+    ICallbackOnPrepare mPrepareListener;
+    ICallbackOnFinish mFinishListener;
 
     final Web3j mWeb3j;
     final ChargCoinContract mContract;

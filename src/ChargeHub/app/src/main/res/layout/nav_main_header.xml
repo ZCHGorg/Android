@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
@@ -22,13 +21,13 @@
             android:layout_gravity="left"
             android:layout_marginTop="12dp"
             android:background="@android:color/transparent"
-            android:src="@drawable/charg"/>
+            android:src="@drawable/charg" />
 
         <TextView
             style="@style/TextViewKey"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Station ID:"/>
+            android:text="Station ID:" />
 
         <TextView
             android:id="@+id/tv_station_id"
@@ -36,27 +35,50 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="N/A"
-            tools:text="android.studio@android.com"/>
+            tools:text="android.studio@android.com" />
 
         <View
             android:layout_width="match_parent"
             android:layout_height="1dp"
             android:layout_marginBottom="4dp"
             android:layout_marginTop="4dp"
-            android:background="@color/dark_gray"/>
+            android:background="@color/dark_gray" />
 
-        <TextView
-            style="@style/TextViewKey"
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="ETH Address:"/>
+            android:orientation="horizontal">
 
-        <TextView
-            android:id="@+id/tv_eth_address"
-            style="@style/TextViewValue"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            tools:text="android.studio@android.com"/>
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    style="@style/TextViewKey"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:text="ETH Address:" />
+
+                <TextView
+                    android:id="@+id/tv_eth_address"
+                    style="@style/TextViewValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    tools:text="android.studio@android.com" />
+
+            </LinearLayout>
+
+            <ImageButton
+                android:id="@+id/btn_show_qr_code"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:padding="8dp"
+                android:src="@mipmap/ic_qr" />
+
+        </LinearLayout>
 
     </LinearLayout>
 

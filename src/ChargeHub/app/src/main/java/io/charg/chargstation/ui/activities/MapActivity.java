@@ -17,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -51,6 +52,7 @@ import java.util.List;
 import java.util.Locale;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.models.ChargeStationMarker;
 import io.charg.chargstation.models.GeoFireRequest;
@@ -60,6 +62,9 @@ import io.charg.chargstation.root.CommonData;
 import io.charg.chargstation.root.Helpers;
 import io.charg.chargstation.root.IAsyncCommand;
 import io.charg.chargstation.root.ICallbackOnComplete;
+import io.charg.chargstation.root.ICallbackOnError;
+import io.charg.chargstation.root.ICallbackOnFinish;
+import io.charg.chargstation.root.ICallbackOnPrepare;
 import io.charg.chargstation.root.ICameraChangeListener;
 import io.charg.chargstation.services.helpers.DialogHelper;
 import io.charg.chargstation.services.helpers.StringHelper;
@@ -68,12 +73,16 @@ import io.charg.chargstation.services.local.FilteringService;
 import io.charg.chargstation.services.local.LocalDB;
 import io.charg.chargstation.services.remote.firebase.ChargeDbApi;
 import io.charg.chargstation.services.remote.firebase.ChargeHubService;
+import io.charg.chargstation.services.remote.firebase.tasks.GetStationDtoTask;
 import io.charg.chargstation.ui.activities.becomeOwner.BecomeOwnerActivity;
 import io.charg.chargstation.ui.activities.chargingActivity.ChargingActivity;
 import io.charg.chargstation.ui.activities.parkingActivity.ParkingActivity;
+import io.charg.chargstation.ui.dialogs.TxWaitDialog;
 import io.charg.chargstation.ui.views.ChargeClusterManager;
 
-public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback, ICameraChangeListener, ClusterManager.OnClusterItemClickListener<ChargeStationMarker> {
+public class MapActivity
+        extends BaseAuthActivity
+        implements OnMapReadyCallback, ICameraChangeListener, ClusterManager.OnClusterItemClickListener<ChargeStationMarker> {
 
     private static final int INITIAL_ZOOM_LEVEL = 8;
     private static final int SEARCH_ZOOM_LEVEL = 13;
@@ -182,6 +191,13 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
     private void initNavigationView() {
 
         tvEthAddress = mNavigationView.getHeaderView(0).findViewById(R.id.tv_eth_address);
+
+        mNavigationView.getHeaderView(0).findViewById(R.id.btn_show_qr_code).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogHelper.showQrCode(MapActivity.this, mAccountService.getEthAddress());
+            }
+        });
 
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -436,19 +452,45 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
             return true;
         }
 
-        mChargeCoinApi.getStationAsync(marker.getKey(), new ICallbackOnComplete<StationDto>() {
-            @Override
-            public void onComplete(StationDto result) {
-
-                if (result == null) {
-                    Toast.makeText(MapActivity.this, R.string.error_loading_data, Toast.LENGTH_SHORT).show();
-                } else {
-                    startActivity(new Intent(MapActivity.this, StationActivity.class)
-                            .putExtra(StationActivity.ARG_STATION_KEY, marker.getKey()));
-                }
-            }
-        });
+        findStationByEthAddressAsync(marker.getKey());
         return true;
+    }
+
+    private void findStationByEthAddressAsync(final String ethAddress) {
+        final TxWaitDialog mDialog = new TxWaitDialog(MapActivity.this, getString(R.string.loading));
+
+        new GetStationDtoTask(ethAddress)
+                .setPrepareCallback(new ICallbackOnPrepare() {
+                    @Override
+                    public void onPrepare() {
+                        mDialog.show();
+                    }
+                })
+                .setFinishCallback(new ICallbackOnFinish() {
+                    @Override
+                    public void onFinish() {
+                        mDialog.dismiss();
+                    }
+                })
+                .setErrorCallback(new ICallbackOnError<DatabaseError>() {
+                    @Override
+                    public void onError(DatabaseError message) {
+                        Toast.makeText(MapActivity.this, message.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setCompleteCallback(new ICallbackOnComplete<StationDto>() {
+                    @Override
+                    public void onComplete(StationDto result) {
+                        if (result == null) {
+                            Toast.makeText(MapActivity.this, "Couldn't find station " + ethAddress, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        startActivity(new Intent(MapActivity.this, StationActivity.class)
+                                .putExtra(StationActivity.ARG_STATION_KEY, ethAddress));
+                    }
+                })
+                .executeAsync();
     }
 
     @Override
@@ -520,15 +562,18 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
 
     private void operateQrCodeResult(int requestCode, int resultCode, Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if (result != null) {
-            if (result.getContents() == null) {
-                Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
-            }
-        } else {
+        if (result == null) {
             super.onActivityResult(requestCode, resultCode, data);
+            return;
         }
+
+        final String scannedEthAddress = result.getContents();
+
+        if (scannedEthAddress == null) {
+            return;
+        }
+
+        findStationByEthAddressAsync(scannedEthAddress);
     }
 
     private void operateGooglePlacesResult(int requestCode, int resultCode, Intent data) {
@@ -542,4 +587,14 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
             }
         }
     }
+
+    @OnClick(R.id.btn_scan_qr_code)
+    void onBtnScanQrCodeClicked() {
+        new IntentIntegrator(this)
+                .setPrompt("Scan charge station's QR code")
+                .setBeepEnabled(false)
+                .setBarcodeImageEnabled(true)
+                .initiateScan();
+    }
+
 }
