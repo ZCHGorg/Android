@@ -46,6 +46,8 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import org.web3j.protocol.Web3j;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -77,6 +79,7 @@ import io.charg.chargstation.services.remote.firebase.tasks.GetStationDtoTask;
 import io.charg.chargstation.ui.activities.becomeOwner.BecomeOwnerActivity;
 import io.charg.chargstation.ui.activities.chargingActivity.ChargingActivity;
 import io.charg.chargstation.ui.activities.parkingActivity.ParkingActivity;
+import io.charg.chargstation.ui.activities.stationActivity.StationActivity;
 import io.charg.chargstation.ui.dialogs.TxWaitDialog;
 import io.charg.chargstation.ui.views.ChargeClusterManager;
 

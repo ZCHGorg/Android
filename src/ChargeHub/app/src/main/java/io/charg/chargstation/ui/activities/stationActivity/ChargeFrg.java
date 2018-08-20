@@ -1,4 +1,4 @@
-package io.charg.chargstation.ui.fragments;
+package io.charg.chargstation.ui.activities.stationActivity;
 
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
@@ -31,8 +31,8 @@ import io.charg.chargstation.services.remote.firebase.ChargeHubService;
 import io.charg.chargstation.services.helpers.DialogHelper;
 import io.charg.chargstation.services.remote.contract.SmartContractManager;
 import io.charg.chargstation.services.helpers.StringHelper;
-import io.charg.chargstation.ui.activities.StationActivity;
 import io.charg.chargstation.ui.dialogs.SendChargDialog;
+import io.charg.chargstation.ui.fragments.BaseFragment;
 
 /**
  * Created by oleg on 04.11.2017.
