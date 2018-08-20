@@ -1,5 +1,6 @@
 package io.charg.chargstation.ui.activities.chargingActivity;
 
+import android.app.Activity;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -16,6 +17,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.ICallbackOnComplete;
+import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.services.local.AccountService;
 import io.charg.chargstation.services.remote.contract.dto.SwitchesDto;
 import io.charg.chargstation.services.remote.contract.tasks.GetChargingSwitchesTask;
@@ -85,22 +87,30 @@ public class ChargingFrg extends BaseNavFragment {
             public void run() {
                 while (true) {
                     if (mEnded) {
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                endProcessUI();
-                            }
-                        });
+                        Activity activity = getActivity();
+
+                        if (activity != null) {
+                            activity.runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    endProcessUI();
+                                }
+                            });
+                        }
                         break;
                     }
                     final long curTime = Calendar.getInstance().getTimeInMillis();
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            mTvTimeLeft.setText(String.format(Locale.getDefault(), "%d seconds",
-                                    mSwitchesDto.EndTime.longValue() - curTime / 1000));
-                        }
-                    });
+
+                    Activity activity = getActivity();
+                    if (activity != null) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                mTvTimeLeft.setText(String.format(Locale.getDefault(), "%d seconds",
+                                        mSwitchesDto.EndTime.longValue() - curTime / 1000));
+                            }
+                        });
+                    }
 
                     if (curTime > mSwitchesDto.EndTime.longValue() * 1000L) {
                         mEnded = true;
@@ -144,8 +154,8 @@ public class ChargingFrg extends BaseNavFragment {
             @Override
             public void onComplete(SwitchesDto result) {
                 mSwitchesDto = result;
-                mTvStartTime.setText(new Date(result.StartTime.longValue() * 1000L).toString());
-                mTvEndTime.setText(new Date(result.EndTime.longValue() * 1000L).toString());
+                mTvStartTime.setText(StringHelper.getTimeStr(new Date(result.StartTime.longValue() * 1000L)));
+                mTvEndTime.setText(StringHelper.getTimeStr(new Date(result.EndTime.longValue() * 1000L)));
 
                 startProcessUI();
             }
