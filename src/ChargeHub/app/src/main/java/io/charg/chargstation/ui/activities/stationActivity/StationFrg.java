@@ -1,10 +1,9 @@
-package io.charg.chargstation.ui.fragments;
+package io.charg.chargstation.ui.activities.stationActivity;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -25,18 +24,18 @@ import io.charg.chargstation.root.ICallbackOnError;
 import io.charg.chargstation.root.ICallbackOnFinish;
 import io.charg.chargstation.root.ICallbackOnPrepare;
 import io.charg.chargstation.root.IStationFrgListener;
+import io.charg.chargstation.services.helpers.StringHelper;
+import io.charg.chargstation.services.local.FilteringService;
 import io.charg.chargstation.services.remote.contract.dto.SwitchesDto;
 import io.charg.chargstation.services.remote.contract.tasks.GetAuthorizeTask;
 import io.charg.chargstation.services.remote.contract.tasks.GetChargingSwitchesTask;
 import io.charg.chargstation.services.remote.contract.tasks.GetParkingSwitchesTask;
 import io.charg.chargstation.services.remote.firebase.ChargeHubService;
-import io.charg.chargstation.services.local.FilteringService;
-import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.services.remote.firebase.tasks.GetStationDtoTask;
-import io.charg.chargstation.ui.activities.StationActivity;
 import io.charg.chargstation.ui.activities.chargingActivity.ChargingActivity;
 import io.charg.chargstation.ui.activities.parkingActivity.ParkingActivity;
 import io.charg.chargstation.ui.dialogs.TxWaitDialog;
+import io.charg.chargstation.ui.fragments.BaseFragment;
 
 /**
  * Created by oleg on 04.11.2017.
@@ -92,9 +91,6 @@ public class StationFrg extends BaseFragment {
 
     @BindView(R.id.iv_station)
     ImageView ivStation;
-
-    @BindView(R.id.layout_content)
-    ViewGroup mLayoutContent;
 
     @Override
     protected int getResourceId() {

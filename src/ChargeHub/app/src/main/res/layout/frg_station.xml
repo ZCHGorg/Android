@@ -1,21 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
-<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/colorPrimaryDark">
+    android:background="@color/colorPrimaryDark"
+    android:orientation="vertical">
 
-    <ScrollView
+    <android.support.v4.widget.NestedScrollView
         android:id="@+id/layout_content"
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="0dp"
+        android:layout_weight="1">
 
         <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_marginTop="8dp"
             android:orientation="vertical">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/TextViewKey"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical|end"
+                    android:text="Eth address" />
+
+                <TextView
+                    android:id="@+id/tv_eth_address"
+                    style="@style/TextViewValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    tools:text="Berlin" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/TextViewKey"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical|end"
+                    android:text="Auth status" />
+
+                <TextView
+                    tools:xdrawableLeft="@drawable/ic_ok"
+                    android:drawablePadding="8dp"
+                    android:id="@+id/tv_auth_status"
+                    style="@style/TextViewValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    tools:text="Berlin" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/TextViewKey"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical|end"
+                    android:text="Charging status" />
+
+                <TextView
+                    tools:xdrawableLeft="@drawable/ic_ok"
+                    android:drawablePadding="8dp"
+                    android:id="@+id/tv_charge_status"
+                    style="@style/TextViewValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    tools:text="Berlin" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_horizontal"
+                android:orientation="horizontal">
+
+                <TextView
+                    style="@style/TextViewKey"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center_vertical|end"
+                    android:text="Parking status" />
+
+                <TextView
+                    tools:xdrawableLeft="@drawable/ic_ok"
+                    android:drawablePadding="8dp"
+                    android:id="@+id/tv_parking_status"
+                    style="@style/TextViewValue"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    tools:text="Berlin" />
+
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_margin="4dp"
+                android:background="@color/dark_gray" />
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -247,59 +357,51 @@
 
             </android.support.v7.widget.CardView>
 
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <Button
-                    android:id="@+id/btn_directions"
-                    android:layout_width="0dp"
-                    android:layout_height="64dp"
-                    android:layout_margin="4dp"
-                    android:layout_weight="1"
-                    android:backgroundTint="@color/dark_red"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:padding="8dp"
-                    android:text="Get directions"
-                    android:textColor="@android:color/white" />
-
-                <Button
-                    android:id="@+id/btn_charge"
-                    android:layout_width="0dp"
-                    android:layout_height="64dp"
-                    android:layout_margin="4dp"
-                    android:layout_weight="1"
-                    android:backgroundTint="@color/dark_green"
-                    android:drawableLeft="@drawable/ic_power"
-                    android:foreground="?android:attr/selectableItemBackground"
-                    android:padding="8dp"
-                    android:text="Charg!" />
-
-                <Button
-                    android:id="@+id/btn_park"
-                    android:layout_width="0dp"
-                    android:layout_height="64dp"
-                    android:layout_margin="4dp"
-                    android:layout_weight="1"
-                    android:backgroundTint="@color/dark_green"
-                    android:drawableLeft="@drawable/ic_parking"
-                    android:padding="8dp"
-                    android:text="@string/parking" />
-
-            </LinearLayout>
 
         </LinearLayout>
 
-    </ScrollView>
+    </android.support.v4.widget.NestedScrollView>
 
-    <ProgressBar
-        android:id="@+id/progress"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:indeterminate="true"
-        android:visibility="gone"
-        tools:visibility="visible" />
+        android:orientation="horizontal">
 
-</FrameLayout>
+        <Button
+            android:id="@+id/btn_directions"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/dark_red"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:padding="8dp"
+            android:text="Get directions"
+            android:textColor="@android:color/white" />
+
+        <Button
+            android:id="@+id/btn_charge"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/dark_green"
+            android:drawableLeft="@drawable/ic_power"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:padding="8dp"
+            android:text="Charg!" />
+
+        <Button
+            android:id="@+id/btn_park"
+            android:layout_width="0dp"
+            android:layout_height="64dp"
+            android:layout_margin="4dp"
+            android:layout_weight="1"
+            android:backgroundTint="@color/dark_green"
+            android:drawableLeft="@drawable/ic_parking"
+            android:padding="8dp"
+            android:text="@string/parking" />
+
+    </LinearLayout>
+
+</LinearLayout>

@@ -22,7 +22,6 @@
         </activity>
 
         <activity android:name=".ui.activities.MapActivity"/>
-        <activity android:name=".ui.activities.StationActivity"/>
         <activity android:name=".ui.activities.WalletActivity"/>
         <activity android:name=".ui.activities.ChangeWalletActivity"/>
         <activity android:name=".ui.activities.FilterActivity"/>
@@ -46,6 +45,7 @@
         <activity android:name=".ui.activities.parkingActivity.ParkingActivity" />
         <activity android:name=".ui.activities.becomeOwner.BecomeOwnerActivity" />
         <activity android:name=".ui.activities.becomeOwner.FamilyPlanActivity" />
+        <activity android:name=".ui.activities.stationActivity.StationActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

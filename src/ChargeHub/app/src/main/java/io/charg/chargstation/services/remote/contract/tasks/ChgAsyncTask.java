@@ -42,20 +42,24 @@ public abstract class ChgAsyncTask<T> {
 
     }
 
-    public void setCompleteListener(ICallbackOnComplete<T> completeListener) {
+    public ChgAsyncTask<T> setCompleteListener(ICallbackOnComplete<T> completeListener) {
         mCompleteListener = completeListener;
+        return this;
     }
 
-    public void setErrorListener(ICallbackOnError<String> errorListener) {
+    public ChgAsyncTask<T> setErrorListener(ICallbackOnError<String> errorListener) {
         mErrorListener = errorListener;
+        return this;
     }
 
-    public void setPrepareListener(ICallbackOnPrepare prepareListener) {
+    public ChgAsyncTask<T> setPrepareListener(ICallbackOnPrepare prepareListener) {
         this.mPrepareListener = prepareListener;
+        return this;
     }
 
-    public void setFinishListener(ICallbackOnFinish finishListener) {
+    public ChgAsyncTask<T> setFinishListener(ICallbackOnFinish finishListener) {
         this.mFinishListener = finishListener;
+        return this;
     }
 
     void invokeOnComplete(final T result) {
