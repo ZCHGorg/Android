@@ -44,6 +44,11 @@ public class BecomeOwnerActivity extends BaseActivity {
         startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=_tDKp1fo5HA")));
     }
 
+    @OnClick(R.id.btn_show_afficate_program)
+    void onBtnShowAffilateProgram(){
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://wecharg.com/affiliate-account-page/")));
+    }
+
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();

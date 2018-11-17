@@ -23,10 +23,19 @@
         android:orientation="vertical">
 
         <Button
+            android:id="@+id/btn_show_afficate_program"
+            android:layout_width="match_parent"
+            android:layout_height="96dp"
+            android:layout_margin="16dp"
+            android:drawableLeft="@drawable/ic_persons"
+            android:padding="24dp"
+            android:text="Affilate program" />
+
+        <Button
             android:id="@+id/btn_show_family_plan"
             android:layout_width="match_parent"
             android:layout_height="96dp"
-            android:layout_margin="36dp"
+            android:layout_margin="16dp"
             android:drawableLeft="@drawable/ic_persons"
             android:padding="24dp"
             android:text="Charg family plan" />
@@ -35,7 +44,7 @@
             android:id="@+id/btn_show_demo_video"
             android:layout_width="match_parent"
             android:layout_height="96dp"
-            android:layout_margin="36dp"
+            android:layout_margin="16dp"
             android:drawableLeft="@drawable/ic_video"
             android:padding="24dp"
             android:text="Demo video" />
