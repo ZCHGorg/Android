@@ -47,11 +47,18 @@ import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 import org.web3j.protocol.Web3j;
+import org.web3j.protocol.Web3jFactory;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.EthBlock;
+import org.web3j.protocol.core.methods.response.Transaction;
+import org.web3j.protocol.http.HttpService;
 
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -73,6 +80,7 @@ import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.services.local.AccountService;
 import io.charg.chargstation.services.local.FilteringService;
 import io.charg.chargstation.services.local.LocalDB;
+import io.charg.chargstation.services.local.SettingsProvider;
 import io.charg.chargstation.services.remote.firebase.ChargeDbApi;
 import io.charg.chargstation.services.remote.firebase.ChargeHubService;
 import io.charg.chargstation.services.remote.firebase.tasks.GetStationDtoTask;
@@ -82,6 +90,7 @@ import io.charg.chargstation.ui.activities.parkingActivity.ParkingActivity;
 import io.charg.chargstation.ui.activities.stationActivity.StationActivity;
 import io.charg.chargstation.ui.dialogs.TxWaitDialog;
 import io.charg.chargstation.ui.views.ChargeClusterManager;
+import rx.Subscriber;
 
 public class MapActivity
         extends BaseAuthActivity
@@ -89,7 +98,7 @@ public class MapActivity
 
     private static final int INITIAL_ZOOM_LEVEL = 8;
     private static final int SEARCH_ZOOM_LEVEL = 13;
-    private static final int STATION_ZOOM_LEVEL = 20;
+    private static final int STATION_ZOOM_LEVEL = 18;
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1000;
     private static final int FILTER_ACTIVITY_REQUEST_CODE = 1001;
 
@@ -166,10 +175,10 @@ public class MapActivity
 
     private void loadAccountData() {
         String ethAddress = mAccountService.getEthAddress();
-        if (!ethAddress.isEmpty()) {
-            tvEthAddress.setText(StringHelper.getShortEthAddress(ethAddress));
+        if (ethAddress == null) {
+            tvEthAddress.setText(R.string.not_defined);
         } else {
-            tvEthAddress.setText(StringHelper.getValueOrNotDefine(ethAddress));
+            tvEthAddress.setText(StringHelper.getShortEthAddress(ethAddress));
         }
     }
 
@@ -301,7 +310,11 @@ public class MapActivity
         mGoogleMap.setOnCameraIdleListener(mClusterManager);
         mGoogleMap.setOnMarkerClickListener(mClusterManager);
 
-        getLocationAsync();
+        if (mInitLocation != null) {
+            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mInitLocation, STATION_ZOOM_LEVEL));
+        } else {
+            getCurrentLocationAsync();
+        }
     }
 
     private void initGeoFire() {
@@ -376,21 +389,15 @@ public class MapActivity
                 Toast.makeText(MapActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        getLocationAsync();
+        getCurrentLocationAsync();
     }
 
-    private void getLocationAsync() {
-
-        if (mInitLocation != null) {
-            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mInitLocation, STATION_ZOOM_LEVEL));
-            return;
-        }
+    private void getCurrentLocationAsync() {
 
         final LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (locationManager == null) {
@@ -402,41 +409,42 @@ public class MapActivity
             return;
         }
 
-        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                Log.d("app", "Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
-                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()),
-                        INITIAL_ZOOM_LEVEL));
-                mGoogleMap.addMarker(new MarkerOptions()
-                        .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                        .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_location))));
-                locationManager.removeUpdates(this);
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-                Log.d("Latitude", "disable");
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-                Log.d("Latitude", "enable");
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-                Log.d("Latitude", "status");
-            }
-        });
-
         Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         if (location != null) {
+            System.out.println("Location: " + location.toString());
             mGoogleMap.addMarker(new MarkerOptions()
                     .position(new LatLng(location.getLatitude(), location.getLongitude()))
                     .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_location))));
-            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()),
-                    INITIAL_ZOOM_LEVEL));
+            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()),
+                    STATION_ZOOM_LEVEL));
+        } else {
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    System.out.println("Location: " + location.toString());
+                    mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()),
+                            STATION_ZOOM_LEVEL));
+                    mGoogleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                            .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_location))));
+                    locationManager.removeUpdates(this);
+                }
+
+                @Override
+                public void onProviderDisabled(String provider) {
+                    Log.d("Latitude", "disable");
+                }
+
+                @Override
+                public void onProviderEnabled(String provider) {
+                    Log.d("Latitude", "enable");
+                }
+
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
+                    Log.d("Latitude", "status");
+                }
+            });
         }
     }
 
@@ -505,6 +513,10 @@ public class MapActivity
 
     private void operateFilterResult(int requestCode, int resultCode, Intent data) {
         if (requestCode != FILTER_ACTIVITY_REQUEST_CODE) {
+            return;
+        }
+
+        if (mClusterManager == null) {
             return;
         }
 
@@ -598,6 +610,11 @@ public class MapActivity
                 .setBeepEnabled(false)
                 .setBarcodeImageEnabled(true)
                 .initiateScan();
+    }
+
+    @OnClick(R.id.btn_get_my_location)
+    void onBtnGetMyLocationClicked() {
+        getCurrentLocationAsync();
     }
 
 }
