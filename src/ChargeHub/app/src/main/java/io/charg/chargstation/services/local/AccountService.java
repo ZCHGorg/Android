@@ -29,10 +29,10 @@ public class AccountService {
     public String getEthAddress() {
         String privateKey = getPrivateKey();
         if (privateKey == null || privateKey.isEmpty()) {
-            return privateKey;
+            return null;
         }
 
         Credentials credentials = Credentials.create(privateKey);
-        return credentials.getAddress();
+        return credentials.getAddress().toLowerCase();
     }
 }

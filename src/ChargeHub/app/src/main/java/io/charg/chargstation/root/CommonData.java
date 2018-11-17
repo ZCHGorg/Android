@@ -25,6 +25,8 @@ public class CommonData {
     public static final String SMART_CONTRACT_ADDRESS = "0x0030740494631cd406e202fe2b91517c7d689259";*/
 
     //using
+    public static final String SMART_CONTRACT_ADDRESS_MAIN = "0xC4A86561cb0b7EA1214904f26E6D50FD357C7986";
+
     public static final String SMART_CONTRACT_ADDRESS = "0x0030740494631cd406e202fe2b91517c7d689259";
 
     public static final float PRICE_CHG_USD = 1.5f;

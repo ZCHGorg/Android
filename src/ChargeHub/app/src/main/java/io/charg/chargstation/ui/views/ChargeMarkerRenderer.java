@@ -30,8 +30,7 @@ public class ChargeMarkerRenderer extends DefaultClusterRenderer<ChargeStationMa
 
     @Override
     protected void onBeforeClusterItemRendered(ChargeStationMarker item, MarkerOptions markerOptions) {
-        Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.drawable.marker);
-        bitmap = Bitmap.createScaledBitmap(bitmap, 96, 96, false);
+        Bitmap bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.ic_station_marker);
 
         markerOptions.snippet(item.getSnippet());
         markerOptions.title(item.getTitle());

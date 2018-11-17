@@ -1,5 +1,8 @@
 package io.charg.chargstation.services.helpers;
 
+import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.Locale;
 
 import io.charg.chargstation.root.CommonData;
@@ -44,5 +47,9 @@ public class StringHelper {
 
     public static String getBalanceChgStr(double value) {
         return String.format(Locale.getDefault(), "%.3f CHG", value);
+    }
+
+    public static String getTimeStr(Date date) {
+        return new SimpleDateFormat("d-MMM-yyyy HH:mm:ss", Locale.getDefault()).format(date);
     }
 }

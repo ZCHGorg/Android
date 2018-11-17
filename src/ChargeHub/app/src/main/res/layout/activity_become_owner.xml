@@ -2,13 +2,53 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/colorPrimaryDark"
     android:orientation="vertical">
 
     <include layout="@layout/action_bar_main" />
 
-    <com.github.barteksc.pdfviewer.PDFView
-        android:id="@+id/pdf_view"
+    <TextView
+        style="@style/Base.TextAppearance.AppCompat.Large"
         android:layout_width="match_parent"
-        android:layout_height="match_parent" />
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:padding="24dp"
+        android:text="@string/become_station_owner"
+        android:textColor="@android:color/white" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:gravity="center"
+        android:orientation="vertical">
+
+        <Button
+            android:id="@+id/btn_show_afficate_program"
+            android:layout_width="match_parent"
+            android:layout_height="96dp"
+            android:layout_margin="16dp"
+            android:drawableLeft="@drawable/ic_persons"
+            android:padding="24dp"
+            android:text="Affilate program" />
+
+        <Button
+            android:id="@+id/btn_show_family_plan"
+            android:layout_width="match_parent"
+            android:layout_height="96dp"
+            android:layout_margin="16dp"
+            android:drawableLeft="@drawable/ic_persons"
+            android:padding="24dp"
+            android:text="Charg family plan" />
+
+        <Button
+            android:id="@+id/btn_show_demo_video"
+            android:layout_width="match_parent"
+            android:layout_height="96dp"
+            android:layout_margin="16dp"
+            android:drawableLeft="@drawable/ic_video"
+            android:padding="24dp"
+            android:text="Demo video" />
+
+    </LinearLayout>
 
 </LinearLayout>

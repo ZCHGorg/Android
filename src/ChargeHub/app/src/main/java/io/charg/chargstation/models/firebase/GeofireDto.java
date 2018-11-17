@@ -1,5 +1,7 @@
 package io.charg.chargstation.models.firebase;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class GeofireDto {
@@ -9,6 +11,7 @@ public class GeofireDto {
     private List<Double> l;
 
     public GeofireDto() {
+        l = new ArrayList<>(Arrays.asList(0.0, 0.0));
     }
 
     public String getG() {

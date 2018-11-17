@@ -66,7 +66,7 @@ public class ChargeOnForceTask extends ChgAsyncTask<TransactionReceipt> {
                 if (result.Initialized) {
                     TransactionReceipt tx = new TransactionReceipt();
                     tx.setStatus("0x1");
-                    if (result.EndTime.longValue() > Calendar.getInstance().getTimeInMillis() / 1000L) {
+                    if (result.EndTime.longValue() > Calendar.getInstance().getTimeInMillis() / 1000L && result.Node.equals(mAddress)) {
                         invokeOnComplete(tx);
                     } else {
                         mChargeOffTask.executeAsync();

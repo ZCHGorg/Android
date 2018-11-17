@@ -89,4 +89,6 @@
     <string name="you_must_stop_parking">You must stop parking</string>
     <string name="stop">Stop</string>
     <string name="parking_off">Parking off</string>
+    <string name="free">Free</string>
+    <string name="busy">Busy</string>
 </resources>

@@ -3,6 +3,7 @@ package io.charg.chargstation.ui.activities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -16,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -33,8 +35,10 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
@@ -42,11 +46,22 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import org.web3j.protocol.Web3j;
+import org.web3j.protocol.Web3jFactory;
+import org.web3j.protocol.core.DefaultBlockParameterName;
+import org.web3j.protocol.core.methods.response.EthBlock;
+import org.web3j.protocol.core.methods.response.Transaction;
+import org.web3j.protocol.http.HttpService;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+import java.util.concurrent.ExecutionException;
+import java.util.function.Consumer;
 
 import butterknife.BindView;
+import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.models.ChargeStationMarker;
 import io.charg.chargstation.models.GeoFireRequest;
@@ -56,23 +71,34 @@ import io.charg.chargstation.root.CommonData;
 import io.charg.chargstation.root.Helpers;
 import io.charg.chargstation.root.IAsyncCommand;
 import io.charg.chargstation.root.ICallbackOnComplete;
+import io.charg.chargstation.root.ICallbackOnError;
+import io.charg.chargstation.root.ICallbackOnFinish;
+import io.charg.chargstation.root.ICallbackOnPrepare;
 import io.charg.chargstation.root.ICameraChangeListener;
-import io.charg.chargstation.services.local.AccountService;
-import io.charg.chargstation.services.remote.firebase.ChargeHubService;
 import io.charg.chargstation.services.helpers.DialogHelper;
+import io.charg.chargstation.services.helpers.StringHelper;
+import io.charg.chargstation.services.local.AccountService;
 import io.charg.chargstation.services.local.FilteringService;
 import io.charg.chargstation.services.local.LocalDB;
-import io.charg.chargstation.services.helpers.StringHelper;
+import io.charg.chargstation.services.local.SettingsProvider;
 import io.charg.chargstation.services.remote.firebase.ChargeDbApi;
+import io.charg.chargstation.services.remote.firebase.ChargeHubService;
+import io.charg.chargstation.services.remote.firebase.tasks.GetStationDtoTask;
+import io.charg.chargstation.ui.activities.becomeOwner.BecomeOwnerActivity;
 import io.charg.chargstation.ui.activities.chargingActivity.ChargingActivity;
 import io.charg.chargstation.ui.activities.parkingActivity.ParkingActivity;
+import io.charg.chargstation.ui.activities.stationActivity.StationActivity;
+import io.charg.chargstation.ui.dialogs.TxWaitDialog;
 import io.charg.chargstation.ui.views.ChargeClusterManager;
+import rx.Subscriber;
 
-public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback, ICameraChangeListener, ClusterManager.OnClusterItemClickListener<ChargeStationMarker> {
+public class MapActivity
+        extends BaseAuthActivity
+        implements OnMapReadyCallback, ICameraChangeListener, ClusterManager.OnClusterItemClickListener<ChargeStationMarker> {
 
-    private static final int INITIAL_ZOOM_LEVEL = 7;
+    private static final int INITIAL_ZOOM_LEVEL = 8;
     private static final int SEARCH_ZOOM_LEVEL = 13;
-    private static final int STATION_ZOOM_LEVEL = 20;
+    private static final int STATION_ZOOM_LEVEL = 18;
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1000;
     private static final int FILTER_ACTIVITY_REQUEST_CODE = 1001;
 
@@ -149,10 +175,10 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
 
     private void loadAccountData() {
         String ethAddress = mAccountService.getEthAddress();
-        if (!ethAddress.isEmpty()) {
-            tvEthAddress.setText(StringHelper.getShortEthAddress(ethAddress));
+        if (ethAddress == null) {
+            tvEthAddress.setText(R.string.not_defined);
         } else {
-            tvEthAddress.setText(StringHelper.getValueOrNotDefine(ethAddress));
+            tvEthAddress.setText(StringHelper.getShortEthAddress(ethAddress));
         }
     }
 
@@ -177,6 +203,13 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
     private void initNavigationView() {
 
         tvEthAddress = mNavigationView.getHeaderView(0).findViewById(R.id.tv_eth_address);
+
+        mNavigationView.getHeaderView(0).findViewById(R.id.btn_show_qr_code).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                DialogHelper.showQrCode(MapActivity.this, mAccountService.getEthAddress());
+            }
+        });
 
         mNavigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             @Override
@@ -277,7 +310,11 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
         mGoogleMap.setOnCameraIdleListener(mClusterManager);
         mGoogleMap.setOnMarkerClickListener(mClusterManager);
 
-        getLocationAsync();
+        if (mInitLocation != null) {
+            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(mInitLocation, STATION_ZOOM_LEVEL));
+        } else {
+            getCurrentLocationAsync();
+        }
     }
 
     private void initGeoFire() {
@@ -298,7 +335,7 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
         mGeoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(final String key, final GeoLocation location) {
-                System.out.println(String.format("Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
+                System.out.println(String.format(Locale.getDefault(), "Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
 
                 if (mStationKeys.contains(key)) {
                     return;
@@ -339,7 +376,7 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
 
             @Override
             public void onKeyMoved(String key, GeoLocation location) {
-                System.out.println(String.format("Key %s moved within the search area to [%f,%f]", key, location.latitude, location.longitude));
+                System.out.println(String.format(Locale.getDefault(), "Key %s moved within the search area to [%f,%f]", key, location.latitude, location.longitude));
             }
 
             @Override
@@ -352,21 +389,15 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
                 Toast.makeText(MapActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
-
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        getLocationAsync();
+        getCurrentLocationAsync();
     }
 
-    private void getLocationAsync() {
-
-        if (mInitLocation != null) {
-            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(mInitLocation, STATION_ZOOM_LEVEL));
-            return;
-        }
+    private void getCurrentLocationAsync() {
 
         final LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (locationManager == null) {
@@ -378,33 +409,42 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
             return;
         }
 
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new LocationListener() {
-            @Override
-            public void onLocationChanged(Location location) {
-                Log.d("app", "Latitude:" + location.getLatitude() + ", Longitude:" + location.getLongitude());
-                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), mGoogleMap.getCameraPosition().zoom));
-                locationManager.removeUpdates(this);
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-                Log.d("Latitude", "disable");
-            }
-
-            @Override
-            public void onProviderEnabled(String provider) {
-                Log.d("Latitude", "enable");
-            }
-
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-                Log.d("Latitude", "status");
-            }
-        });
-
-        Location location = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+        Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
         if (location != null) {
-            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()), mGoogleMap.getCameraPosition().zoom));
+            System.out.println("Location: " + location.toString());
+            mGoogleMap.addMarker(new MarkerOptions()
+                    .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                    .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_location))));
+            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()),
+                    STATION_ZOOM_LEVEL));
+        } else {
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
+                @Override
+                public void onLocationChanged(Location location) {
+                    System.out.println("Location: " + location.toString());
+                    mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()),
+                            STATION_ZOOM_LEVEL));
+                    mGoogleMap.addMarker(new MarkerOptions()
+                            .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                            .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_location))));
+                    locationManager.removeUpdates(this);
+                }
+
+                @Override
+                public void onProviderDisabled(String provider) {
+                    Log.d("Latitude", "disable");
+                }
+
+                @Override
+                public void onProviderEnabled(String provider) {
+                    Log.d("Latitude", "enable");
+                }
+
+                @Override
+                public void onStatusChanged(String provider, int status, Bundle extras) {
+                    Log.d("Latitude", "status");
+                }
+            });
         }
     }
 
@@ -423,19 +463,45 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
             return true;
         }
 
-        mChargeCoinApi.getStationAsync(marker.getKey(), new ICallbackOnComplete<StationDto>() {
-            @Override
-            public void onComplete(StationDto result) {
-
-                if (result == null) {
-                    Toast.makeText(MapActivity.this, R.string.error_loading_data, Toast.LENGTH_SHORT).show();
-                } else {
-                    startActivity(new Intent(MapActivity.this, StationActivity.class)
-                            .putExtra(StationActivity.ARG_STATION_KEY, marker.getKey()));
-                }
-            }
-        });
+        findStationByEthAddressAsync(marker.getKey());
         return true;
+    }
+
+    private void findStationByEthAddressAsync(final String ethAddress) {
+        final TxWaitDialog mDialog = new TxWaitDialog(MapActivity.this, getString(R.string.loading));
+
+        new GetStationDtoTask(ethAddress)
+                .setPrepareCallback(new ICallbackOnPrepare() {
+                    @Override
+                    public void onPrepare() {
+                        mDialog.show();
+                    }
+                })
+                .setFinishCallback(new ICallbackOnFinish() {
+                    @Override
+                    public void onFinish() {
+                        mDialog.dismiss();
+                    }
+                })
+                .setErrorCallback(new ICallbackOnError<DatabaseError>() {
+                    @Override
+                    public void onError(DatabaseError message) {
+                        Toast.makeText(MapActivity.this, message.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .setCompleteCallback(new ICallbackOnComplete<StationDto>() {
+                    @Override
+                    public void onComplete(StationDto result) {
+                        if (result == null) {
+                            Toast.makeText(MapActivity.this, "Couldn't find station " + ethAddress, Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
+                        startActivity(new Intent(MapActivity.this, StationActivity.class)
+                                .putExtra(StationActivity.ARG_STATION_KEY, ethAddress));
+                    }
+                })
+                .executeAsync();
     }
 
     @Override
@@ -447,6 +513,10 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
 
     private void operateFilterResult(int requestCode, int resultCode, Intent data) {
         if (requestCode != FILTER_ACTIVITY_REQUEST_CODE) {
+            return;
+        }
+
+        if (mClusterManager == null) {
             return;
         }
 
@@ -507,15 +577,18 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
 
     private void operateQrCodeResult(int requestCode, int resultCode, Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if (result != null) {
-            if (result.getContents() == null) {
-                Toast.makeText(this, "Cancelled", Toast.LENGTH_LONG).show();
-            } else {
-                Toast.makeText(this, "Scanned: " + result.getContents(), Toast.LENGTH_LONG).show();
-            }
-        } else {
+        if (result == null) {
             super.onActivityResult(requestCode, resultCode, data);
+            return;
         }
+
+        final String scannedEthAddress = result.getContents();
+
+        if (scannedEthAddress == null) {
+            return;
+        }
+
+        findStationByEthAddressAsync(scannedEthAddress);
     }
 
     private void operateGooglePlacesResult(int requestCode, int resultCode, Intent data) {
@@ -529,4 +602,19 @@ public class MapActivity extends BaseAuthActivity implements OnMapReadyCallback,
             }
         }
     }
+
+    @OnClick(R.id.btn_scan_qr_code)
+    void onBtnScanQrCodeClicked() {
+        new IntentIntegrator(this)
+                .setPrompt("Scan charge station's QR code")
+                .setBeepEnabled(false)
+                .setBarcodeImageEnabled(true)
+                .initiateScan();
+    }
+
+    @OnClick(R.id.btn_get_my_location)
+    void onBtnGetMyLocationClicked() {
+        getCurrentLocationAsync();
+    }
+
 }

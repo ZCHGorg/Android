@@ -1,20 +1,19 @@
-package io.charg.chargstation.ui.activities;
+package io.charg.chargstation.ui.activities.becomeOwner;
 
+import android.content.Intent;
+import android.net.Uri;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 
-import com.github.barteksc.pdfviewer.PDFView;
-
 import butterknife.BindView;
+import butterknife.OnClick;
 import io.charg.chargstation.R;
+import io.charg.chargstation.ui.activities.BaseActivity;
 
 public class BecomeOwnerActivity extends BaseActivity {
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
-
-    @BindView(R.id.pdf_view)
-    PDFView mPdfView;
 
     @Override
     public int getResourceId() {
@@ -24,14 +23,6 @@ public class BecomeOwnerActivity extends BaseActivity {
     @Override
     public void onActivate() {
         initToolbar();
-        loadPdf();
-    }
-
-    private void loadPdf() {
-        mPdfView.fromAsset("plan.pdf")
-                .enableSwipe(true)
-                .enableDoubletap(true)
-                .load();
     }
 
     private void initToolbar() {
@@ -40,8 +31,22 @@ public class BecomeOwnerActivity extends BaseActivity {
         if (actionBar != null) {
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setDisplayShowHomeEnabled(true);
-
         }
+    }
+
+    @OnClick(R.id.btn_show_family_plan)
+    void onBtnShowFamilyPlanClicked() {
+        startActivity(new Intent(this, FamilyPlanActivity.class));
+    }
+
+    @OnClick(R.id.btn_show_demo_video)
+    void onBtnShowDemoVideoClicked() {
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://www.youtube.com/watch?v=_tDKp1fo5HA")));
+    }
+
+    @OnClick(R.id.btn_show_afficate_program)
+    void onBtnShowAffilateProgram(){
+        startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("https://wecharg.com/affiliate-account-page/")));
     }
 
     @Override

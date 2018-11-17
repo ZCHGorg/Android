@@ -13,9 +13,9 @@ public class TxWaitDialog {
 
     private final AlertDialog mDlgLoading;
 
-    public TxWaitDialog(Context context) {
+    public TxWaitDialog(Context context, String message) {
         TextView tvText = new TextView(context);
-        tvText.setText(R.string.executing_smart_contract);
+        tvText.setText(message);
         tvText.setPadding(8, 0, 0, 0);
 
         ProgressBar prBar = new ProgressBar(context);
@@ -35,13 +35,8 @@ public class TxWaitDialog {
                 .create();
     }
 
-    public TxWaitDialog(Context context, String message) {
-        mDlgLoading = new AlertDialog.Builder(context)
-                .setMessage(message)
-                .setIcon(R.mipmap.ic_launcher)
-                .setTitle(R.string.app_name)
-                .setCancelable(false)
-                .create();
+    public TxWaitDialog(Context context) {
+        this(context, context.getString(R.string.executing_smart_contract));
     }
 
     public void show() {

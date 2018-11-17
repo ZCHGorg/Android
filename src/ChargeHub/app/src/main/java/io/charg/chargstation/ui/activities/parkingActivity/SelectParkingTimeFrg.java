@@ -19,8 +19,8 @@ import io.charg.chargstation.root.ICallbackOnPrepare;
 import io.charg.chargstation.services.helpers.ContractHelper;
 import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.services.local.AccountService;
+import io.charg.chargstation.services.remote.contract.tasks.GetAuthorizeTask;
 import io.charg.chargstation.services.remote.contract.tasks.GetBalanceChgTask;
-import io.charg.chargstation.services.remote.contract.tasks.GetRateOfCharging;
 import io.charg.chargstation.services.remote.contract.tasks.GetRateOfParking;
 import io.charg.chargstation.ui.dialogs.EditNumberDialog;
 import io.charg.chargstation.ui.fragments.BaseNavFragment;
@@ -46,7 +46,7 @@ public class SelectParkingTimeFrg extends BaseNavFragment {
     TextView mTvBalanceChg;
 
     @BindView(R.id.tv_charging_rate)
-    TextView mTvChargingRate;
+    TextView mTvParkingRate;
 
     @BindView(R.id.iv_status)
     ImageView mIvStatus;
@@ -58,6 +58,7 @@ public class SelectParkingTimeFrg extends BaseNavFragment {
     TextView mTvStatus;
 
     private AccountService mAccountService;
+    private boolean mValid;
 
     @Override
     protected int getResourceId() {
@@ -97,62 +98,89 @@ public class SelectParkingTimeFrg extends BaseNavFragment {
 
     private void refreshUI() {
         mTvTime.setText(StringHelper.getTimeStr(mTime.longValue()));
+        mValid = false;
 
-        final GetRateOfParking getRateTask = new GetRateOfParking(getActivity(), mNodeAddress);
-        getRateTask.setPrepareListener(new ICallbackOnPrepare() {
+        GetAuthorizeTask getAuthTask = new GetAuthorizeTask(getActivity(), mNodeAddress);
+        getAuthTask.setPrepareListener(new ICallbackOnPrepare() {
             @Override
             public void onPrepare() {
-                mTvCost.setText(R.string.loading);
-                mTvChargingRate.setText(R.string.loading);
+                mTvStatus.setText(R.string.loading);
             }
         });
-        getRateTask.setErrorListener(new ICallbackOnError<String>() {
+        getAuthTask.setErrorListener(new ICallbackOnError<String>() {
             @Override
             public void onError(String message) {
-                mTvCost.setText(message);
-                mTvChargingRate.setText(message);
+                mTvStatus.setText(message);
             }
         });
-        getRateTask.setCompleteListener(new ICallbackOnComplete<BigInteger>() {
+        getAuthTask.setCompleteListener(new ICallbackOnComplete<Boolean>() {
             @Override
-            public void onComplete(BigInteger result) {
-                mTvCost.setText(StringHelper.getBalanceChgStr(ContractHelper.getChgFromWei(mCost = mTime.multiply(result))));
-                mTvChargingRate.setText(StringHelper.getRateChgStr(ContractHelper.getChgFromWei(result)));
-                if (mBalance.compareTo(mCost) < 0) {
-                    mTvStatus.setText(R.string.not_enough_chg);
-                    mBtnGetMoreChg.setVisibility(View.VISIBLE);
+            public void onComplete(Boolean result) {
+                if (!result) {
+                    mTvStatus.setText(R.string.node_is_not_auth);
                     mIvStatus.setImageResource(R.drawable.ic_error);
-                } else {
-                    mTvStatus.setText(R.string.success);
-                    mBtnGetMoreChg.setVisibility(View.INVISIBLE);
-                    mIvStatus.setImageResource(R.drawable.ic_ok);
+                    return;
                 }
-            }
-        });
 
-        GetBalanceChgTask getBalanceTask = new GetBalanceChgTask(getActivity(), mAccountService.getEthAddress());
-        getBalanceTask.setPrepareListener(new ICallbackOnPrepare() {
-            @Override
-            public void onPrepare() {
-                mTvBalanceChg.setText(R.string.loading);
-            }
-        });
-        getBalanceTask.setErrorListener(new ICallbackOnError<String>() {
-            @Override
-            public void onError(String message) {
-                mTvBalanceChg.setText(message);
-            }
-        });
-        getBalanceTask.setCompleteListener(new ICallbackOnComplete<BigInteger>() {
-            @Override
-            public void onComplete(BigInteger result) {
-                mBalance = result;
-                mTvBalanceChg.setText(StringHelper.getBalanceChgStr(ContractHelper.getChgFromWei(result)));
-                getRateTask.executeAsync();
-            }
-        });
-        getBalanceTask.executeAsync();
+                final GetRateOfParking getRateTask = new GetRateOfParking(getActivity(), mNodeAddress);
+                getRateTask.setPrepareListener(new ICallbackOnPrepare() {
+                    @Override
+                    public void onPrepare() {
+                        mTvCost.setText(R.string.loading);
+                        mTvParkingRate.setText(R.string.loading);
+                    }
+                });
+                getRateTask.setErrorListener(new ICallbackOnError<String>() {
+                    @Override
+                    public void onError(String message) {
+                        mTvCost.setText(message);
+                        mTvParkingRate.setText(message);
+                    }
+                });
+                getRateTask.setCompleteListener(new ICallbackOnComplete<BigInteger>() {
+                    @Override
+                    public void onComplete(BigInteger result) {
+                        mTvCost.setText(StringHelper.getBalanceChgStr(ContractHelper.getChgFromWei(mCost = mTime.multiply(result))));
+                        mTvParkingRate.setText(StringHelper.getRateChgStr(ContractHelper.getChgFromWei(result)));
+                        if (mBalance.compareTo(mCost) < 0) {
+                            mValid = false;
+                            mTvStatus.setText(R.string.not_enough_chg);
+                            mBtnGetMoreChg.setVisibility(View.VISIBLE);
+                            mIvStatus.setImageResource(R.drawable.ic_error);
+                        } else {
+                            mValid = true;
+                            mTvStatus.setText(R.string.success);
+                            mBtnGetMoreChg.setVisibility(View.INVISIBLE);
+                            mIvStatus.setImageResource(R.drawable.ic_ok);
+                        }
+                    }
+                });
 
+                GetBalanceChgTask getBalanceTask = new GetBalanceChgTask(getActivity(), mAccountService.getEthAddress());
+                getBalanceTask.setPrepareListener(new ICallbackOnPrepare() {
+                    @Override
+                    public void onPrepare() {
+                        mTvBalanceChg.setText(R.string.loading);
+                    }
+                });
+                getBalanceTask.setErrorListener(new ICallbackOnError<String>() {
+                    @Override
+                    public void onError(String message) {
+                        mTvBalanceChg.setText(message);
+                    }
+                });
+                getBalanceTask.setCompleteListener(new ICallbackOnComplete<BigInteger>() {
+                    @Override
+                    public void onComplete(BigInteger result) {
+                        mBalance = result;
+                        mTvBalanceChg.setText(StringHelper.getBalanceChgStr(ContractHelper.getChgFromWei(result)));
+                        getRateTask.executeAsync();
+                    }
+                });
+                getBalanceTask.executeAsync();
+            }
+        });
+        getAuthTask.executeAsync();
     }
 
     @Override
@@ -172,11 +200,7 @@ public class SelectParkingTimeFrg extends BaseNavFragment {
 
     @Override
     public boolean isValid() {
-        boolean valid = mTime.doubleValue() > 0;
-        if (!valid) {
-            Toast.makeText(getActivity(), R.string.time_not_defined, Toast.LENGTH_SHORT).show();
-        }
-        return valid;
+        return mValid;
     }
 
     public BigInteger getTimeSeconds() {

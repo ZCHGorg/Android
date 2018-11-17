@@ -1,4 +1,4 @@
-package io.charg.chargstation.ui.activities;
+package io.charg.chargstation.ui.activities.stationActivity;
 
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -17,11 +17,10 @@ import io.charg.chargstation.R;
 import io.charg.chargstation.models.firebase.StationDto;
 import io.charg.chargstation.root.IAsyncCommand;
 import io.charg.chargstation.root.IStationFrgListener;
-import io.charg.chargstation.services.remote.firebase.ChargeHubService;
 import io.charg.chargstation.services.local.FavouriteStationsRepository;
+import io.charg.chargstation.services.remote.firebase.ChargeHubService;
+import io.charg.chargstation.ui.activities.BaseActivity;
 import io.charg.chargstation.ui.fragments.BaseFragment;
-import io.charg.chargstation.ui.fragments.ChargeFrg;
-import io.charg.chargstation.ui.fragments.StationFrg;
 
 /**
  * Created by worker on 03.11.2017.

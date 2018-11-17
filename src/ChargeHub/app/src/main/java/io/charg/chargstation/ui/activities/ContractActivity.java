@@ -23,8 +23,11 @@ import io.charg.chargstation.services.remote.contract.tasks.ChargeOffTask;
 import io.charg.chargstation.services.remote.contract.tasks.ChargeOnTask;
 import io.charg.chargstation.services.remote.contract.tasks.GetAuthorizeTask;
 import io.charg.chargstation.services.remote.contract.tasks.GetChargingSwitchesTask;
+import io.charg.chargstation.services.remote.contract.tasks.GetParkingSwitchesTask;
 import io.charg.chargstation.services.remote.contract.tasks.GetRateOfCharging;
 import io.charg.chargstation.services.remote.contract.tasks.GetRateOfParking;
+import io.charg.chargstation.services.remote.contract.tasks.ParkingOffTask;
+import io.charg.chargstation.services.remote.contract.tasks.ParkingOnTask;
 import io.charg.chargstation.services.remote.contract.tasks.RegisterNodeTask;
 import io.charg.chargstation.services.remote.contract.tasks.UpdateChargingRateTask;
 import io.charg.chargstation.services.remote.contract.tasks.UpdateParkingRateTask;
@@ -325,5 +328,71 @@ public class ContractActivity extends BaseAuthActivity {
             }
         });
         rateTask.executeAsync();
+    }
+
+    @OnClick(R.id.btn_parking_on)
+    void onBtnParkingOnClicked() {
+        final EditTextDialog dlg = new EditTextDialog(this, getString(R.string.eth_address), mAccountService.getEthAddress());
+        dlg.setOnComplete(new ICallbackOnComplete<String>() {
+            @Override
+            public void onComplete(String result) {
+                ParkingOnTask task = new ParkingOnTask(ContractActivity.this, result, BigInteger.valueOf(10));
+                task.setPrepareListener(mPrepareListener);
+                task.setFinishListener(mFinishListener);
+                task.setErrorListener(mErrorListener);
+                task.setCompleteListener(new ICallbackOnComplete<TransactionReceipt>() {
+                    @Override
+                    public void onComplete(TransactionReceipt result) {
+                        mTvStatus.setText(ContractHelper.getStatus(result));
+                    }
+                });
+                task.executeAsync();
+            }
+        });
+        dlg.show();
+    }
+
+    @OnClick(R.id.btn_parking_off)
+    void onBtnParkingOffClicked() {
+        final EditTextDialog dlg = new EditTextDialog(this, getString(R.string.eth_address), mAccountService.getEthAddress());
+        dlg.setOnComplete(new ICallbackOnComplete<String>() {
+            @Override
+            public void onComplete(String result) {
+                ParkingOffTask task = new ParkingOffTask(ContractActivity.this, result);
+                task.setPrepareListener(mPrepareListener);
+                task.setFinishListener(mFinishListener);
+                task.setErrorListener(mErrorListener);
+                task.setCompleteListener(new ICallbackOnComplete<TransactionReceipt>() {
+                    @Override
+                    public void onComplete(TransactionReceipt result) {
+                        mTvStatus.setText(ContractHelper.getStatus(result));
+                    }
+                });
+                task.executeAsync();
+            }
+        });
+        dlg.show();
+    }
+
+    @OnClick(R.id.btn_parking_switches)
+    void onBtnParkingSwitchesClicked() {
+        EditTextDialog dlg = new EditTextDialog(this, getString(R.string.eth_address), mAccountService.getEthAddress());
+        dlg.setOnComplete(new ICallbackOnComplete<String>() {
+            @Override
+            public void onComplete(String result) {
+                GetParkingSwitchesTask task = new GetParkingSwitchesTask(ContractActivity.this, result);
+                task.setPrepareListener(mPrepareListener);
+                task.setFinishListener(mFinishListener);
+                task.setErrorListener(mErrorListener);
+                task.setCompleteListener(new ICallbackOnComplete<SwitchesDto>() {
+                    @Override
+                    public void onComplete(SwitchesDto result) {
+                        mTvStatus.setText(result.toString());
+                    }
+                });
+                task.executeAsync();
+            }
+        });
+        dlg.show();
     }
 }
