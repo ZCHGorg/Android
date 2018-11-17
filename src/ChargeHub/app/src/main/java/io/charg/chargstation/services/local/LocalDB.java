@@ -47,7 +47,7 @@ public class LocalDB {
         SharedPreferences sharedPref = mContext.getSharedPreferences(mContext.getPackageName(), Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPref.edit();
         editor.clear();
-        editor.commit();
+        editor.apply();
     }
 
     public boolean putBoolean(String key, boolean value) {
