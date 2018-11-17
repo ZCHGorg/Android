@@ -1,5 +1,6 @@
 package io.charg.chargstation.ui.fragments;
 
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -48,6 +49,9 @@ public class ExecuteContractFuncFrg extends BaseNavFragment {
     @BindView(R.id.tv_max_fee)
     TextView mTvMaxFee;
 
+    @BindView(R.id.btn_execute)
+    Button mBtnExecute;
+
     private ChgAsyncTask<TransactionReceipt> mTask;
 
     private TxWaitDialog mLoadingDialog;
@@ -81,6 +85,7 @@ public class ExecuteContractFuncFrg extends BaseNavFragment {
     }
 
     private void refreshUI() {
+        mBtnExecute.setText(mOperationName);
         mTvOperation.setText(mOperationName);
         mTvGasLimit.setText(String.format(Locale.getDefault(), "%d units", mSettingsProvider.getGasLimit().longValue()));
         mTvGasPrice.setText(String.format(Locale.getDefault(), "%d WEI per unit", mSettingsProvider.getGasPrice()));
