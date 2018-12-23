@@ -7,8 +7,11 @@ import android.graphics.BitmapFactory;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
+import android.os.Build;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -46,19 +49,10 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.Web3jFactory;
-import org.web3j.protocol.core.DefaultBlockParameterName;
-import org.web3j.protocol.core.methods.response.EthBlock;
-import org.web3j.protocol.core.methods.response.Transaction;
-import org.web3j.protocol.http.HttpService;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
-import java.util.concurrent.ExecutionException;
-import java.util.function.Consumer;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -80,7 +74,7 @@ import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.services.local.AccountService;
 import io.charg.chargstation.services.local.FilteringService;
 import io.charg.chargstation.services.local.LocalDB;
-import io.charg.chargstation.services.local.SettingsProvider;
+import io.charg.chargstation.services.local.LogService;
 import io.charg.chargstation.services.remote.firebase.ChargeDbApi;
 import io.charg.chargstation.services.remote.firebase.ChargeHubService;
 import io.charg.chargstation.services.remote.firebase.tasks.GetStationDtoTask;
@@ -90,7 +84,6 @@ import io.charg.chargstation.ui.activities.parkingActivity.ParkingActivity;
 import io.charg.chargstation.ui.activities.stationActivity.StationActivity;
 import io.charg.chargstation.ui.dialogs.TxWaitDialog;
 import io.charg.chargstation.ui.views.ChargeClusterManager;
-import rx.Subscriber;
 
 public class MapActivity
         extends BaseAuthActivity
@@ -399,6 +392,8 @@ public class MapActivity
 
     private void getCurrentLocationAsync() {
 
+        LogService.info("Get current location started");
+
         final LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         if (locationManager == null) {
             return;
@@ -409,43 +404,61 @@ public class MapActivity
             return;
         }
 
-        Location location = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-        if (location != null) {
-            System.out.println("Location: " + location.toString());
-            mGoogleMap.addMarker(new MarkerOptions()
-                    .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                    .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_location))));
-            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()),
-                    STATION_ZOOM_LEVEL));
-        } else {
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 0, 0, new LocationListener() {
-                @Override
-                public void onLocationChanged(Location location) {
-                    System.out.println("Location: " + location.toString());
-                    mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()),
-                            STATION_ZOOM_LEVEL));
-                    mGoogleMap.addMarker(new MarkerOptions()
-                            .position(new LatLng(location.getLatitude(), location.getLongitude()))
-                            .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_location))));
-                    locationManager.removeUpdates(this);
-                }
+        int gpsState = 1;
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                gpsState = Settings.Secure.getInt(getContentResolver(), Settings.Secure.LOCATION_MODE);
+            }
+        } catch (Settings.SettingNotFoundException e) {
+            e.printStackTrace();
+        }
 
-                @Override
-                public void onProviderDisabled(String provider) {
-                    Log.d("Latitude", "disable");
-                }
+        if (gpsState == 0) {
 
+            DialogHelper.showQuestion(this, "You must enable GPS first", new Runnable() {
                 @Override
-                public void onProviderEnabled(String provider) {
-                    Log.d("Latitude", "enable");
-                }
-
-                @Override
-                public void onStatusChanged(String provider, int status, Bundle extras) {
-                    Log.d("Latitude", "status");
+                public void run() {
+                    Intent intentEnableGps = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                    startActivity(intentEnableGps);
                 }
             });
+
+            return;
         }
+
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, new LocationListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                drawCurrentLocationMarker(location);
+                locationManager.removeUpdates(this);
+            }
+
+            @Override
+            public void onProviderDisabled(String provider) {
+                Log.d("Latitude", "disable");
+            }
+
+            @Override
+            public void onProviderEnabled(String provider) {
+                Log.d("Latitude", "enable");
+            }
+
+            @Override
+            public void onStatusChanged(String provider, int status, Bundle extras) {
+                Log.d("Latitude", "status");
+            }
+        });
+    }
+
+    private void drawCurrentLocationMarker(Location location) {
+
+        LogService.info("Current location: " + location.toString());
+
+        mGoogleMap.addMarker(new MarkerOptions()
+                .position(new LatLng(location.getLatitude(), location.getLongitude()))
+                .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_location))));
+        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(location.getLatitude(), location.getLongitude()),
+                STATION_ZOOM_LEVEL));
     }
 
     @Override

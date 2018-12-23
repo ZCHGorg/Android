@@ -161,19 +161,26 @@ public class SmartContractManager {
         @Override
         protected void onPostExecute(String s) {
             super.onPostExecute(s);
-            if (s != null) {
-                NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
 
-                Notification notification = new Notification.Builder(mContext)
-                        .setSmallIcon(R.drawable.ic_notify)
-                        .setContentTitle(mContext.getString(R.string.execute_tansaction))
-                        .setContentText(String.format("TxHash: %s...%s", s.substring(0, 8), s.substring(s.length() - 4)))
-                        .setContentIntent(PendingIntent.getActivity(mContext, 0, new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("https://ethplorer.io/tx/%s", s))), 0))
-                        .setAutoCancel(true)
-                        .build();
-
-                notificationManager.notify(0, notification);
+            if (s == null || s.isEmpty()) {
+                return;
             }
+
+            NotificationManager notificationManager = (NotificationManager) mContext.getSystemService(Context.NOTIFICATION_SERVICE);
+            if (notificationManager == null) {
+                return;
+            }
+
+            Notification notification = new Notification.Builder(mContext)
+                    .setSmallIcon(R.drawable.ic_notify)
+                    .setContentTitle(mContext.getString(R.string.execute_tansaction))
+                    .setContentText(String.format("TxHash: %s...%s", s.substring(0, 8), s.substring(s.length() - 4)))
+                    .setContentIntent(PendingIntent.getActivity(mContext, 0, new Intent(Intent.ACTION_VIEW, Uri.parse(String.format("https://ethplorer.io/tx/%s", s))), 0))
+                    .setAutoCancel(true)
+                    .build();
+
+            notificationManager.notify(0, notification);
+
         }
     }
 }
