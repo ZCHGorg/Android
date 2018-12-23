@@ -32,18 +32,22 @@ import io.charg.chargstation.services.local.SettingsProvider;
 public class SmartContractManager {
 
     private final Context mContext;
-    private final Web3j web3;
+
+    private final Web3j mWeb3;
+
     private final AccountService mAccountService;
-    private final ChargCoinContract contract;
+
+    private final ChargCoinContract mSmContract;
+
     private final SettingsProvider mSettingsProvider;
 
     private SmartContractManager(Context context) {
         mContext = context;
         mAccountService = new AccountService(context);
         mSettingsProvider = new SettingsProvider(context);
-        web3 = Web3jFactory.build(new HttpService(mSettingsProvider.getContractAddress()));
+        mWeb3 = Web3jFactory.build(new HttpService(mSettingsProvider.getContractAddress()));
         Credentials credentials = Credentials.create(mAccountService.getPrivateKey());
-        contract = ChargCoinContract.load(CommonData.SMART_CONTRACT_ADDRESS, web3, credentials, mSettingsProvider.getGasPrice(), mSettingsProvider.getGasLimit());
+        mSmContract = ChargCoinContract.load(CommonData.SMART_CONTRACT_ADDRESS, mWeb3, credentials, mSettingsProvider.getGasPrice(), mSettingsProvider.getGasLimit());
     }
 
     public static SmartContractManager getInstance(Context context) {
@@ -57,7 +61,7 @@ public class SmartContractManager {
 
     public boolean isNowParking() {
         try {
-            Tuple6 res = contract.parkingSwitches(mAccountService.getEthAddress()).sendAsync().get();
+            Tuple6 res = mSmContract.parkingSwitches(mAccountService.getEthAddress()).sendAsync().get();
             String nodeAddress = String.valueOf(res.getValue1());
             long startTime = Long.valueOf(res.getValue2().toString());
             long endTime = Long.valueOf(res.getValue3().toString());
@@ -76,7 +80,7 @@ public class SmartContractManager {
         new SmartContractAsyncTask(mContext) {
             @Override
             protected String onExecute() throws ExecutionException, InterruptedException {
-                return contract.parkingOn(address, time).sendAsync().get().getTransactionHash();
+                return mSmContract.parkingOn(address, time).sendAsync().get().getTransactionHash();
             }
         }.execute();
     }
@@ -86,7 +90,7 @@ public class SmartContractManager {
         new SmartContractAsyncTask(mContext) {
             @Override
             protected String onExecute() throws ExecutionException, InterruptedException {
-                return contract.parkingOff(ethAddress).sendAsync().get().getTransactionHash();
+                return mSmContract.parkingOff(ethAddress).sendAsync().get().getTransactionHash();
             }
         }.execute();
     }
@@ -96,7 +100,7 @@ public class SmartContractManager {
         new SmartContractAsyncTask(mContext) {
             @Override
             protected String onExecute() throws ExecutionException, InterruptedException {
-                return contract.chargeOn(ethAddress, time).sendAsync().get().getTransactionHash();
+                return mSmContract.chargeOn(ethAddress, time).sendAsync().get().getTransactionHash();
             }
         }.execute();
     }
@@ -106,14 +110,14 @@ public class SmartContractManager {
         new SmartContractAsyncTask(mContext) {
             @Override
             protected String onExecute() throws ExecutionException, InterruptedException {
-                return contract.chargeOff(ethAddress).sendAsync().get().getTransactionHash();
+                return mSmContract.chargeOff(ethAddress).sendAsync().get().getTransactionHash();
             }
         }.execute();
     }
 
     public boolean isNowCharging() {
         try {
-            Tuple6 res = contract.chargingSwitches(mAccountService.getEthAddress()).sendAsync().get();
+            Tuple6 res = mSmContract.chargingSwitches(mAccountService.getEthAddress()).sendAsync().get();
             String nodeAddress = String.valueOf(res.getValue1());
             long startTime = Long.valueOf(res.getValue2().toString());
             long endTime = Long.valueOf(res.getValue3().toString());
