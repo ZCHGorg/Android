@@ -12,7 +12,7 @@ public class ContractHelper {
 
         String status = transaction.getStatus();
 
-        if (null == status) {
+        if (status == null) {
             return true;
         }
 
