@@ -1,5 +1,7 @@
 package io.charg.chargstation.services.remote.firebase;
 
+import android.support.annotation.NonNull;
+
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -34,18 +36,18 @@ public class ChargeHubService {
         final DatabaseReference dbNodeRef = dbRef.child(command.getInputData());
         dbNodeRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 StationDto nodeDto = dataSnapshot.getValue(StationDto.class);
                 if (nodeDto == null) {
                     command.onError("Error while loading station " + command.getInputData());
                 } else {
                     command.onComplete(nodeDto);
                 }
-              //  dbNodeRef.removeEventListener(this);
+                //  dbNodeRef.removeEventListener(this);
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
                 command.onError(databaseError.getMessage());
             }
         });
@@ -74,14 +76,14 @@ public class ChargeHubService {
         final DatabaseReference dbNodeRef = dbRef.child(ethAddress);
         dbNodeRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 GeofireDto location = dataSnapshot.getValue(GeofireDto.class);
                 command.onComplete(location);
                 dbNodeRef.removeEventListener(this);
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
                 command.onError(databaseError.getMessage());
             }
         });

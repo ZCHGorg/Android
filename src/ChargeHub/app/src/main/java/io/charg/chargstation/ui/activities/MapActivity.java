@@ -87,11 +87,14 @@ import io.charg.chargstation.ui.views.ChargeClusterManager;
 
 public class MapActivity
         extends BaseAuthActivity
-        implements OnMapReadyCallback, ICameraChangeListener, ClusterManager.OnClusterItemClickListener<ChargeStationMarker> {
+        implements
+        OnMapReadyCallback,
+        ICameraChangeListener,
+        ClusterManager.OnClusterItemClickListener<ChargeStationMarker> {
 
     private static final int INITIAL_ZOOM_LEVEL = 8;
     private static final int SEARCH_ZOOM_LEVEL = 13;
-    private static final int STATION_ZOOM_LEVEL = 18;
+    private static final int STATION_ZOOM_LEVEL = 15;
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1000;
     private static final int FILTER_ACTIVITY_REQUEST_CODE = 1001;
 
@@ -99,7 +102,7 @@ public class MapActivity
     public static final String EXTRA_LNG = "EXTRA_LNG";
 
     private GoogleMap mGoogleMap;
-    private ClusterManager<ChargeStationMarker> mClusterManager;
+    private ChargeClusterManager mClusterManager;
 
     private ChargeDbApi mChargeCoinApi;
     private GeoFire mGeoFire;
@@ -111,6 +114,8 @@ public class MapActivity
     private SupportMapFragment mMapFragment;
 
     private List<String> mStationKeys = new ArrayList<>();
+    private LatLng mInitLocation;
+    private long mLastBackPressedTime;
 
     @BindView(R.id.nav_view)
     NavigationView mNavigationView;
@@ -122,9 +127,6 @@ public class MapActivity
     DrawerLayout mDrawerLayout;
 
     TextView tvEthAddress;
-
-    private LatLng mInitLocation;
-    private long mLastBackPressedTime;
 
     @Override
     public int getResourceId() {
@@ -240,19 +242,23 @@ public class MapActivity
                         startActivity(new Intent(MapActivity.this, SettingsActivity.class));
                         return true;
                     case R.id.menu_log_out:
-                        DialogHelper.showQuestion(MapActivity.this, getString(R.string.ask_delete_wallet), new Runnable() {
-                            @Override
-                            public void run() {
-                                mLocalDb.clearDb();
-                                loadAccountData();
-                            }
-                        });
+                        requestLogOut();
                         return true;
                     case R.id.menu_exit:
                         finish();
                         return true;
                 }
                 return false;
+            }
+        });
+    }
+
+    private void requestLogOut() {
+        DialogHelper.showQuestion(MapActivity.this, getString(R.string.ask_delete_wallet), new Runnable() {
+            @Override
+            public void run() {
+                mLocalDb.clearDb();
+                loadAccountData();
             }
         });
     }
@@ -318,6 +324,8 @@ public class MapActivity
 
     private void searchChargeStations(GeoFireRequest request) {
 
+        LogService.info("Search: " + request.toString());
+
         if (mGeoQuery != null) {
             mGeoQuery.setRadius(request.getRadius());
             mGeoQuery.setCenter(new GeoLocation(request.getPosition().latitude, request.getPosition().longitude));
@@ -328,38 +336,14 @@ public class MapActivity
         mGeoQuery.addGeoQueryEventListener(new GeoQueryEventListener() {
             @Override
             public void onKeyEntered(final String key, final GeoLocation location) {
-                System.out.println(String.format(Locale.getDefault(), "Key %s entered the search area at [%f,%f]", key, location.latitude, location.longitude));
+
+                LogService.info(String.format(Locale.getDefault(), "Station: %s at [%.2f,%.2f]", key, location.latitude, location.longitude));
 
                 if (mStationKeys.contains(key)) {
                     return;
                 }
 
-                mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, StationDto>() {
-                    @Override
-                    public String getInputData() {
-                        return key;
-                    }
-
-                    @Override
-                    public void onPrepare() {
-
-                    }
-
-                    @Override
-                    public void onComplete(StationDto result) {
-                        if (!mFilteringService.isValid(result)) {
-                            return;
-                        }
-                        mStationKeys.add(key);
-                        mClusterManager.addItem(new ChargeStationMarker(location.latitude, location.longitude, key));
-                        mClusterManager.cluster();
-                    }
-
-                    @Override
-                    public void onError(String error) {
-
-                    }
-                });
+                onMapKeyEntered(key, location);
             }
 
             @Override
@@ -382,6 +366,33 @@ public class MapActivity
                 Toast.makeText(MapActivity.this, error.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void onMapKeyEntered(final String key, final GeoLocation location) {
+        GetStationDtoTask task = new GetStationDtoTask(key);
+        task.setCompleteCallback(new ICallbackOnComplete<StationDto>() {
+            @Override
+            public void onComplete(StationDto result) {
+
+                if (result == null) {
+
+                    mStationKeys.add(key);
+                    mClusterManager.addItem(new ChargeStationMarker(location.latitude, location.longitude, key, ChargeStationMarker.SNIPPET_UNKNOWN));
+                    mClusterManager.cluster();
+
+                    return;
+                }
+
+                if (!mFilteringService.isValid(result)) {
+                    return;
+                }
+
+                mStationKeys.add(key);
+                mClusterManager.addItem(new ChargeStationMarker(location.latitude, location.longitude, key, ChargeStationMarker.SNIPPET_CHARG));
+                mClusterManager.cluster();
+            }
+        });
+        task.executeAsync();
     }
 
     @Override
@@ -525,6 +536,7 @@ public class MapActivity
     }
 
     private void operateFilterResult(int requestCode, int resultCode, Intent data) {
+
         if (requestCode != FILTER_ACTIVITY_REQUEST_CODE) {
             return;
         }
@@ -568,7 +580,7 @@ public class MapActivity
 
                             @Override
                             public void onComplete(GeofireDto result) {
-                                mClusterManager.addItem(new ChargeStationMarker(result.getLat(), result.getLng(), item));
+                                mClusterManager.addItem(new ChargeStationMarker(result.getLat(), result.getLng(), item, ChargeStationMarker.SNIPPET_CHARG));
                                 mClusterManager.cluster();
                             }
 

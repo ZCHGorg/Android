@@ -8,6 +8,7 @@ public class CommonData {
 
     public static final String FIREBASE_PATH_GEOFIRE = "geofire";
     public static final String FIREBASE_PATH_NODES = "nodes";
+    public static final String FIREBASE_PATH_LOCATION = "locations";
 
     public static final double RADIUS_LIMIT = 75;
     public static final String TAG = "charge";

@@ -2,6 +2,8 @@ package io.charg.chargstation.models;
 
 import com.google.android.gms.maps.model.LatLng;
 
+import java.util.Locale;
+
 /**
  * Created by worker on 02.11.2017.
  */
@@ -23,5 +25,10 @@ public class GeoFireRequest {
 
     public double getRadius() {
         return mRadius;
+    }
+
+    @Override
+    public String toString() {
+        return String.format(Locale.getDefault(), " %s; R: %.2f", mPosition, mRadius);
     }
 }

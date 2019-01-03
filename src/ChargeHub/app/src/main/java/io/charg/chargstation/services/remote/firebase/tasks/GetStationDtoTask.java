@@ -37,13 +37,13 @@ public class GetStationDtoTask {
 
         dbRef.child(mEthAddress).addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 invokeOnFinish();
                 invokeOnComplete(dataSnapshot.getValue(StationDto.class));
             }
 
             @Override
-            public void onCancelled(DatabaseError databaseError) {
+            public void onCancelled(@NonNull DatabaseError databaseError) {
                 invokeOnFinish();
                 invokeOnError(databaseError);
             }

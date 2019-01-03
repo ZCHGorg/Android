@@ -20,7 +20,7 @@ public class ChargeClusterManager extends ClusterManager<ChargeStationMarker> {
         super(context, map);
 
         mCameraChangeListener = cameraChangeListener;
-        setRenderer(new ChargeMarkerRenderer(context, map, this));
+        setRenderer(new StationMarkerRenderer(context, map, this));
     }
 
     @Override
