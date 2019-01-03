@@ -1,0 +1,92 @@
+List Affiliates
+https://wecharg.com/wp-json/ultimate-affiliates-pro/v1/affiliates
+
+Method: GET
+
+Arguments: page, limit
+
+Approve affiliate
+https://wecharg.com/wp-json/ultimate-affiliates-pro/v1/approve-affiliate/{affiliateId}
+
+Method: POST
+
+Arguments: affiliateId
+
+Update affiliate rank
+https://wecharg.com/wp-json/ultimate-affiliates-pro/v1/update-affiliate-rank/{affiliateId}/{newRankId}
+
+Method: POST
+
+Arguments: affiliateId, rankId
+
+Get user data
+https://wecharg.com/wp-json/ultimate-affiliates-pro/v1/get-user-data/{affiliateId}
+
+Method: GET
+
+Arguments: affiliateId
+
+Get user field value
+https://wecharg.com/wp-json/ultimate-affiliates-pro/v1/get-user-field-value/{affiliateId}/{fieldName}
+
+Method: GET
+
+Arguments: affiliateId, fieldName
+
+Get affiliate rank
+https://wecharg.com/wp-json/ultimate-affiliates-pro/v1/get-affiliate-rank/{affiliateId}
+
+Method: GET
+
+Arguments: affiliateId
+
+Get affiliate rank details
+https://wecharg.com/wp-json/ultimate-affiliates-pro/v1/get-affiliate-rank-details/{affiliateId}
+
+Method: GET
+
+Arguments: affiliateId
+
+Search Affiliate
+https://wecharg.com/wp-json/ultimate-affiliates-pro/v1/search-affiliate/{search}
+
+Method: GET
+
+Arguments: search
+
+List Ranks
+https://wecharg.com/wp-json/ultimate-affiliates-pro/v1/list-ranks
+
+Method: GET
+
+Arguments:
+
+Get affiliates by rank
+https://wecharg.com/wp-json/ultimate-affiliates-pro/v1/list-affiliates-by-rank/{rankId}
+
+Method: GET
+
+Arguments: rankId
+
+Make user affiliate
+https://wecharg.com/wp-json/ultimate-affiliates-pro/v1/make-user-affiliate/{userId}
+
+Method: PUT
+
+Arguments: userId
+
+List Referrals
+https://wecharg.com/wp-json/ultimate-affiliates-pro/v1/list-referrals
+
+Method: GET
+
+Arguments:
+
+Add Referral
+https://wecharg.com/wp-json/ultimate-affiliates-pro/v1/add-referral
+
+Method: PUT
+
+Arguments: json with all referral details
+
+Example: { "refferal_wp_uid": 2, "campaign": "", "affiliate_id": "", "visit_id": "", "description": "test", "source": "restapi", "reference": "q", "reference_details": "test", "parent_referral_id": "test", "child_referral_id": "", "amount": 10, "currency": "usd", "date": "12-02-2018", "status": 1, "payment": 0 }
