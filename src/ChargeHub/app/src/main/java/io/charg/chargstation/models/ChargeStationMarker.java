@@ -10,11 +10,16 @@ import com.google.maps.android.clustering.ClusterItem;
 public class ChargeStationMarker implements ClusterItem {
 
     private final String mKey;
+    private final String mSnippet;
     private LatLng mPosition;
 
-    public ChargeStationMarker(double lat, double lng, String key) {
+   public static final String SNIPPET_CHARG = "SNIPPET_CHARG";
+   public static final String SNIPPET_UNKNOWN = "SNIPPET_UNKNOWN";
+
+    public ChargeStationMarker(double lat, double lng, String key, String snippet) {
         mKey = key;
         mPosition = new LatLng(lat, lng);
+        mSnippet = snippet;
     }
 
     @Override
@@ -29,10 +34,16 @@ public class ChargeStationMarker implements ClusterItem {
 
     @Override
     public String getSnippet() {
-        return null;
+        return mSnippet;
     }
 
     public String getKey() {
         return mKey;
     }
+
+    public boolean isCharg() {
+        return mSnippet.equals(SNIPPET_CHARG);
+    }
+
+
 }
