@@ -1,5 +1,7 @@
 package io.charg.chargstation.firebase;
 
+import android.support.test.runner.AndroidJUnit4;
+
 import com.google.firebase.database.DatabaseError;
 
 import org.junit.Assert;
@@ -8,7 +10,6 @@ import org.junit.runner.RunWith;
 
 import java.util.concurrent.TimeUnit;
 
-import androidx.test.runner.AndroidJUnit4;
 import io.charg.chargstation.models.firebase.StationDto;
 import io.charg.chargstation.root.ICallbackOnComplete;
 import io.charg.chargstation.root.ICallbackOnError;
@@ -60,8 +61,6 @@ public class FirebaseTests {
         task.setCompleteCallback(null);
         task.executeAsync();
 
-
     }
-
 
 }
