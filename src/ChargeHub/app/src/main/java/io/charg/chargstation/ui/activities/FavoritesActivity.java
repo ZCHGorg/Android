@@ -1,8 +1,13 @@
 package io.charg.chargstation.ui.activities;
 
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.view.View;
+import android.widget.TextView;
+
+import java.util.List;
 
 import butterknife.BindView;
 import io.charg.chargstation.R;
@@ -16,6 +21,9 @@ public class FavoritesActivity extends BaseActivity {
 
     @BindView(R.id.rv_items)
     RecyclerView mRvItems;
+
+    @BindView(R.id.tv_no_data)
+    TextView mTvNoData;
 
     private FavouriteStationsRepository mFavoriteService;
     private FavoriteAdapter mAdapter;
@@ -38,7 +46,18 @@ public class FavoritesActivity extends BaseActivity {
     }
 
     private void loadItems() {
-        mAdapter.setItems(mFavoriteService.getIds());
+
+        List<String> items = mFavoriteService.getIds();
+        mAdapter.setItems(items);
+
+        if (items.size() > 0) {
+            mRvItems.setVisibility(View.VISIBLE);
+            mTvNoData.setVisibility(View.GONE);
+        } else {
+            mRvItems.setVisibility(View.GONE);
+            mTvNoData.setVisibility(View.VISIBLE);
+        }
+
     }
 
     private void initRecyclerView() {
@@ -50,8 +69,13 @@ public class FavoritesActivity extends BaseActivity {
 
     private void initToolbar() {
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
+
     }
 
     @Override
