@@ -12,12 +12,24 @@ import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
+import org.spongycastle.crypto.AsymmetricCipherKeyPair;
+import org.spongycastle.crypto.generators.ECKeyPairGenerator;
+import org.spongycastle.crypto.params.ECKeyGenerationParameters;
 import org.web3j.crypto.Credentials;
+import org.web3j.crypto.ECKeyPair;
+import org.web3j.crypto.Keys;
 import org.web3j.protocol.core.methods.response.EthGasPrice;
+
+import java.math.BigInteger;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.Key;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
+import io.charg.chargstation.services.helpers.ContractHelper;
 import io.charg.chargstation.services.local.AccountService;
 import io.charg.chargstation.services.helpers.DialogHelper;
 import io.charg.chargstation.services.helpers.StringHelper;
@@ -138,6 +150,12 @@ public class ChangeWalletActivity extends BaseActivity {
         refreshUI();
     }
 
+    @OnClick(R.id.btn_generate)
+    void onBtnGenerateCLicked() {
+        mNewPrivateKey = ContractHelper.generatePrivateKey();
+        refreshUI();
+    }
+
     @OnClick(R.id.btn_discard)
     void onBtnDiscardClicked() {
         finish();
@@ -156,23 +174,24 @@ public class ChangeWalletActivity extends BaseActivity {
 
     private void operateQrCodeResult(int requestCode, int resultCode, Intent data) {
         IntentResult result = IntentIntegrator.parseActivityResult(requestCode, resultCode, data);
-        if (result != null) {
-            if (result.getContents() != null) {
-                if (mQrMode.equals(QR_MODE_PRIVATE_KEY)) {
-                    String privateKey = result.getContents();
-
-                    try {
-                        Credentials.create(privateKey);
-                        mNewPrivateKey = privateKey;
-                    } catch (Exception ex) {
-                        Toast.makeText(this, privateKey + " - is not valid private key", Toast.LENGTH_SHORT).show();
-                    }
-                }
-
-                refreshUI();
-            }
-        } else {
+        if (result == null) {
             super.onActivityResult(requestCode, resultCode, data);
+            return;
+        }
+
+        if (result.getContents() != null) {
+            if (mQrMode.equals(QR_MODE_PRIVATE_KEY)) {
+                String privateKey = result.getContents();
+
+                try {
+                    Credentials.create(privateKey);
+                    mNewPrivateKey = privateKey;
+                } catch (Exception ex) {
+                    Toast.makeText(this, privateKey + " - is not valid private key", Toast.LENGTH_SHORT).show();
+                }
+            }
+
+            refreshUI();
         }
     }
 }

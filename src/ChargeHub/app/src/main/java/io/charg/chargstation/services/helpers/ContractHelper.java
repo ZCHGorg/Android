@@ -1,10 +1,15 @@
 package io.charg.chargstation.services.helpers;
 
+import org.web3j.crypto.ECKeyPair;
+import org.web3j.crypto.Keys;
 import org.web3j.protocol.core.methods.response.TransactionReceipt;
 import org.web3j.utils.Numeric;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.security.InvalidAlgorithmParameterException;
+import java.security.NoSuchAlgorithmException;
+import java.security.NoSuchProviderException;
 
 public class ContractHelper {
 
@@ -37,5 +42,20 @@ public class ContractHelper {
 
     public static Boolean getResult(BigInteger result) {
         return BigInteger.ONE.equals(result);
+    }
+
+    public static String generatePrivateKey() {
+        try {
+            ECKeyPair keyPair = Keys.createEcKeyPair();
+            return keyPair.getPrivateKey().toString(16);
+        } catch (InvalidAlgorithmParameterException e) {
+            e.printStackTrace();
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (NoSuchProviderException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 }
