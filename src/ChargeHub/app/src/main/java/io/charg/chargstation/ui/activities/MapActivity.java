@@ -113,7 +113,7 @@ public class MapActivity
     private LocalDB mLocalDb;
     private SupportMapFragment mMapFragment;
 
-    private List<String> mStationKeys = new ArrayList<>();
+    private List<String> mStationKeys;
     private LatLng mInitLocation;
     private long mLastBackPressedTime;
 
@@ -160,6 +160,9 @@ public class MapActivity
     }
 
     private void initServices() {
+
+        mStationKeys = new ArrayList<>();
+
         initGeoFire();
         mChargeCoinApi = new ChargeDbApi();
         mFilteringService = new FilteringService(this);
