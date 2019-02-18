@@ -1,8 +1,11 @@
 package io.charg.chargstation.services.local;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import org.web3j.crypto.Credentials;
+
+import io.charg.chargstation.services.helpers.ContractHelper;
 
 /**
  * Created by worker on 23.01.2018.
@@ -34,5 +37,14 @@ public class AccountService {
 
         Credentials credentials = Credentials.create(privateKey);
         return credentials.getAddress().toLowerCase();
+    }
+
+    public boolean isValidAccountExist() {
+        return !TextUtils.isEmpty(getEthAddress()) && !TextUtils.isEmpty(getPrivateKey());
+    }
+
+    public void initRandomAccount() {
+        String privateKey = ContractHelper.generatePrivateKey();
+        putPrivateKey(privateKey);
     }
 }

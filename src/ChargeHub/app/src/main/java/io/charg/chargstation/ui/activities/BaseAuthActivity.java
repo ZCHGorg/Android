@@ -2,6 +2,7 @@ package io.charg.chargstation.ui.activities;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 
 import io.charg.chargstation.R;
 import io.charg.chargstation.services.local.AccountService;
@@ -16,15 +17,15 @@ public abstract class BaseAuthActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        checkWallet();
+        checkWalletWithDialog();
     }
 
-    protected boolean checkWallet() {
+    protected boolean checkWalletWithDialog() {
         AccountService accountService = new AccountService(this);
 
         String ethAddress = accountService.getEthAddress();
         String privateKey = accountService.getPrivateKey();
-        if (ethAddress == null || ethAddress.isEmpty() || privateKey == null || privateKey.isEmpty()) {
+        if (TextUtils.isEmpty(ethAddress) || TextUtils.isEmpty(privateKey)) {
             DialogHelper.showQuestion(this, getString(R.string.ask_login), new Runnable() {
                 @Override
                 public void run() {
