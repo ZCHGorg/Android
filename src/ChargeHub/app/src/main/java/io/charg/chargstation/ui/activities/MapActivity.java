@@ -11,7 +11,6 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.annotation.RequiresApi;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -93,7 +92,7 @@ public class MapActivity
         ClusterManager.OnClusterItemClickListener<ChargeStationMarker> {
 
     private static final int INITIAL_ZOOM_LEVEL = 8;
-    private static final int SEARCH_ZOOM_LEVEL = 13;
+    private static final int SEARCH_ZOOM_LEVEL = 12;
     private static final int STATION_ZOOM_LEVEL = 15;
     private static final int PLACE_AUTOCOMPLETE_REQUEST_CODE = 1000;
     private static final int FILTER_ACTIVITY_REQUEST_CODE = 1001;
@@ -222,7 +221,7 @@ public class MapActivity
                         startActivityForResult(intent, FILTER_ACTIVITY_REQUEST_CODE);
                         return true;
                     case R.id.menu_wallet:
-                        if (checkWallet()) {
+                        if (checkWalletWithDialog()) {
                             startActivity(new Intent(MapActivity.this, WalletActivity.class));
                         }
                         return true;
@@ -449,17 +448,14 @@ public class MapActivity
 
             @Override
             public void onProviderDisabled(String provider) {
-                Log.d("Latitude", "disable");
             }
 
             @Override
             public void onProviderEnabled(String provider) {
-                Log.d("Latitude", "enable");
             }
 
             @Override
             public void onStatusChanged(String provider, int status, Bundle extras) {
-                Log.d("Latitude", "status");
             }
         });
     }
@@ -486,7 +482,7 @@ public class MapActivity
     @Override
     public boolean onClusterItemClick(final ChargeStationMarker marker) {
 
-        if (!checkWallet()) {
+        if (!checkWalletWithDialog()) {
             return true;
         }
 

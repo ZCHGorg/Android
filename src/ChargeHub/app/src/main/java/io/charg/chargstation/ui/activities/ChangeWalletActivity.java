@@ -151,7 +151,7 @@ public class ChangeWalletActivity extends BaseActivity {
     }
 
     @OnClick(R.id.btn_generate)
-    void onBtnGenerateCLicked() {
+    void onBtnGenerateClicked() {
         mNewPrivateKey = ContractHelper.generatePrivateKey();
         refreshUI();
     }
