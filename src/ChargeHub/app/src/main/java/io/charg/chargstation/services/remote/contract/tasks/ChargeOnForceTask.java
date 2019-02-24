@@ -23,9 +23,7 @@ public class ChargeOnForceTask extends ChgAsyncTask<TransactionReceipt> {
 
     public ChargeOnForceTask(Activity activity, String address, BigInteger time) {
         super(activity);
-
         mAccountService = new AccountService(activity);
-
         mAddress = address;
         mTime = time;
     }
