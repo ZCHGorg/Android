@@ -3,7 +3,9 @@ package io.charg.chargstation.ui.activities;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.design.widget.Snackbar;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
@@ -12,15 +14,18 @@ import android.widget.TextView;
 import com.braintreepayments.api.dropin.DropInActivity;
 import com.braintreepayments.api.dropin.DropInRequest;
 import com.braintreepayments.api.dropin.DropInResult;
+import com.braintreepayments.api.models.GooglePaymentRequest;
 import com.braintreepayments.api.models.PaymentMethodNonce;
-
-import java.util.List;
 
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.CommonData;
-import io.charg.chargstation.services.remote.api.wecharg.BraintreeTokenDto;
+import io.charg.chargstation.root.ICallbackOnComplete;
+import io.charg.chargstation.services.remote.api.socketio.PaymentDataRequestDto;
+import io.charg.chargstation.services.remote.api.socketio.SellOrderResponseDto;
+import io.charg.chargstation.services.remote.api.socketio.SocketIOProvider;
+import io.charg.chargstation.services.remote.api.socketio.BraintreeTokenDto;
 import io.charg.chargstation.services.remote.api.wecharg.CartItemRequestDto;
 import io.charg.chargstation.services.remote.api.wecharg.CartItemResponseDto;
 import io.charg.chargstation.services.remote.api.wecharg.PaymentInformationDto;
@@ -48,11 +53,11 @@ public class BuyChargActivity extends BaseAuthActivity {
     TextView mTvResult;
 
     private WeChargApi mWeChargApi;
+    private SocketIOProvider mSocketsIO;
 
     private String mClientToken;
     private String mQuoteId;
     private String mBraintreeToken;
-    private String mNonce;
     private String mOrderId;
 
     @Override
@@ -75,12 +80,16 @@ public class BuyChargActivity extends BaseAuthActivity {
 
     private void initServices() {
         mWeChargApi = WeChargProvider.getWeChargApi();
+        mSocketsIO = SocketIOProvider.getInstance();
     }
 
     private void initToolbar() {
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+            getSupportActionBar().setDisplayShowHomeEnabled(true);
+        }
     }
 
     private void initEtAmountChg() {
@@ -112,10 +121,25 @@ public class BuyChargActivity extends BaseAuthActivity {
     @OnClick(R.id.btn_credit)
     void onBtnCreditClicked() {
         executeBuy();
+
     }
 
     public void executeBuy() {
 
+        mSocketsIO.getBraintreeTokenAsync(new ICallbackOnComplete<BraintreeTokenDto>() {
+            @Override
+            public void onComplete(BraintreeTokenDto result) {
+
+                DropInRequest dropInRequest = new DropInRequest()
+                        .clientToken(result.Token);
+
+                startActivityForResult(dropInRequest.getIntent(BuyChargActivity.this), REQUEST_CODE_BRAINTREE);
+            }
+        });
+
+    }
+
+    private void useMagento() {
         mWeChargApi.getTokenAsync(new TokenRequestDto("jdoe@example.com", "Password1"))
                 .enqueue(new Callback<String>() {
                     @Override
@@ -191,7 +215,7 @@ public class BuyChargActivity extends BaseAuthActivity {
                     return;
                 }
 
-                mBraintreeToken = body.Message;
+                mBraintreeToken = body.Token;
                 DropInRequest dropInRequest = new DropInRequest()
                         .clientToken(mBraintreeToken);
 
@@ -217,8 +241,11 @@ public class BuyChargActivity extends BaseAuthActivity {
                     return;
                 }
 
-                mNonce = nonce.getNonce();
-                createOrderAsync();
+                Log.i(CommonData.TAG, "nonce:" + nonce.getNonce());
+
+                exchangeUSDtoCHG(nonce.getNonce());
+
+//                createOrderAsyncMagento();
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 mTvResult.setText(R.string.cancel_user);
             } else {
@@ -228,10 +255,28 @@ public class BuyChargActivity extends BaseAuthActivity {
         }
     }
 
-    private void createOrderAsync() {
+    private void exchangeUSDtoCHG(final String nonce) {
+
+        mSocketsIO.getBestSellOrderAsync(new ICallbackOnComplete<SellOrderResponseDto>() {
+            @Override
+            public void onComplete(SellOrderResponseDto sellOrder) {
+
+                PaymentDataRequestDto paymentData = new PaymentDataRequestDto(
+                        "0x1aa494ff7a493e0ba002e2d38650d4d21bd5591b",
+                        "0x55e93bce34504f89a7966be0aadfefb8cffd5903580b6859b3093c6efdb598d0",
+                        1.76f,
+                        nonce);
+
+                mSocketsIO.payBraintreeAsync(paymentData);
+            }
+        });
+
+    }
+
+    private void createOrderAsyncMagento(String nonce) {
         PaymentInformationDto payment = new PaymentInformationDto(mQuoteId);
         payment.PaymentMethod.Method = "braintree";
-        payment.PaymentMethod.AdditionalData.Nonce = mNonce;
+        payment.PaymentMethod.AdditionalData.Nonce = nonce;
 
         mWeChargApi.createOrderAsync("bearer " + mClientToken, payment).enqueue(new Callback<String>() {
             @Override

@@ -1,5 +1,6 @@
 package io.charg.chargstation.services.remote.api.wecharg;
 
+import io.charg.chargstation.services.remote.api.socketio.BraintreeTokenDto;
 import retrofit2.Call;
 import retrofit2.http.Body;
 import retrofit2.http.Header;
