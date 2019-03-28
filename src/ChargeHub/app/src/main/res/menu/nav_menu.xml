@@ -54,6 +54,12 @@
             android:icon="@drawable/ic_settings"
             android:title="Settings" />
 
+        <item
+            android:visible="false"
+            android:id="@+id/menu_socketio"
+            android:icon="@drawable/charg"
+            android:title="Socketio" />
+
     </group>
 
     <group android:id="@+id/grp2">

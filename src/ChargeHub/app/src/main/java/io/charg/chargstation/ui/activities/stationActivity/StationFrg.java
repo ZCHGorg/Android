@@ -118,7 +118,8 @@ public class StationFrg extends BaseFragment {
                     @Override
                     public void onComplete(Boolean result) {
                         mTvAuthStatus.setText(result ? "Authorized" : "Not authorized");
-                        mTvAuthStatus.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_ok, 0, 0, 0);
+                        mTvAuthStatus.setCompoundDrawablesWithIntrinsicBounds(result ? R.drawable.ic_ok : R.drawable.ic_error, 0, 0, 0);
+
                     }
                 })
                 .setErrorListener(new ICallbackOnError<String>() {

@@ -118,7 +118,7 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
 
         final List<BaseFragment> fragments = new ArrayList<BaseFragment>() {{
             add(StationFrg.newInstance(mEthAddress));
-            add(ChargeFrg.newInstance(mEthAddress));
+        //    add(ChargeFrg.newInstance(mEthAddress));
         }};
 
         mViewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {
