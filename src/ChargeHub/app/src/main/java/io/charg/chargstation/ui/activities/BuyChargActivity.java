@@ -2,14 +2,17 @@ package io.charg.chargstation.ui.activities;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.braintreepayments.api.dropin.DropInActivity;
 import com.braintreepayments.api.dropin.DropInRequest;
@@ -22,13 +25,17 @@ import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.CommonData;
 import io.charg.chargstation.root.ICallbackOnComplete;
+import io.charg.chargstation.services.helpers.DialogHelper;
+import io.charg.chargstation.services.local.LogService;
 import io.charg.chargstation.services.remote.api.socketio.PaymentDataRequestDto;
 import io.charg.chargstation.services.remote.api.socketio.SellOrderResponseDto;
 import io.charg.chargstation.services.remote.api.socketio.SocketIOProvider;
 import io.charg.chargstation.services.remote.api.socketio.BraintreeTokenDto;
 import io.charg.chargstation.services.remote.api.wecharg.CartItemRequestDto;
 import io.charg.chargstation.services.remote.api.wecharg.CartItemResponseDto;
+import io.charg.chargstation.services.remote.api.wecharg.PaymentDataResponseDto;
 import io.charg.chargstation.services.remote.api.wecharg.PaymentInformationDto;
+import io.charg.chargstation.services.remote.api.wecharg.PaymentResultResponseDto;
 import io.charg.chargstation.services.remote.api.wecharg.TokenRequestDto;
 import io.charg.chargstation.services.remote.api.wecharg.WeChargApi;
 import io.charg.chargstation.services.remote.api.wecharg.WeChargProvider;
@@ -121,22 +128,42 @@ public class BuyChargActivity extends BaseAuthActivity {
     @OnClick(R.id.btn_credit)
     void onBtnCreditClicked() {
         executeBuy();
-
     }
 
     public void executeBuy() {
 
-        mSocketsIO.getBraintreeTokenAsync(new ICallbackOnComplete<BraintreeTokenDto>() {
+        LogService.info("Starting payment");
+
+        mWeChargApi.getPaymentDataAsync().enqueue(new Callback<PaymentDataResponseDto>() {
             @Override
-            public void onComplete(BraintreeTokenDto result) {
+            public void onResponse(@NonNull Call<PaymentDataResponseDto> call, @NonNull Response<PaymentDataResponseDto> response) {
+                if (!response.isSuccessful()) {
+                    Snackbar.make(mToolbar, "Response is not successful", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                PaymentDataResponseDto body = response.body();
+                if (body == null || body.PaymentData == null) {
+                    Snackbar.make(mToolbar, R.string.error_loading_data, Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (!body.PaymentData.Success) {
+                    Snackbar.make(mToolbar, "Reading payment data is not successful", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 DropInRequest dropInRequest = new DropInRequest()
-                        .clientToken(result.Token);
+                        .clientToken(body.PaymentData.ClientToken);
 
                 startActivityForResult(dropInRequest.getIntent(BuyChargActivity.this), REQUEST_CODE_BRAINTREE);
             }
-        });
 
+            @Override
+            public void onFailure(@NonNull Call<PaymentDataResponseDto> call, @NonNull Throwable t) {
+                Snackbar.make(mToolbar, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void useMagento() {
@@ -257,17 +284,33 @@ public class BuyChargActivity extends BaseAuthActivity {
 
     private void exchangeUSDtoCHG(final String nonce) {
 
-        mSocketsIO.getBestSellOrderAsync(new ICallbackOnComplete<SellOrderResponseDto>() {
+        mWeChargApi.confirmPaymentAsync(
+                "0x1aa494ff7a493e0ba002e2d38650d4d21bd5591b",
+                "0x3d203f7ad6471c5d11d9ab5e1950130da759c594aa998435d01e36067ac9b7e8",
+                5,
+                nonce
+        ).enqueue(new Callback<PaymentResultResponseDto>() {
             @Override
-            public void onComplete(SellOrderResponseDto sellOrder) {
+            public void onResponse(@NonNull Call<PaymentResultResponseDto> call, @NonNull Response<PaymentResultResponseDto> response) {
+                PaymentResultResponseDto body = response.body();
+                if (body == null || body.PaymentResult == null) {
+                    Snackbar.make(mToolbar, R.string.error_loading_data, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
 
-                PaymentDataRequestDto paymentData = new PaymentDataRequestDto(
-                        "0x1aa494ff7a493e0ba002e2d38650d4d21bd5591b",
-                        "0x55e93bce34504f89a7966be0aadfefb8cffd5903580b6859b3093c6efdb598d0",
-                        1.76f,
-                        nonce);
+                String txHash = body.PaymentResult.TxHash;
+                if (TextUtils.isEmpty(txHash)) {
+                    Snackbar.make(mToolbar, R.string.error_loading_data, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
 
-                mSocketsIO.payBraintreeAsync(paymentData);
+                Snackbar.make(mToolbar, txHash, Snackbar.LENGTH_SHORT).show();
+
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<PaymentResultResponseDto> call, @NonNull Throwable t) {
+                Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
             }
         });
 

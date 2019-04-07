@@ -18,7 +18,7 @@ public class WeChargProvider {
 
     public static WeChargApi getWeChargApi() {
         return new Retrofit.Builder()
-                .baseUrl("https://207.246.97.160/rest/V1/")
+                .baseUrl("https://dhanyainnovation.com:3003/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .client(getUnsafeOkHttpClient())

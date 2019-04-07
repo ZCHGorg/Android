@@ -11,7 +11,7 @@ public class CommonData {
     public static final String FIREBASE_PATH_LOCATION = "locations";
 
     public static final double RADIUS_LIMIT = 75;
-    public static final String TAG = "charge";
+    public static final String TAG = "Charge";
     public static final String NOT_DEFINED = "Not defined";
 
     //main net
