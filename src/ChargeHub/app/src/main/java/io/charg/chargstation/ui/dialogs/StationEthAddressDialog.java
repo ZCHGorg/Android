@@ -4,7 +4,6 @@ import android.content.Context;
 import android.support.v7.app.AlertDialog;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.webkit.WebView;
 import android.widget.TextView;
 
 import butterknife.BindView;
@@ -13,7 +12,7 @@ import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.ICallbackOnComplete;
 
-public class RequestStationEthAddressDialog {
+public class StationEthAddressDialog {
 
     private final Context mContext;
 
@@ -24,14 +23,14 @@ public class RequestStationEthAddressDialog {
     @BindView(R.id.tv_station_id)
     TextView mTvStationId;
 
-    public RequestStationEthAddressDialog(Context context) {
+    public StationEthAddressDialog(Context context) {
         mContext = context;
         initView();
         initDialog();
     }
 
     private void initView() {
-        mView = LayoutInflater.from(mContext).inflate(R.layout.dlg_request_station_eth_address, null);
+        mView = LayoutInflater.from(mContext).inflate(R.layout.dlg_station_eth_address, null);
         ButterKnife.bind(this, mView);
     }
 

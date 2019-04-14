@@ -81,7 +81,7 @@ import io.charg.chargstation.ui.activities.becomeOwner.BecomeOwnerActivity;
 import io.charg.chargstation.ui.activities.chargingActivity.ChargingActivity;
 import io.charg.chargstation.ui.activities.parkingActivity.ParkingActivity;
 import io.charg.chargstation.ui.activities.stationActivity.StationActivity;
-import io.charg.chargstation.ui.dialogs.RequestStationEthAddressDialog;
+import io.charg.chargstation.ui.dialogs.StationEthAddressDialog;
 import io.charg.chargstation.ui.dialogs.TxWaitDialog;
 import io.charg.chargstation.ui.views.ChargeClusterManager;
 
@@ -301,7 +301,7 @@ public class MapActivity
     }
 
     private void showRequestStationEthAddressDialog() {
-        RequestStationEthAddressDialog dialog = new RequestStationEthAddressDialog(this);
+        StationEthAddressDialog dialog = new StationEthAddressDialog(this);
         dialog.setOnComplete(new ICallbackOnComplete<String>() {
             @Override
             public void onComplete(String result) {
