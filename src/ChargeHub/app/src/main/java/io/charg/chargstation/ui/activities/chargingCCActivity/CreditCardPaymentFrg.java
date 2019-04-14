@@ -1,16 +1,11 @@
-package io.charg.chargstation.ui.activities;
+package io.charg.chargstation.ui.activities.chargingCCActivity;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,138 +18,118 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.CommonData;
-import io.charg.chargstation.services.local.LogService;
 import io.charg.chargstation.services.remote.api.wecharg.PaymentDataResponseDto;
 import io.charg.chargstation.services.remote.api.wecharg.PaymentResultResponseDto;
 import io.charg.chargstation.services.remote.api.wecharg.WeChargApi;
 import io.charg.chargstation.services.remote.api.wecharg.WeChargProvider;
+import io.charg.chargstation.ui.dialogs.TxWaitDialog;
+import io.charg.chargstation.ui.fragments.BaseNavFragment;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class BuyChargActivity extends BaseAuthActivity {
+public class CreditCardPaymentFrg extends BaseNavFragment {
 
     private static final int REQUEST_CODE_BRAINTREE = 1001;
 
-    @BindView(R.id.et_amount_chg)
-    EditText mEtAmountChg;
+    private WeChargApi mWeChargApi;
 
-    @BindView(R.id.tv_final_price)
-    TextView mTvFinalPrice;
-
-    @BindView(R.id.toolbar)
-    Toolbar mToolbar;
+    private String mTxHash;
 
     @BindView(R.id.tv_result)
     TextView mTvResult;
 
-    private WeChargApi mWeChargApi;
-
-    private String mClientToken;
-    private String mQuoteId;
-    private String mBraintreeToken;
-    private String mOrderId;
-
     @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
+    public boolean canBack() {
         return true;
     }
 
     @Override
-    public int getResourceId() {
-        return R.layout.activity_buy_charg;
+    public boolean canNext() {
+        return true;
     }
 
     @Override
-    public void onActivate() {
+    public boolean isValid() {
+        return !TextUtils.isEmpty(mTxHash);
+    }
+
+    @Override
+    public void invalidate() {
+
+    }
+
+    @Override
+    protected int getResourceId() {
+        return R.layout.frg_credit_card_payment;
+    }
+
+    @Override
+    protected void onShows() {
         initServices();
-        initToolbar();
-        initEtAmountChg();
     }
 
     private void initServices() {
         mWeChargApi = WeChargProvider.getWeChargApi();
     }
 
-    private void initToolbar() {
-        setSupportActionBar(mToolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-            getSupportActionBar().setDisplayShowHomeEnabled(true);
-        }
+    @Override
+    public CharSequence getTitle() {
+        return null;
     }
 
-    private void initEtAmountChg() {
-        mEtAmountChg.setOnKeyListener(new View.OnKeyListener() {
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-
-                refreshFinalPrice();
-
-                if (mEtAmountChg.getText().toString().isEmpty()) {
-                    mEtAmountChg.setError("Amount cannot be empty");
-                }
-
-                return false;
-            }
-        });
-    }
-
-    private void refreshFinalPrice() {
-        try {
-            int amount = Integer.parseInt(mEtAmountChg.getText().toString());
-            float finalPrice = amount * CommonData.PRICE_CHG_USD;
-
-            mTvFinalPrice.setText(String.valueOf(finalPrice));
-        } catch (Exception ex) {
-            mTvFinalPrice.setText("");
-        }
-    }
-
-    @OnClick(R.id.btn_credit)
-    void onBtnCreditClicked() {
-        executeBuy();
-    }
-
-    public void executeBuy() {
-
-        LogService.info("Starting payment");
+    @OnClick(R.id.btn_pay)
+    void btnPay() {
+        final TxWaitDialog dialog = new TxWaitDialog(getContext(), "Loading payment data");
+        dialog.show();
 
         mWeChargApi.getPaymentDataAsync().enqueue(new Callback<PaymentDataResponseDto>() {
             @Override
             public void onResponse(@NonNull Call<PaymentDataResponseDto> call, @NonNull Response<PaymentDataResponseDto> response) {
-                if (!response.isSuccessful()) {
-                    Snackbar.make(mToolbar, "Response is not successful", Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+
+                PaymentDataResponseDto dto = response.body();
+                if (dto == null) {
+                    Toast.makeText(getContext(), R.string.error_loading_payment_token, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                PaymentDataResponseDto body = response.body();
-                if (body == null || body.PaymentData == null) {
-                    Snackbar.make(mToolbar, R.string.error_loading_data, Toast.LENGTH_SHORT).show();
+                PaymentDataResponseDto.PaymentDataDto paymentData = dto.PaymentData;
+                if (paymentData == null) {
+                    Toast.makeText(getContext(), R.string.error_loading_payment_token, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                if (!body.PaymentData.Success) {
-                    Snackbar.make(mToolbar, "Reading payment data is not successful", Toast.LENGTH_SHORT).show();
+                if (!paymentData.Success) {
+                    Toast.makeText(getContext(), R.string.error_loading_payment_token, Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                DropInRequest dropInRequest = new DropInRequest()
-                        .clientToken(body.PaymentData.ClientToken);
-
-                startActivityForResult(dropInRequest.getIntent(BuyChargActivity.this), REQUEST_CODE_BRAINTREE);
+                executeBraintreePayment(paymentData.ClientToken);
             }
 
             @Override
             public void onFailure(@NonNull Call<PaymentDataResponseDto> call, @NonNull Throwable t) {
-                Snackbar.make(mToolbar, t.getMessage(), Toast.LENGTH_SHORT).show();
+                dialog.dismiss();
+
+                Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
+    private void executeBraintreePayment(String clientToken) {
+        DropInRequest dropInRequest = new DropInRequest()
+                .clientToken(clientToken);
+
+        startActivityForResult(dropInRequest.getIntent(getContext()), REQUEST_CODE_BRAINTREE);
+    }
+
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        handleBraintreeResult(requestCode, resultCode, data);
+    }
+
+    private void handleBraintreeResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_BRAINTREE) {
             if (resultCode == Activity.RESULT_OK) {
                 DropInResult result = data.getParcelableExtra(DropInResult.EXTRA_DROP_IN_RESULT);
@@ -178,7 +153,10 @@ public class BuyChargActivity extends BaseAuthActivity {
         }
     }
 
-    private void exchangeUSDtoCHG(final String nonce) {
+    private void exchangeUSDtoCHG(String nonce) {
+
+        final TxWaitDialog dialog = new TxWaitDialog(getContext(), "Making payment");
+        dialog.show();
 
         mWeChargApi.confirmPaymentAsync(
                 "0x1aa494ff7a493e0ba002e2d38650d4d21bd5591b",
@@ -188,28 +166,33 @@ public class BuyChargActivity extends BaseAuthActivity {
         ).enqueue(new Callback<PaymentResultResponseDto>() {
             @Override
             public void onResponse(@NonNull Call<PaymentResultResponseDto> call, @NonNull Response<PaymentResultResponseDto> response) {
+
+                dialog.dismiss();
+
                 PaymentResultResponseDto body = response.body();
                 if (body == null || body.PaymentResult == null) {
-                    Snackbar.make(mToolbar, R.string.error_loading_data, Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(mTvResult, R.string.error_loading_data, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
 
                 String txHash = body.PaymentResult.TxHash;
                 if (TextUtils.isEmpty(txHash)) {
-                    Snackbar.make(mToolbar, R.string.error_loading_data, Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(mTvResult, R.string.error_loading_data, Snackbar.LENGTH_SHORT).show();
                     return;
                 }
 
-                Snackbar.make(mToolbar, txHash, Snackbar.LENGTH_SHORT).show();
+                mTxHash = txHash;
+
+                mTvResult.setText("Transaction hash:\r\n" + txHash);
 
             }
 
             @Override
             public void onFailure(@NonNull Call<PaymentResultResponseDto> call, @NonNull Throwable t) {
-                Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
+                dialog.dismiss();
+                Snackbar.make(mTvResult, t.getMessage(), Snackbar.LENGTH_SHORT).show();
             }
         });
-
     }
 
 }

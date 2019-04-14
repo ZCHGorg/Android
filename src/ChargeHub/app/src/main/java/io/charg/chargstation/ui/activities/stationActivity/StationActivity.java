@@ -4,6 +4,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -75,8 +76,11 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
 
     private void initToolbar() {
         setSupportActionBar(mToolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-        getSupportActionBar().setDisplayShowHomeEnabled(true);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setDisplayShowHomeEnabled(true);
+        }
     }
 
     @Override
@@ -118,7 +122,7 @@ public class StationActivity extends BaseActivity implements IStationFrgListener
 
         final List<BaseFragment> fragments = new ArrayList<BaseFragment>() {{
             add(StationFrg.newInstance(mEthAddress));
-        //    add(ChargeFrg.newInstance(mEthAddress));
+            //    add(ChargeFrg.newInstance(mEthAddress));
         }};
 
         mViewPager.setAdapter(new FragmentPagerAdapter(getSupportFragmentManager()) {

@@ -51,6 +51,7 @@
         <activity android:name=".ui.activities.becomeOwner.FamilyPlanActivity" />
         <activity android:name=".ui.activities.stationActivity.StationActivity" />
         <activity android:name=".ui.activities.SocketIOActivity" />
+        <activity android:name=".ui.activities.chargingCCActivity.ChargingCCActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
