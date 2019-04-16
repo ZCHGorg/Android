@@ -1,0 +1,10 @@
+Charg Android Application
+---------------------------------
+versionCode 21
+versionName "1.3.8"
+date 07.04.2019
+---------------------------------
+release notes:
+Changes:
+- added button "find station by ETH address"
+- credit card support

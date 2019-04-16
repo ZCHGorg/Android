@@ -1,0 +1,53 @@
+<h2>
+    Sockets works
+</h2>
+
+<script src="socket.io/socket.io.js"></script>
+<script>
+    var paymentData = { 'amountCHG': 1000 };
+    var paymentBraintreeData = {
+        'station': '0x1aa494ff7a493e0ba002e2d38650d4d21bd5591b',
+        'hash': '0x55e93bce34504f89a7966be0aadfefb8cffd5903580b6859b3093c6efdb598d0',
+        'amountUSD': 1.76,
+        'nonce': 'tokencc_bh_j9j5k6_gf8cs4_rqdy9n_nnwjns_7y6'
+    };
+
+    var androidPayment = { "amountUSD": 1.76, "nonce": "tokencc_bh_rkvfgp_7cyhh7_yf2k95_kkfqjs_3j3", "hash": "0x55e93bce34504f89a7966be0aadfefb8cffd5903580b6859b3093c6efdb598d0", "station": "0x1aa494ff7a493e0ba002e2d38650d4d21bd5591b" };
+
+    /*
+    var paymentBraintreeData = {
+        'orderHash': '0xee72f9a90af30fbbfb655a272cf379bff47001a75e9c990cb7bb6e933313c012',
+        'amountUSD': 1.79,
+        'nonce': 'tokencc_bh_xf7ntg_fcy3cy_8r57tg_67bhs2_xp2'
+    };
+    */
+
+    var socket = io('https://dhanyainnovation.com:3002');
+    socket.on('connect', function () {
+        console.log('connected');
+    });
+    socket.on('disconnect', function () {
+        console.log('disconnect');
+    });
+
+    // socket.emit('getBraintreeToken', function (data) {
+    //     console.log(data);
+    // });
+    // socket.emit('getBestSellOrder', paymentData, function (data) {
+    //     console.log(data);
+    // });
+
+    console.log('Paying...');
+    socket.emit('payBraintree', androidPayment, function (data) {
+        console.log('Pay result');
+        console.log(data);
+    });
+
+    // var json = { "amountUSD": 1.76, "nonce": "tokencc_bh_93m8cd_j2tktp_5mcw5g_74h2tt_sty", "hash": "0x55e93bce34504f89a7966be0aadfefb8cffd5903580b6859b3093c6efdb598d0", "station": "0x1aa494ff7a493e0ba002e2d38650d4d21bd5591b" };
+    // console.log("payBraintree 2", json);
+
+    // var amountUSD = parseFloat(json.amountUSD);
+
+    // console.log("payBraintree 3", amountUSD);
+
+</script>

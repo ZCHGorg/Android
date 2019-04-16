@@ -81,6 +81,7 @@ import io.charg.chargstation.ui.activities.becomeOwner.BecomeOwnerActivity;
 import io.charg.chargstation.ui.activities.chargingActivity.ChargingActivity;
 import io.charg.chargstation.ui.activities.parkingActivity.ParkingActivity;
 import io.charg.chargstation.ui.activities.stationActivity.StationActivity;
+import io.charg.chargstation.ui.dialogs.StationEthAddressDialog;
 import io.charg.chargstation.ui.dialogs.TxWaitDialog;
 import io.charg.chargstation.ui.views.ChargeClusterManager;
 
@@ -243,6 +244,9 @@ public class MapActivity
                     case R.id.menu_settings:
                         startActivity(new Intent(MapActivity.this, SettingsActivity.class));
                         return true;
+                    case R.id.menu_socketio:
+                        startActivity(new Intent(MapActivity.this, SocketIOActivity.class));
+                        return true;
                     case R.id.menu_log_out:
                         requestLogOut();
                         return true;
@@ -275,18 +279,36 @@ public class MapActivity
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.menu_search:
-                try {
-                    Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY).build(this);
-                    startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
-                } catch (GooglePlayServicesRepairableException e) {
-                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
-                }
+                showRequestGoogleSearch();
+                return true;
+            case R.id.menu_station_eth:
+                showRequestStationEthAddressDialog();
                 return true;
             default:
                 return false;
         }
+    }
+
+    private void showRequestGoogleSearch() {
+        try {
+            Intent intent = new PlaceAutocomplete.IntentBuilder(PlaceAutocomplete.MODE_OVERLAY).build(this);
+            startActivityForResult(intent, PLACE_AUTOCOMPLETE_REQUEST_CODE);
+        } catch (GooglePlayServicesRepairableException e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        } catch (GooglePlayServicesNotAvailableException e) {
+            Toast.makeText(this, e.getMessage(), Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void showRequestStationEthAddressDialog() {
+        StationEthAddressDialog dialog = new StationEthAddressDialog(this);
+        dialog.setOnComplete(new ICallbackOnComplete<String>() {
+            @Override
+            public void onComplete(String result) {
+                findStationByEthAddressAsync(result);
+            }
+        });
+        dialog.show();
     }
 
     private void initMapAsync() {

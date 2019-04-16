@@ -33,7 +33,9 @@ import io.charg.chargstation.services.remote.contract.tasks.GetParkingSwitchesTa
 import io.charg.chargstation.services.remote.firebase.ChargeHubService;
 import io.charg.chargstation.services.remote.firebase.tasks.GetStationDtoTask;
 import io.charg.chargstation.ui.activities.chargingActivity.ChargingActivity;
+import io.charg.chargstation.ui.activities.chargingCCActivity.ChargingCCActivity;
 import io.charg.chargstation.ui.activities.parkingActivity.ParkingActivity;
+import io.charg.chargstation.ui.dialogs.SelectPaymentDialog;
 import io.charg.chargstation.ui.dialogs.TxWaitDialog;
 import io.charg.chargstation.ui.fragments.BaseFragment;
 
@@ -118,7 +120,8 @@ public class StationFrg extends BaseFragment {
                     @Override
                     public void onComplete(Boolean result) {
                         mTvAuthStatus.setText(result ? "Authorized" : "Not authorized");
-                        mTvAuthStatus.setCompoundDrawablesWithIntrinsicBounds(R.drawable.ic_ok, 0, 0, 0);
+                        mTvAuthStatus.setCompoundDrawablesWithIntrinsicBounds(result ? R.drawable.ic_ok : R.drawable.ic_error, 0, 0, 0);
+
                     }
                 })
                 .setErrorListener(new ICallbackOnError<String>() {
@@ -270,12 +273,30 @@ public class StationFrg extends BaseFragment {
 /*        if (mStation.getMediaItems().size() > 0) {
             Glide.with(this).load(mStation.getMediaItems().get(0).getItemThumbnailURL()).into(ivStation);
         }*/
+
     }
 
     @OnClick(R.id.btn_charge)
     void onBtnChargeClick() {
-        startActivity(new Intent(getActivity(), ChargingActivity.class)
-                .putExtra(ChargingActivity.KEY_ETH_ADDRESS, mStationEthAddress));
+
+        SelectPaymentDialog dialog = new SelectPaymentDialog(getContext());
+        dialog.setCreditCardClickListener(new Runnable() {
+            @Override
+            public void run() {
+                startActivity(new Intent(getActivity(), ChargingCCActivity.class)
+                        .putExtra(ChargingCCActivity.KEY_ETH_ADDRESS, mStationEthAddress));
+
+            }
+        });
+        dialog.setChargCoinClickListener(new Runnable() {
+            @Override
+            public void run() {
+                startActivity(new Intent(getActivity(), ChargingActivity.class)
+                        .putExtra(ChargingActivity.KEY_ETH_ADDRESS, mStationEthAddress));
+            }
+        });
+        dialog.show();
+
     }
 
     @OnClick(R.id.btn_park)

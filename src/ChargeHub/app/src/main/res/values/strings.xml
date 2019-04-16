@@ -92,4 +92,5 @@
     <string name="free">Free</string>
     <string name="busy">Busy</string>
     <string name="no_data_available">No data available</string>
+    <string name="error_loading_payment_token">Error while loading payment token</string>
 </resources>

@@ -8,4 +8,5 @@ public class ChargeApp extends Application {
     public void onCreate() {
         super.onCreate();
     }
+
 }
