@@ -9,13 +9,13 @@
     <string name="err_loading_balance">Error while loading balance</string>
     <string name="not_implemented_yet">Arriving March, 2018</string>
     <string name="eth_address_empty">You must set ethereum address</string>
-    <string name="eth_private_key_empty">Private kay is empty</string>
-    <string name="eth_address">Eth address</string>
+    <string name="eth_private_key_empty">Private key is empty</string>
+    <string name="eth_address">Ethereum address</string>
     <string name="save">Save</string>
     <string name="discard">Discard</string>
-    <string name="private_key">ETH wallet private key</string>
+    <string name="private_key">Ethereum wallet private key</string>
     <string name="ask_delete_wallet">All data will be erased. Do you realy want to log out?</string>
-    <string name="eth_test_address">0xce443043d36bd4027a0c52ca2a17ba370e458bc8</string>
+    <string name="eth_test_address" translatable="false">0xce443043d36bd4027a0c52ca2a17ba370e458bc8</string>
     <string name="ask_parking_off">You are parking now. Do you want to stop parking?</string>
     <string name="ask_charging_off">You are charging now. Do you want to stop?</string>
     <string name="execute_tansaction">Transaction executed</string>
@@ -23,7 +23,7 @@
     <string name="is_charging">Station state is not idle. Try again later.</string>
     <string name="is_request">Please wait for response from charging station</string>
     <string name="favorites">Favorites</string>
-    <string name="loading_details">Loading details...</string>
+    <string name="loading_details">Loading details…</string>
     <string name="error_loading_data">Error loading data</string>
     <string name="smart_contract_address">Smart contract address</string>
     <string name="gas_price">Gas price</string>
