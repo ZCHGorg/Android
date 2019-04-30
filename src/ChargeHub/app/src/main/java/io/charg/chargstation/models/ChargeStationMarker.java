@@ -11,10 +11,10 @@ public class ChargeStationMarker implements ClusterItem {
 
     private final String mKey;
     private final String mSnippet;
-    private LatLng mPosition;
+    private final LatLng mPosition;
 
-   public static final String SNIPPET_CHARG = "SNIPPET_CHARG";
-   public static final String SNIPPET_UNKNOWN = "SNIPPET_UNKNOWN";
+    public static final String SNIPPET_CHARG = "SNIPPET_CHARG";
+    public static final String SNIPPET_UNKNOWN = "SNIPPET_UNKNOWN";
 
     public ChargeStationMarker(double lat, double lng, String key, String snippet) {
         mKey = key;

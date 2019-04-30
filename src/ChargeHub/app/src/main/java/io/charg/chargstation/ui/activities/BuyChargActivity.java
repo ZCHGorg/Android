@@ -50,11 +50,6 @@ public class BuyChargActivity extends BaseAuthActivity {
 
     private WeChargApi mWeChargApi;
 
-    private String mClientToken;
-    private String mQuoteId;
-    private String mBraintreeToken;
-    private String mOrderId;
-
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
