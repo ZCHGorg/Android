@@ -14,7 +14,7 @@
     <string name="save">Save</string>
     <string name="discard">Discard</string>
     <string name="private_key">Ethereum wallet private key</string>
-    <string name="ask_delete_wallet">All data will be erased. Do you realy want to log out?</string>
+    <string name="ask_delete_wallet">All data will be erased. Do you really want to log out?</string>
     <string name="eth_test_address" translatable="false">0xce443043d36bd4027a0c52ca2a17ba370e458bc8</string>
     <string name="ask_parking_off">You are parking now. Do you want to stop parking?</string>
     <string name="ask_charging_off">You are charging now. Do you want to stop?</string>
