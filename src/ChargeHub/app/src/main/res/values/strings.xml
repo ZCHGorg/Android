@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Charg</string>
+    <string name="app_name" translatable="false">Charg</string>
     <string name="title_activity_maps">Map</string>
     <string name="ask_login">You must set eth address for using this app.\nWithout eth address some functions will be disabled\nDo you want to login?</string>
     <string name="yes">Yes</string>

@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Charg</string>
     <string name="title_activity_maps">Mapa</string>
     <string name="ask_login">Debe configurar la dirección de correo electrónico para usar esta aplicación. Sin la dirección de correo electrónico algunas funciones serán deshabilitadas. ¿Quieres iniciar sesión?</string>
     <string name="yes">Sí</string>
@@ -23,7 +22,7 @@
     <string name="is_charging">El estado de la estación no está inactivo. Inténtalo de nuevo más tarde.</string>
     <string name="is_request">Por favor, espere la respuesta de la estación de carga</string>
     <string name="favorites">Favoritos</string>
-    <string name="loading_details">Cargando detalles …</string>
+    <string name="loading_details">Cargando de`talles …</string>
     <string name="error_loading_data">Error al cargar los datos</string>
     <string name="smart_contract_address">Dirección de contrato inteligente</string>
     <string name="gas_price">Precio del gas</string>
