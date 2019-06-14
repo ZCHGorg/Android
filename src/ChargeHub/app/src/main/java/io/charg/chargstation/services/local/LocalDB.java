@@ -2,8 +2,11 @@ package io.charg.chargstation.services.local;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.v4.text.TextUtilsCompat;
+import android.text.TextUtils;
 
 import com.google.gson.Gson;
+import com.google.zxing.common.StringUtils;
 
 import java.math.BigInteger;
 
@@ -22,50 +25,55 @@ public class LocalDB {
     }
 
     public String getString(String key) {
-        SharedPreferences sharedPref = mContext.getSharedPreferences(mContext.getPackageName(), Context.MODE_PRIVATE);
-        return sharedPref.getString(key, "");
+        return getSharedPreferences()
+                .getString(key, "");
     }
 
     public boolean getBoolean(String key, boolean defValue) {
-        SharedPreferences sharedPref = mContext.getSharedPreferences(mContext.getPackageName(), Context.MODE_PRIVATE);
-        return sharedPref.getBoolean(key, defValue);
+        return getSharedPreferences()
+                .getBoolean(key, defValue);
     }
 
     public String getString(String key, String defValue) {
-        SharedPreferences sharedPref = mContext.getSharedPreferences(mContext.getPackageName(), Context.MODE_PRIVATE);
-        return sharedPref.getString(key, defValue);
+        return getSharedPreferences()
+                .getString(key, defValue);
     }
 
     public Boolean putValue(String key, String value) {
-        SharedPreferences sharedPref = mContext.getSharedPreferences(mContext.getPackageName(), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putString(key, value);
-        return editor.commit();
+        return getSharedPreferences()
+                .edit()
+                .putString(key, value)
+                .commit();
     }
 
     public void clearDb() {
-        SharedPreferences sharedPref = mContext.getSharedPreferences(mContext.getPackageName(), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.clear();
-        editor.apply();
+        getSharedPreferences()
+                .edit()
+                .clear()
+                .apply();
     }
 
     public boolean putBoolean(String key, boolean value) {
-        SharedPreferences sharedPref = mContext.getSharedPreferences(mContext.getPackageName(), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putBoolean(key, value);
-        return editor.commit();
+        return getSharedPreferences()
+                .edit()
+                .putBoolean(key, value)
+                .commit();
     }
 
     public long getLong(String key, long value) {
-        SharedPreferences sharedPref = mContext.getSharedPreferences(mContext.getPackageName(), Context.MODE_PRIVATE);
-        return sharedPref.getLong(key, value);
+        return getSharedPreferences()
+                .getLong(key, value);
     }
 
     public void putLong(String key, long value) {
-        SharedPreferences sharedPref = mContext.getSharedPreferences(mContext.getPackageName(), Context.MODE_PRIVATE);
-        SharedPreferences.Editor editor = sharedPref.edit();
-        editor.putLong(key, value);
-        editor.apply();
+        getSharedPreferences()
+                .edit()
+                .putLong(key, value)
+                .apply();
     }
+
+    private SharedPreferences getSharedPreferences() {
+        return mContext.getSharedPreferences(mContext.getPackageName(), Context.MODE_PRIVATE);
+    }
+
 }
