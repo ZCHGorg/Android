@@ -16,14 +16,14 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class WeChargProvider {
 
-    public static WeChargApi getWeChargApi() {
+    public static IWeChargApi getWeChargApi() {
         return new Retrofit.Builder()
                 .baseUrl("https://dhanyainnovation.com:3003/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .client(getUnsafeOkHttpClient())
                 .build()
-                .create(WeChargApi.class);
+                .create(IWeChargApi.class);
     }
 
     private static OkHttpClient getUnsafeOkHttpClient() {

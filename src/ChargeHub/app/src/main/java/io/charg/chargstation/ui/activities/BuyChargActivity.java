@@ -26,7 +26,7 @@ import io.charg.chargstation.root.CommonData;
 import io.charg.chargstation.services.local.LogService;
 import io.charg.chargstation.services.remote.api.wecharg.PaymentDataResponseDto;
 import io.charg.chargstation.services.remote.api.wecharg.PaymentResultResponseDto;
-import io.charg.chargstation.services.remote.api.wecharg.WeChargApi;
+import io.charg.chargstation.services.remote.api.wecharg.IWeChargApi;
 import io.charg.chargstation.services.remote.api.wecharg.WeChargProvider;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -48,7 +48,7 @@ public class BuyChargActivity extends BaseAuthActivity {
     @BindView(R.id.tv_result)
     TextView mTvResult;
 
-    private WeChargApi mWeChargApi;
+    private IWeChargApi mWeChargApi;
 
     @Override
     public boolean onSupportNavigateUp() {

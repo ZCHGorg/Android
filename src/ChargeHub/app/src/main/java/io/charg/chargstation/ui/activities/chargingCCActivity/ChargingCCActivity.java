@@ -1,6 +1,5 @@
 package io.charg.chargstation.ui.activities.chargingCCActivity;
 
-import android.app.AlertDialog;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
@@ -17,14 +16,9 @@ import java.util.ArrayList;
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
-import io.charg.chargstation.services.remote.contract.tasks.ChargeOffForceTask;
-import io.charg.chargstation.services.remote.contract.tasks.ChargeOnForceTask;
 import io.charg.chargstation.ui.activities.BaseActivity;
-import io.charg.chargstation.ui.activities.chargingActivity.ChargingActivity;
 import io.charg.chargstation.ui.activities.chargingActivity.ChargingFrg;
-import io.charg.chargstation.ui.activities.chargingActivity.SelectChargingTimeFrg;
 import io.charg.chargstation.ui.fragments.BaseNavFragment;
-import io.charg.chargstation.ui.fragments.ExecuteContractFuncFrg;
 import io.charg.chargstation.ui.fragments.SelectDestinationFrg;
 
 public class ChargingCCActivity extends BaseActivity {
