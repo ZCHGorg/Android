@@ -4,7 +4,7 @@ import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Query;
 
-public interface WeChargApi {
+public interface IWeChargApi {
 
     @GET("api/getPaymentData?gateway=braintree&currency=USD")
     Call<PaymentDataResponseDto> getPaymentDataAsync();
