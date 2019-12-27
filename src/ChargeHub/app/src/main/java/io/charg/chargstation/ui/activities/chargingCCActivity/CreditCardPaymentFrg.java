@@ -21,7 +21,7 @@ import io.charg.chargstation.root.CommonData;
 import io.charg.chargstation.services.remote.api.wecharg.PaymentDataResponseDto;
 import io.charg.chargstation.services.remote.api.wecharg.PaymentResultResponseDto;
 import io.charg.chargstation.services.remote.api.wecharg.IWeChargApi;
-import io.charg.chargstation.services.remote.api.wecharg.WeChargProvider;
+import io.charg.chargstation.services.remote.api.ApiProvider;
 import io.charg.chargstation.ui.dialogs.TxWaitDialog;
 import io.charg.chargstation.ui.fragments.BaseNavFragment;
 import retrofit2.Call;
@@ -70,7 +70,7 @@ public class CreditCardPaymentFrg extends BaseNavFragment {
     }
 
     private void initServices() {
-        mWeChargApi = WeChargProvider.getWeChargApi();
+        mWeChargApi = ApiProvider.getWeChargApi();
     }
 
     @Override

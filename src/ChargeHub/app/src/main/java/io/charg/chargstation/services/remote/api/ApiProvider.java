@@ -1,6 +1,4 @@
-package io.charg.chargstation.services.remote.api.wecharg;
-
-import java.security.cert.CertificateException;
+package io.charg.chargstation.services.remote.api;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
@@ -9,12 +7,14 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import io.charg.chargstation.services.remote.api.chargCoinServiceApi.IChargCoinServiceApi;
+import io.charg.chargstation.services.remote.api.wecharg.IWeChargApi;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
 import retrofit2.converter.scalars.ScalarsConverterFactory;
 
-public class WeChargProvider {
+public class ApiProvider {
 
     public static IWeChargApi getWeChargApi() {
         return new Retrofit.Builder()
@@ -26,17 +26,26 @@ public class WeChargProvider {
                 .create(IWeChargApi.class);
     }
 
+    public static IChargCoinServiceApi getChargCoinServiceApi() {
+        return new Retrofit.Builder()
+                .baseUrl("https://chg-hub-002.myreal.space/")
+                .addConverterFactory(GsonConverterFactory.create())
+                .addConverterFactory(ScalarsConverterFactory.create())
+                .client(getUnsafeOkHttpClient())
+                .build()
+                .create(IChargCoinServiceApi.class);
+    }
+
     private static OkHttpClient getUnsafeOkHttpClient() {
         try {
-            // Create a trust manager that does not validate certificate chains
             final TrustManager[] trustAllCerts = new TrustManager[]{
                     new X509TrustManager() {
                         @Override
-                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+                        public void checkClientTrusted(java.security.cert.X509Certificate[] chain, String authType) {
                         }
 
                         @Override
-                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) throws CertificateException {
+                        public void checkServerTrusted(java.security.cert.X509Certificate[] chain, String authType) {
                         }
 
                         @Override
@@ -46,10 +55,8 @@ public class WeChargProvider {
                     }
             };
 
-            // Install the all-trusting trust manager
             final SSLContext sslContext = SSLContext.getInstance("SSL");
             sslContext.init(null, trustAllCerts, new java.security.SecureRandom());
-            // Create an ssl socket factory with our all-trusting manager
             final SSLSocketFactory sslSocketFactory = sslContext.getSocketFactory();
 
             OkHttpClient.Builder builder = new OkHttpClient.Builder();
@@ -61,8 +68,7 @@ public class WeChargProvider {
                 }
             });
 
-            OkHttpClient okHttpClient = builder.build();
-            return okHttpClient;
+            return builder.build();
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

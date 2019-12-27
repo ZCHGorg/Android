@@ -78,6 +78,7 @@ import io.charg.chargstation.services.remote.firebase.ChargeDbApi;
 import io.charg.chargstation.services.remote.firebase.ChargeHubService;
 import io.charg.chargstation.services.remote.firebase.tasks.GetStationDtoTask;
 import io.charg.chargstation.ui.activities.becomeOwner.BecomeOwnerActivity;
+import io.charg.chargstation.ui.activities.chargeCoinService.ChargeCoinServiceActivity;
 import io.charg.chargstation.ui.activities.chargingActivity.ChargingActivity;
 import io.charg.chargstation.ui.activities.parkingActivity.ParkingActivity;
 import io.charg.chargstation.ui.activities.stationActivity.StationActivity;
@@ -216,6 +217,9 @@ public class MapActivity
                 switch (item.getItemId()) {
                     case R.id.menu_favorites:
                         startActivity(new Intent(MapActivity.this, FavoritesActivity.class));
+                        return true;
+                    case R.id.menu_charge_coin_service:
+                        startActivity(new Intent(MapActivity.this, ChargeCoinServiceActivity.class));
                         return true;
                     case R.id.menu_filter:
                         Intent intent = new Intent(MapActivity.this, FilterActivity.class);

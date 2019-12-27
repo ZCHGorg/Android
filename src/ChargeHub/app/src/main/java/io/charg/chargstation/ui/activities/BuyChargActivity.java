@@ -27,7 +27,7 @@ import io.charg.chargstation.services.local.LogService;
 import io.charg.chargstation.services.remote.api.wecharg.PaymentDataResponseDto;
 import io.charg.chargstation.services.remote.api.wecharg.PaymentResultResponseDto;
 import io.charg.chargstation.services.remote.api.wecharg.IWeChargApi;
-import io.charg.chargstation.services.remote.api.wecharg.WeChargProvider;
+import io.charg.chargstation.services.remote.api.ApiProvider;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -69,7 +69,7 @@ public class BuyChargActivity extends BaseAuthActivity {
     }
 
     private void initServices() {
-        mWeChargApi = WeChargProvider.getWeChargApi();
+        mWeChargApi = ApiProvider.getWeChargApi();
     }
 
     private void initToolbar() {
