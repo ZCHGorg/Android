@@ -4,6 +4,7 @@ import java.util.Map;
 
 import retrofit2.Call;
 import retrofit2.http.GET;
+import retrofit2.http.POST;
 import retrofit2.http.Query;
 
 public interface IChargCoinServiceApi {
@@ -28,6 +29,35 @@ public interface IChargCoinServiceApi {
     );
 
     @GET("api/getBuyOrders")
-    Call<BuyOrdersDto> getBuyOrders();
+    Call<OrdersDto> getBuyOrders();
+
+    @GET("api/getSellOrders")
+    Call<OrdersDto> getSellOrders();
+
+    @GET("api/getBestSellOrder")
+    Call<BestSellOrderDto> getBestSellOrder(
+            @Query("amountCHG") int amountChg
+    );
+
+    @GET("api/getPaymentData")
+    Call<PaymentDataDto> getPaymentData();
+
+    @POST("api/confirmPayment")
+    Call<ConfirmPaymentResponseDto> postConfirmPayment();
+
+    @POST("api/serviceOn")
+    Call<ServiceOnResponseDto> postServiceOn();
+
+    @POST("api/serviceOff")
+    Call<ServiceOnResponseDto> postServiceOff();
+
+    @GET("api/serviceStatus")
+    Call<ServiceOnResponseDto> getServiceStatus();
+
+    @GET("api/nodeStatus")
+    Call<NodeStatusDto> getNodeStatus();
+
+    @GET("api/getBlockNumber")
+    Call<BlockNumberDto> getBlockNumber();
 
 }

@@ -4,12 +4,12 @@ import com.google.gson.annotations.SerializedName;
 
 import java.util.Map;
 
-public class BuyOrdersDto {
+public class OrdersDto {
 
     @SerializedName("buyOrders")
-    public Map<String, BuyOrderDto> BuyOrders;
+    public Map<String, OrderDto> BuyOrders;
 
-    public class BuyOrderDto {
+    public class OrderDto {
 
         @SerializedName("give")
         public double Give;
