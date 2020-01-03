@@ -1,10 +1,16 @@
 package io.charg.chargstation.ui.activities.chargeCoinService;
 
 import android.support.annotation.NonNull;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.widget.TextView;
 import android.widget.Toast;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
+import butterknife.BindView;
 import io.charg.chargstation.R;
 import io.charg.chargstation.services.remote.api.ApiProvider;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.IChargCoinServiceApi;
@@ -18,6 +24,14 @@ public class FrgNodes extends BaseFragment {
 
     private IChargCoinServiceApi mChargCoinServiceApi;
 
+    private NodesAdapter mAdapter;
+
+    @BindView(R.id.recycler_view)
+    public RecyclerView mRecyclerView;
+
+    @BindView(R.id.tv_count_items)
+    public TextView mTvCountItems;
+
     @Override
     protected int getResourceId() {
         return R.layout.frg_nodes;
@@ -26,7 +40,15 @@ public class FrgNodes extends BaseFragment {
     @Override
     protected void onShows() {
         initServices();
+        initViews();
         loadNodes();
+    }
+
+    private void initViews() {
+        mAdapter = new NodesAdapter();
+
+        mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
+        mRecyclerView.setAdapter(mAdapter);
     }
 
     private void initServices() {
@@ -46,8 +68,15 @@ public class FrgNodes extends BaseFragment {
                     return;
                 }
 
-                Toast.makeText(getContext(), response.body().toString(), Toast.LENGTH_SHORT).show();
+                Map<String, NodeDto> content = response.body();
 
+                mTvCountItems.setText(String.valueOf(content.size()));
+
+                List<NodeVM> items = new ArrayList<>();
+                for (String key : content.keySet()) {
+                    items.add(new NodeVM(content.get(key), key));
+                }
+                mAdapter.updateItems(items);
             }
 
             @Override

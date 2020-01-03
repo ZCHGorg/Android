@@ -19,7 +19,6 @@ import io.charg.chargstation.services.remote.api.chargCoinServiceApi.ConfigDto;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.FeesDto;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.IChargCoinServiceApi;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.LocationDto;
-import io.charg.chargstation.services.remote.api.chargCoinServiceApi.NodeDto;
 import io.charg.chargstation.ui.activities.BaseActivity;
 import io.charg.chargstation.ui.fragments.BaseFragment;
 import retrofit2.Call;
@@ -82,9 +81,9 @@ public class ChargeCoinServiceActivity extends BaseActivity {
     }
 
     private void loadData() {
-        loadConfigAsync();
-        loadLocationAsync();
-        loadFeesAsync();
+        //loadConfigAsync();
+        //loadLocationAsync();
+        //loadFeesAsync();
     }
 
     private void loadLocationAsync() {

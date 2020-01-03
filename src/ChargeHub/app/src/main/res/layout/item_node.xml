@@ -1,0 +1,181 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    tools:background="@color/bt_color_primary_dark">
+
+    <TextView
+        style="@style/TextViewKey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Node ETH address" />
+
+    <TextView
+        android:id="@+id/tv_node_eth_address"
+        style="@style/TextViewValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="0x8c16622e2155b19060fc5e2ef6fbcecec47b522d" />
+
+    <TextView
+        style="@style/TextViewKey"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Name" />
+
+    <TextView
+        android:id="@+id/tv_node_name"
+        style="@style/TextViewValue"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        tools:text="Plastyk Charg" />
+
+    <ImageButton
+        android:id="@+id/btn_show"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_arrow_drop_down_black_24dp" />
+
+    <ImageButton
+        android:id="@+id/btn_hide"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:src="@drawable/ic_arrow_drop_up_black_24dp"
+        android:visibility="gone"
+        tools:visibility="visible" />
+
+    <LinearLayout
+        android:id="@+id/layout_collapsed"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:visibility="gone"
+        tools:visibility="visible">
+
+        <TextView
+            style="@style/TextViewKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Location" />
+
+        <TextView
+            android:id="@+id/tv_node_location"
+            style="@style/TextViewValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="149, Zelena, Ukraine" />
+
+        <TextView
+            style="@style/TextViewKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Phone" />
+
+        <TextView
+            android:id="@+id/tv_node_phone"
+            style="@style/TextViewValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="+38 032 270 90 54" />
+
+        <TextView
+            style="@style/TextViewKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Connector" />
+
+        <TextView
+            android:id="@+id/tv_node_connector"
+            style="@style/TextViewValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="J7112" />
+
+        <TextView
+            style="@style/TextViewKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Power" />
+
+        <TextView
+            android:id="@+id/tv_node_power"
+            style="@style/TextViewValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="15.0 kW" />
+
+        <TextView
+            style="@style/TextViewKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Latitude" />
+
+        <TextView
+            android:id="@+id/tv_node_latitude"
+            style="@style/TextViewValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="49.81185" />
+
+        <TextView
+            style="@style/TextViewKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Longitude" />
+
+        <TextView
+            android:id="@+id/tv_node_longitude"
+            style="@style/TextViewValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="24.065" />
+
+        <TextView
+            style="@style/TextViewKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Connected" />
+
+        <TextView
+            android:id="@+id/tv_node_connected"
+            style="@style/TextViewValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="true" />
+
+        <TextView
+            style="@style/TextViewKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Ip" />
+
+        <TextView
+            android:id="@+id/tv_node_ip"
+            style="@style/TextViewValue"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            tools:text="206.189.142.202" />
+
+        <TextView
+            style="@style/TextViewKey"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Assets" />
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/recycler_view_assets"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
+
+    </LinearLayout>
+
+    <View
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="4dp"
+        android:layout_marginBottom="4dp"
+        android:background="@android:color/white" />
+
+</LinearLayout>
