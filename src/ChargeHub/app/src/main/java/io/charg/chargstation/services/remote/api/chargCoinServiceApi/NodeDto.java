@@ -5,6 +5,7 @@ import android.support.annotation.NonNull;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class NodeDto {
@@ -37,7 +38,7 @@ public class NodeDto {
     public String Ip;
 
     @SerializedName("assets")
-    public Map<String, AssetDto> Assets;
+    public Map<String, AssetDto> Assets = new HashMap<>();
 
     @NonNull
     @Override

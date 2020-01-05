@@ -40,10 +40,19 @@ public interface IChargCoinServiceApi {
     );
 
     @GET("api/getPaymentData")
-    Call<PaymentDataDto> getPaymentData();
+    Call<PaymentDataDto> getPaymentData(
+            @Query("currency") String currency
+    );
 
     @POST("api/confirmPayment")
-    Call<ConfirmPaymentResponseDto> postConfirmPayment();
+    Call<ConfirmPaymentResponseDto> postConfirmPayment(
+            @Query("currency") String currency,
+            @Query("nodeAddress") String nodeAddress,
+            @Query("orderHash") String orderHash,
+            @Query("amount") float amount,
+            @Query("paymentId") String paymentId,
+            @Query("payerId") String payerId
+    );
 
     @POST("api/serviceOn")
     Call<ServiceOnResponseDto> postServiceOn();

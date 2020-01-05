@@ -1,11 +1,13 @@
 package io.charg.chargstation.ui.activities.chargeCoinService;
 
 import android.annotation.SuppressLint;
+import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -13,6 +15,12 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.charg.chargstation.R;
+import io.charg.chargstation.services.remote.api.ApiProvider;
+import io.charg.chargstation.services.remote.api.chargCoinServiceApi.NodeDto;
+import io.charg.chargstation.services.remote.api.chargCoinServiceApi.PaymentDataDto;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class NodesAdapter extends RecyclerView.Adapter<NodesAdapter.ViewHolder> {
 
@@ -60,6 +68,33 @@ public class NodesAdapter extends RecyclerView.Adapter<NodesAdapter.ViewHolder> 
                 holder.mLayoutCollapsed.setVisibility(View.GONE);
             }
         });
+
+        if (item.getNodeDto().Assets != null) {
+            NodeAssetAdapter mAssetAdapter = new NodeAssetAdapter();
+            holder.mRecyclerViewAssets.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext(), LinearLayoutManager.VERTICAL, false));
+            holder.mRecyclerViewAssets.setAdapter(mAssetAdapter);
+            mAssetAdapter.updateItems(new ArrayList<>(item.getNodeDto().Assets.values()));
+        }
+
+        holder.mBtnPay.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                ApiProvider.getChargCoinServiceApi().getPaymentData("USD").enqueue(new Callback<PaymentDataDto>() {
+                    @Override
+                    public void onResponse(Call<PaymentDataDto> call, Response<PaymentDataDto> response) {
+                        PaymentDataDto content = response.body();
+
+
+                    }
+
+                    @Override
+                    public void onFailure(Call<PaymentDataDto> call, Throwable t) {
+                        Toast.makeText(holder.itemView.getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+
     }
 
     @Override
@@ -83,6 +118,9 @@ public class NodesAdapter extends RecyclerView.Adapter<NodesAdapter.ViewHolder> 
 
         @BindView(R.id.btn_show)
         View mBtnShow;
+
+        @BindView(R.id.btn_pay)
+        View mBtnPay;
 
         @BindView(R.id.tv_node_eth_address)
         TextView mTvEthAddress;
