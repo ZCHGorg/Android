@@ -82,6 +82,7 @@ import io.charg.chargstation.ui.activities.chargeCoinService.ChargeCoinServiceAc
 import io.charg.chargstation.ui.activities.chargingActivity.ChargingActivity;
 import io.charg.chargstation.ui.activities.parkingActivity.ParkingActivity;
 import io.charg.chargstation.ui.activities.stationActivity.StationActivity;
+import io.charg.chargstation.ui.activities.webBasedActivity.WebBasedActivity;
 import io.charg.chargstation.ui.dialogs.StationEthAddressDialog;
 import io.charg.chargstation.ui.dialogs.TxWaitDialog;
 import io.charg.chargstation.ui.views.ChargeClusterManager;
@@ -217,6 +218,9 @@ public class MapActivity
                 switch (item.getItemId()) {
                     case R.id.menu_favorites:
                         startActivity(new Intent(MapActivity.this, FavoritesActivity.class));
+                        return true;
+                    case R.id.menu_web_based:
+                        startActivity(new Intent(MapActivity.this, WebBasedActivity.class));
                         return true;
                     case R.id.menu_charge_coin_service:
                         startActivity(new Intent(MapActivity.this, ChargeCoinServiceActivity.class));
