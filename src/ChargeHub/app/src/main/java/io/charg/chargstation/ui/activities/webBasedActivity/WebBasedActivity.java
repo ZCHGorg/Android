@@ -3,11 +3,12 @@ package io.charg.chargstation.ui.activities.webBasedActivity;
 import android.annotation.SuppressLint;
 import android.graphics.Bitmap;
 import android.os.Build;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
 import android.webkit.CookieSyncManager;
 import android.webkit.WebResourceRequest;
-import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
@@ -19,7 +20,10 @@ import io.charg.chargstation.ui.activities.BaseActivity;
 public class WebBasedActivity extends BaseActivity {
 
     @BindView(R.id.webview)
-    WebView mWebView;
+    public WebView mWebView;
+
+    @BindView(R.id.toolbar)
+    public Toolbar mToolbar;
 
     private ExtWebViewClient mExtWebClient;
 
@@ -30,9 +34,20 @@ public class WebBasedActivity extends BaseActivity {
 
     @Override
     public void onActivate() {
+        initToolbar();
         initWebClient();
         initView();
         loadPage();
+    }
+
+    private void initToolbar() {
+        setSupportActionBar(mToolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar == null) {
+            return;
+        }
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(true);
     }
 
     @SuppressLint("SetJavaScriptEnabled")
@@ -62,6 +77,12 @@ public class WebBasedActivity extends BaseActivity {
         }
     }
 
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
+    }
+
     public class ExtWebViewClient extends WebViewClient {
 
         @Override
@@ -85,4 +106,5 @@ public class WebBasedActivity extends BaseActivity {
             Log.i(CommonData.TAG, "Page finished: " + url);
         }
     }
+
 }

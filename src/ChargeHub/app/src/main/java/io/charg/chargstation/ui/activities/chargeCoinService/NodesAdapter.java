@@ -84,6 +84,11 @@ public class NodesAdapter extends RecyclerView.Adapter<NodesAdapter.ViewHolder> 
                     public void onResponse(Call<PaymentDataDto> call, Response<PaymentDataDto> response) {
                         PaymentDataDto content = response.body();
 
+                        if (content == null) {
+                            return;
+                        }
+
+                        Toast.makeText(holder.itemView.getContext(), "Brintree token: " + content.PaymentData.ClientToken.substring(0, 15) + "...", Toast.LENGTH_SHORT).show();
 
                     }
 

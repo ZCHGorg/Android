@@ -6,6 +6,8 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.ActionBar;
+import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
 import java.util.ArrayList;
@@ -33,6 +35,9 @@ public class ChargeCoinServiceActivity extends BaseActivity {
     @BindView(R.id.view_pager)
     public ViewPager mViewPager;
 
+    @BindView(R.id.toolbar)
+    public Toolbar mToolbar;
+
     private IChargCoinServiceApi mChargCoinServiceApi;
 
     @Override
@@ -42,9 +47,20 @@ public class ChargeCoinServiceActivity extends BaseActivity {
 
     @Override
     public void onActivate() {
+        initToolbar();
         initServices();
         initView();
         loadData();
+    }
+
+    private void initToolbar() {
+        setSupportActionBar(mToolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar == null) {
+            return;
+        }
+        actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setDisplayShowHomeEnabled(true);
     }
 
     private void initView() {
@@ -78,6 +94,12 @@ public class ChargeCoinServiceActivity extends BaseActivity {
 
     private void initServices() {
         mChargCoinServiceApi = ApiProvider.getChargCoinServiceApi();
+    }
+
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
     private void loadData() {
