@@ -62,7 +62,6 @@ public class FrgRates extends BaseFragment {
             @Override
             public void onFailure(@NonNull Call<RatesDto> call, @NonNull Throwable t) {
                 Toast.makeText(getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
-
             }
         });
     }

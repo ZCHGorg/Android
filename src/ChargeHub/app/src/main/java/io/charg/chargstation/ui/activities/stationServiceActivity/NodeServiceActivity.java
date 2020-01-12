@@ -1,16 +1,14 @@
-package io.charg.chargstation.ui.activities;
+package io.charg.chargstation.ui.activities.stationServiceActivity;
 
 import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
-import android.view.KeyEvent;
-import android.view.View;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,38 +27,49 @@ import io.charg.chargstation.services.remote.api.chargCoinServiceApi.BestSellOrd
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.ConfirmPaymentResponseDto;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.IChargCoinServiceApi;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.PaymentDataDto;
+import io.charg.chargstation.ui.activities.BaseActivity;
+import io.charg.chargstation.ui.activities.BuyChargActivity;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
 
-public class BuyChargActivity extends BaseAuthActivity {
+public class NodeServiceActivity extends BaseActivity {
 
+    public static final String EXTRA_NODE_ADDRESS = "EXTRA_NODE_ADDRESS";
     private static final int REQUEST_CODE_BRAINTREE = 1001;
-
-    @BindView(R.id.et_amount_chg)
-    EditText mEtAmountChg;
-
-    @BindView(R.id.tv_final_price)
-    TextView mTvFinalPrice;
 
     @BindView(R.id.toolbar)
     Toolbar mToolbar;
 
-    @BindView(R.id.tv_result)
-    TextView mTvResult;
+    @BindView(R.id.tv_node_eth_address)
+    TextView mTvNodeEthAddress;
 
-    private IChargCoinServiceApi mApi;
+    @BindView(R.id.tv_payment_status)
+    TextView mTvPaymentStatus;
+
+    private IChargCoinServiceApi mChargCoinServiceApi;
+
+    private String mNodeEthAddress;
+    private boolean mPaymentStatus;
+    private String mSellOrderHash;
+
+    private AlertDialog mLoadingDialog;
 
     @Override
     public int getResourceId() {
-        return R.layout.activity_buy_charg;
+        return R.layout.activity_node_service;
     }
 
     @Override
     public void onActivate() {
         initServices();
+        readIntent();
         initToolbar();
-        initEtAmountChg();
+        refreshUI();
+    }
+
+    private void initServices() {
+        mChargCoinServiceApi = ApiProvider.getChargCoinServiceApi();
     }
 
     @Override
@@ -78,130 +87,131 @@ public class BuyChargActivity extends BaseAuthActivity {
         }
     }
 
-    private void initServices() {
-        mApi = ApiProvider.getChargCoinServiceApi();
-    }
 
-    private void initEtAmountChg() {
-        mEtAmountChg.setOnKeyListener(new View.OnKeyListener() {
-            public boolean onKey(View v, int keyCode, KeyEvent event) {
-
-                refreshFinalPrice();
-
-                if (mEtAmountChg.getText().toString().isEmpty()) {
-                    mEtAmountChg.setError("Amount cannot be empty");
-                }
-
-                return false;
-            }
-        });
-    }
-
-    private void refreshFinalPrice() {
-        try {
-            int amount = Integer.parseInt(mEtAmountChg.getText().toString());
-            float finalPrice = amount * CommonData.PRICE_CHG_USD;
-
-            mTvFinalPrice.setText(String.valueOf(finalPrice));
-        } catch (Exception ex) {
-            mTvFinalPrice.setText("");
+    private void readIntent() {
+        Intent intent = getIntent();
+        if (intent != null) {
+            mNodeEthAddress = intent.getStringExtra(EXTRA_NODE_ADDRESS);
         }
     }
 
-    @OnClick(R.id.btn_credit)
-    void onBtnCreditClicked() {
-        executeBuy();
+    private void refreshUI() {
+        mTvNodeEthAddress.setText(mNodeEthAddress);
+        mTvPaymentStatus.setText(mPaymentStatus ? "Confirmed" : "Not confirmed");
     }
 
-    public void executeBuy() {
+    @OnClick(R.id.btn_payment_credit_card)
+    void onBtnPayCreditCardClicked() {
+        showLoading();
 
-        LogService.info("Starting payment");
+        mChargCoinServiceApi.getPaymentData("USD")
+                .enqueue(new Callback<PaymentDataDto>() {
+                    @Override
+                    public void onResponse(@NonNull Call<PaymentDataDto> call, @NonNull Response<PaymentDataDto> response) {
+                        if (response.body() == null) {
+                            Snackbar.make(mToolbar, R.string.error_loading_payment_token, Snackbar.LENGTH_SHORT).show();
+                            return;
+                        }
 
-        mApi.getPaymentData("USD").enqueue(new Callback<PaymentDataDto>() {
-            @Override
-            public void onResponse(@NonNull Call<PaymentDataDto> call, @NonNull Response<PaymentDataDto> response) {
-                if (!response.isSuccessful()) {
-                    Snackbar.make(mToolbar, "Response is not successful", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                        PaymentDataDto.PaymentDataContentDto body = response.body().PaymentData;
+                        if (body == null) {
+                            return;
+                        }
 
-                PaymentDataDto body = response.body();
-                if (body == null || body.PaymentData == null) {
-                    Snackbar.make(mToolbar, R.string.error_loading_data, Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                        if (!body.Success) {
+                            return;
+                        }
 
-                if (!body.PaymentData.Success) {
-                    Snackbar.make(mToolbar, "Reading payment data is not successful", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                        performPayment(body.ClientToken);
+                    }
 
-                DropInRequest dropInRequest = new DropInRequest()
-                        .clientToken(body.PaymentData.ClientToken);
+                    @Override
+                    public void onFailure(@NonNull Call<PaymentDataDto> call, @NonNull Throwable t) {
+                        Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
+                    }
+                });
+    }
 
-                startActivityForResult(dropInRequest.getIntent(BuyChargActivity.this), REQUEST_CODE_BRAINTREE);
-            }
+    private void showLoading() {
 
-            @Override
-            public void onFailure(@NonNull Call<PaymentDataDto> call, @NonNull Throwable t) {
-                Snackbar.make(mToolbar, t.getMessage(), Toast.LENGTH_SHORT).show();
-            }
-        });
+        if (mLoadingDialog == null) {
+            mLoadingDialog = new AlertDialog.Builder(this)
+                    .setMessage("Loading data...")
+                    .create();
+        }
+
+        mLoadingDialog.show();
+    }
+
+    private void hideLoading() {
+        mLoadingDialog.dismiss();
+    }
+
+    private void performPayment(String brainTreeClientToken) {
+        hideLoading();
+
+        DropInRequest dropInRequest = new DropInRequest()
+                .disablePayPal()
+                .clientToken(brainTreeClientToken);
+
+        startActivityForResult(dropInRequest.getIntent(NodeServiceActivity.this), REQUEST_CODE_BRAINTREE);
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        handleBraintree(requestCode, resultCode, data);
+    }
+
+    private void handleBraintree(int requestCode, int resultCode, Intent data) {
         if (requestCode == REQUEST_CODE_BRAINTREE) {
             if (resultCode == Activity.RESULT_OK) {
                 DropInResult result = data.getParcelableExtra(DropInResult.EXTRA_DROP_IN_RESULT);
 
                 PaymentMethodNonce nonce = result.getPaymentMethodNonce();
                 if (nonce == null) {
-                    mTvResult.setText(R.string.cancel_user);
+                    mTvPaymentStatus.setText(R.string.cancel_user);
                     return;
                 }
 
                 Log.i(CommonData.TAG, "nonce: " + nonce.getNonce());
 
-                exchangeUSDtoCHG(nonce.getNonce());
+                loadBestSellOrder();
+
+                confirmPayment(nonce.getNonce());
 
             } else if (resultCode == Activity.RESULT_CANCELED) {
-                mTvResult.setText(R.string.cancel_user);
+                mTvPaymentStatus.setText(R.string.cancel_user);
             } else {
                 Exception error = (Exception) data.getSerializableExtra(DropInActivity.EXTRA_ERROR);
-                mTvResult.setText(error.getMessage());
+                mTvPaymentStatus.setText(error.getMessage());
             }
         }
     }
 
-    private void exchangeUSDtoCHG(final String nonce) {
-
+    private void loadBestSellOrder() {
         ApiProvider.getChargCoinServiceApi().getBestSellOrder(1000).enqueue(new Callback<BestSellOrderDto>() {
             @Override
-            public void onResponse(Call<BestSellOrderDto> call, Response<BestSellOrderDto> response) {
+            public void onResponse(@NonNull Call<BestSellOrderDto> call, @NonNull Response<BestSellOrderDto> response) {
                 BestSellOrderDto orderContent = response.body();
                 if (orderContent == null || orderContent.BestSellOrder == null) {
-                    Toast.makeText(BuyChargActivity.this, "Best sell order loading error", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(NodeServiceActivity.this, "Best sell order loading error", Toast.LENGTH_SHORT).show();
                     return;
                 }
-
-                Toast.makeText(BuyChargActivity.this, orderContent.BestSellOrder.Hash, Toast.LENGTH_SHORT).show();
-
-                confirmPayment(orderContent.BestSellOrder.Hash, nonce);
+                mSellOrderHash = orderContent.BestSellOrder.Hash;
             }
 
             @Override
-            public void onFailure(Call<BestSellOrderDto> call, Throwable t) {
-                Toast.makeText(BuyChargActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            public void onFailure(@NonNull Call<BestSellOrderDto> call, @NonNull Throwable t) {
+                Toast.makeText(NodeServiceActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
     }
 
-    private void confirmPayment(String hash, String nonce) {
-        mApi.postConfirmPayment(
+    private void confirmPayment(final String nonce) {
+        mChargCoinServiceApi.postConfirmPayment(
                 "USD",
-                "0x1aa494ff7a493e0ba002e2d38650d4d21bd5591b",
-                hash,
+                mNodeEthAddress,
+                mSellOrderHash,
                 5,
                 nonce,
                 "uk0505")/*

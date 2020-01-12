@@ -1,5 +1,6 @@
 package io.charg.chargstation.ui.activities.chargeCoinService;
 
+import android.content.Intent;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -15,6 +16,7 @@ import io.charg.chargstation.R;
 import io.charg.chargstation.services.remote.api.ApiProvider;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.IChargCoinServiceApi;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.NodeDto;
+import io.charg.chargstation.ui.activities.stationServiceActivity.NodeServiceActivity;
 import io.charg.chargstation.ui.fragments.BaseFragment;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -46,6 +48,13 @@ public class FrgNodes extends BaseFragment {
 
     private void initViews() {
         mAdapter = new NodesAdapter();
+        mAdapter.setOnBtnPayClickListener(new NodesAdapter.IOnItemClickListener() {
+            @Override
+            public void onItemClicked(NodeVM nodeDto) {
+                startActivity(new Intent(getContext(), NodeServiceActivity.class)
+                        .putExtra(NodeServiceActivity.EXTRA_NODE_ADDRESS, nodeDto.getNodeAddress()));
+            }
+        });
 
         mRecyclerView.setLayoutManager(new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false));
         mRecyclerView.setAdapter(mAdapter);

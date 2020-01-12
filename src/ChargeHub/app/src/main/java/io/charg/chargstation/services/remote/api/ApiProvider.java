@@ -8,7 +8,6 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.IChargCoinServiceApi;
-import io.charg.chargstation.services.remote.api.wecharg.IWeChargApi;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.converter.gson.GsonConverterFactory;
@@ -16,19 +15,9 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ApiProvider {
 
-    public static IWeChargApi getWeChargApi() {
-        return new Retrofit.Builder()
-                .baseUrl("https://dhanyainnovation.com:3003/")
-                .addConverterFactory(GsonConverterFactory.create())
-                .addConverterFactory(ScalarsConverterFactory.create())
-                .client(getUnsafeOkHttpClient())
-                .build()
-                .create(IWeChargApi.class);
-    }
-
     public static IChargCoinServiceApi getChargCoinServiceApi() {
         return new Retrofit.Builder()
-                .baseUrl("https://chg-hub-002.myreal.space/")
+                .baseUrl("https://chg-hub-001.myreal.space/")
                 .addConverterFactory(GsonConverterFactory.create())
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .client(getUnsafeOkHttpClient())

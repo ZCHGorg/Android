@@ -16,6 +16,7 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.charg.chargstation.R;
 import io.charg.chargstation.services.remote.api.ApiProvider;
+import io.charg.chargstation.services.remote.api.chargCoinServiceApi.BestSellOrderDto;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.NodeDto;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.PaymentDataDto;
 import retrofit2.Call;
@@ -25,6 +26,8 @@ import retrofit2.Response;
 public class NodesAdapter extends RecyclerView.Adapter<NodesAdapter.ViewHolder> {
 
     private final List<NodeVM> mItems;
+
+    private IOnItemClickListener mOnItemClickListener;
 
     public NodesAdapter() {
         mItems = new ArrayList<>();
@@ -38,7 +41,7 @@ public class NodesAdapter extends RecyclerView.Adapter<NodesAdapter.ViewHolder> 
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        NodeVM item = mItems.get(position);
+        final NodeVM item = mItems.get(position);
 
         holder.mTvEthAddress.setText(item.getNodeAddress());
         holder.mTvName.setText(item.getNodeDto().Name);
@@ -79,24 +82,9 @@ public class NodesAdapter extends RecyclerView.Adapter<NodesAdapter.ViewHolder> 
         holder.mBtnPay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                ApiProvider.getChargCoinServiceApi().getPaymentData("USD").enqueue(new Callback<PaymentDataDto>() {
-                    @Override
-                    public void onResponse(Call<PaymentDataDto> call, Response<PaymentDataDto> response) {
-                        PaymentDataDto content = response.body();
-
-                        if (content == null) {
-                            return;
-                        }
-
-                        Toast.makeText(holder.itemView.getContext(), "Brintree token: " + content.PaymentData.ClientToken.substring(0, 15) + "...", Toast.LENGTH_SHORT).show();
-
-                    }
-
-                    @Override
-                    public void onFailure(Call<PaymentDataDto> call, Throwable t) {
-                        Toast.makeText(holder.itemView.getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
-                    }
-                });
+                if (mOnItemClickListener!=null){
+                    mOnItemClickListener.onItemClicked(item);
+                }
             }
         });
 
@@ -111,6 +99,16 @@ public class NodesAdapter extends RecyclerView.Adapter<NodesAdapter.ViewHolder> 
         mItems.clear();
         mItems.addAll(items);
         notifyDataSetChanged();
+    }
+
+    public void setOnBtnPayClickListener(IOnItemClickListener onItemClickListener) {
+        mOnItemClickListener = onItemClickListener;
+    }
+
+    interface IOnItemClickListener {
+
+        void onItemClicked(NodeVM nodeDto);
+
     }
 
     class ViewHolder extends RecyclerView.ViewHolder {
