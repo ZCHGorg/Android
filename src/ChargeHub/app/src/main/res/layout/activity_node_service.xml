@@ -53,10 +53,23 @@
             android:text="Sell order (used for exchange purposes)" />
 
         <TextView
+            android:id="@+id/tv_sell_order_status"
             style="@style/TextViewValue"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:text="txHash" />
+
+        <Button
+            android:id="@+id/btn_start_wifi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Start wifi service" />
+
+        <Button
+            android:id="@+id/btn_stop_wifi"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Stop wifi service" />
 
     </LinearLayout>
 

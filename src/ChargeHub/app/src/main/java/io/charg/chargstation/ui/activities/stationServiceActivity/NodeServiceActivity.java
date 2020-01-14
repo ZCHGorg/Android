@@ -17,6 +17,8 @@ import com.braintreepayments.api.dropin.DropInRequest;
 import com.braintreepayments.api.dropin.DropInResult;
 import com.braintreepayments.api.models.PaymentMethodNonce;
 
+import java.io.IOException;
+
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
@@ -27,8 +29,8 @@ import io.charg.chargstation.services.remote.api.chargCoinServiceApi.BestSellOrd
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.ConfirmPaymentResponseDto;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.IChargCoinServiceApi;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.PaymentDataDto;
+import io.charg.chargstation.services.remote.api.chargCoinServiceApi.ServiceOnResponseDto;
 import io.charg.chargstation.ui.activities.BaseActivity;
-import io.charg.chargstation.ui.activities.BuyChargActivity;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -47,11 +49,17 @@ public class NodeServiceActivity extends BaseActivity {
     @BindView(R.id.tv_payment_status)
     TextView mTvPaymentStatus;
 
+    @BindView(R.id.tv_sell_order_status)
+    TextView mTvSellOrderStatus;
+
     private IChargCoinServiceApi mChargCoinServiceApi;
 
+    private String mPayerId = "uk0505";
     private String mNodeEthAddress;
     private boolean mPaymentStatus;
     private String mSellOrderHash;
+    private String mPaymentHash;
+    private String mPaymentNonce;
 
     private AlertDialog mLoadingDialog;
 
@@ -66,6 +74,7 @@ public class NodeServiceActivity extends BaseActivity {
         readIntent();
         initToolbar();
         refreshUI();
+        loadBestSellOrder();
     }
 
     private void initServices() {
@@ -98,6 +107,8 @@ public class NodeServiceActivity extends BaseActivity {
     private void refreshUI() {
         mTvNodeEthAddress.setText(mNodeEthAddress);
         mTvPaymentStatus.setText(mPaymentStatus ? "Confirmed" : "Not confirmed");
+        mTvSellOrderStatus.setText(mSellOrderHash);
+        mTvPaymentStatus.setText(mPaymentHash);
     }
 
     @OnClick(R.id.btn_payment_credit_card)
@@ -113,16 +124,18 @@ public class NodeServiceActivity extends BaseActivity {
                             return;
                         }
 
-                        PaymentDataDto.PaymentDataContentDto body = response.body().PaymentData;
-                        if (body == null) {
+                        PaymentDataDto.PaymentDataContentDto content = response.body().PaymentData;
+                        if (content == null) {
+                            Snackbar.make(mToolbar, R.string.error_loading_payment_token, Snackbar.LENGTH_SHORT).show();
                             return;
                         }
 
-                        if (!body.Success) {
+                        if (!content.Success) {
+                            Snackbar.make(mToolbar, R.string.error_loading_payment_token, Snackbar.LENGTH_SHORT).show();
                             return;
                         }
 
-                        performPayment(body.ClientToken);
+                        performPayment(content.ClientToken);
                     }
 
                     @Override
@@ -130,6 +143,62 @@ public class NodeServiceActivity extends BaseActivity {
                         Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
                     }
                 });
+    }
+
+    @OnClick(R.id.btn_start_wifi)
+    void onBtnWifiStartClicked() {
+
+        if (TextUtils.isEmpty(mPaymentHash)) {
+            Snackbar.make(mToolbar, "Payment is not confirmed. TxHash required", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (TextUtils.isEmpty(mPaymentNonce)) {
+            Snackbar.make(mToolbar, "Payment is not confirmed. PaymentId required", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+
+        mChargCoinServiceApi.postServiceOn(mPayerId, mPaymentHash, mPaymentNonce).enqueue(new Callback<ServiceOnResponseDto>() {
+            @Override
+            public void onResponse(@NonNull Call<ServiceOnResponseDto> call, @NonNull Response<ServiceOnResponseDto> response) {
+
+                if (response.errorBody() != null) {
+                    try {
+                        Snackbar.make(mToolbar, response.errorBody().string(), Snackbar.LENGTH_SHORT).show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return;
+                }
+
+                if (response.body() == null) {
+                    Snackbar.make(mToolbar, R.string.error_loading_payment_token, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+
+                LogService.info("Wifi start response: " + response.body());
+
+                ServiceOnResponseDto body = response.body();
+                if (body.Error) {
+                    Snackbar.make(mToolbar, R.string.error_service_wifi_on, Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(mToolbar, body.Result.Error, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+
+                Snackbar.make(mToolbar, body.toString(), Snackbar.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ServiceOnResponseDto> call, @NonNull Throwable t) {
+                Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
+                refreshUI();
+            }
+        });
+    }
+
+    @OnClick(R.id.btn_stop_wifi)
+    void onBtnWifiStopClicked() {
+
     }
 
     private void showLoading() {
@@ -174,10 +243,9 @@ public class NodeServiceActivity extends BaseActivity {
                 }
 
                 Log.i(CommonData.TAG, "nonce: " + nonce.getNonce());
+                mPaymentNonce = nonce.getNonce();
 
-                loadBestSellOrder();
-
-                confirmPayment(nonce.getNonce());
+                confirmPayment();
 
             } else if (resultCode == Activity.RESULT_CANCELED) {
                 mTvPaymentStatus.setText(R.string.cancel_user);
@@ -197,54 +265,65 @@ public class NodeServiceActivity extends BaseActivity {
                     Toast.makeText(NodeServiceActivity.this, "Best sell order loading error", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+                LogService.info("SellOrder. " + orderContent.toString());
                 mSellOrderHash = orderContent.BestSellOrder.Hash;
+
+                refreshUI();
             }
 
             @Override
             public void onFailure(@NonNull Call<BestSellOrderDto> call, @NonNull Throwable t) {
                 Toast.makeText(NodeServiceActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+                refreshUI();
             }
         });
     }
 
-    private void confirmPayment(final String nonce) {
+    private void confirmPayment() {
         mChargCoinServiceApi.postConfirmPayment(
                 "USD",
                 mNodeEthAddress,
                 mSellOrderHash,
-                5,
-                nonce,
-                "uk0505")/*
-                "0x1aa494ff7a493e0ba002e2d38650d4d21bd5591b",
-                "0x3d203f7ad6471c5d11d9ab5e1950130da759c594aa998435d01e36067ac9b7e8",
-                5,
-                nonce*/
-                .enqueue(new Callback<ConfirmPaymentResponseDto>() {
-                    @Override
-                    public void onResponse(@NonNull Call<ConfirmPaymentResponseDto> call, @NonNull Response<ConfirmPaymentResponseDto> response) {
-                        ConfirmPaymentResponseDto body = response.body();
-                        if (body == null || body.PaymentResult == null) {
-                            Snackbar.make(mToolbar, R.string.error_loading_data, Snackbar.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        String txHash = body.PaymentResult.TxHash;
-                        if (TextUtils.isEmpty(txHash)) {
-                            Snackbar.make(mToolbar, R.string.error_loading_data, Snackbar.LENGTH_SHORT).show();
-                            return;
-                        }
-
-                        LogService.info("Payment hash: " + txHash);
-
-                        Snackbar.make(mToolbar, txHash, Snackbar.LENGTH_SHORT).show();
-
+                1,
+                mPaymentNonce,
+                mPayerId).enqueue(new Callback<ConfirmPaymentResponseDto>() {
+            @Override
+            public void onResponse(@NonNull Call<ConfirmPaymentResponseDto> call, @NonNull Response<ConfirmPaymentResponseDto> response) {
+                if (response.errorBody() != null) {
+                    try {
+                        Snackbar.make(mToolbar, response.errorBody().string(), Snackbar.LENGTH_SHORT).show();
+                        mTvPaymentStatus.setText(response.errorBody().string());
+                    } catch (IOException e) {
+                        e.printStackTrace();
                     }
+                    return;
+                }
 
-                    @Override
-                    public void onFailure(@NonNull Call<ConfirmPaymentResponseDto> call, @NonNull Throwable t) {
-                        Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
-                    }
-                });
+                ConfirmPaymentResponseDto body = response.body();
+                if (body == null || body.PaymentResult == null) {
+                    Snackbar.make(mToolbar, R.string.error_loading_data, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+
+                String txHash = body.PaymentResult.TxHash;
+                if (TextUtils.isEmpty(txHash)) {
+                    Snackbar.make(mToolbar, R.string.error_loading_data, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+
+                LogService.info("Payment hash: " + txHash);
+                mPaymentHash = txHash;
+
+                refreshUI();
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ConfirmPaymentResponseDto> call, @NonNull Throwable t) {
+                Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
+                refreshUI();
+            }
+        });
     }
 
 }

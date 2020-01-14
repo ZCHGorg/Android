@@ -55,7 +55,11 @@ public interface IChargCoinServiceApi {
     );
 
     @POST("api/serviceOn")
-    Call<ServiceOnResponseDto> postServiceOn();
+    Call<ServiceOnResponseDto> postServiceOn(
+            @Query("payerId") String payerId,
+            @Query("txHash") String txHash,
+            @Query("paymentId") String paymentId
+    );
 
     @POST("api/serviceOff")
     Call<ServiceOnResponseDto> postServiceOff();

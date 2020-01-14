@@ -1,5 +1,6 @@
 package io.charg.chargstation.services.remote.api.chargCoinServiceApi;
 
+import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
 public class ServiceOnResponseDto {
@@ -8,6 +9,23 @@ public class ServiceOnResponseDto {
     public boolean Error;
 
     @SerializedName("result")
-    public String Result;
+    public ResultDto Result;
 
+    @SerializedName("started")
+    public long StartedAt;
+
+    @SerializedName("time")
+    public long TimeElapsed;
+
+    public class ResultDto {
+
+        @SerializedName("error")
+        public String Error;
+
+    }
+
+    @Override
+    public String toString() {
+        return new Gson().toJson(this);
+    }
 }
