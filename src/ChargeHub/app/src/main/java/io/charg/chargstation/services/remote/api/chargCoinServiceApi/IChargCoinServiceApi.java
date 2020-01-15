@@ -46,6 +46,7 @@ public interface IChargCoinServiceApi {
 
     @POST("api/confirmPayment")
     Call<ConfirmPaymentResponseDto> postConfirmPayment(
+            @Query("serviceId") int serviceId,
             @Query("currency") String currency,
             @Query("nodeAddress") String nodeAddress,
             @Query("orderHash") String orderHash,
@@ -69,7 +70,11 @@ public interface IChargCoinServiceApi {
     );
 
     @GET("api/serviceStatus")
-    Call<ServiceStatusDto> getServiceStatus();
+    Call<ServiceStatusDto> getServiceStatus(
+            @Query("payerId") String payerId,
+            @Query("txHash") String txHash,
+            @Query("paymentId") String paymentId
+    );
 
     @GET("api/nodeStatus")
     Call<NodeStatusDto> getNodeStatus();

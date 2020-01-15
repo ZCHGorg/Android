@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.activities.MapActivity" />
+        <activity android:name=".ui.activities.mapActivity.MapActivity" />
         <activity android:name=".ui.activities.WalletActivity" />
         <activity android:name=".ui.activities.ChangeWalletActivity" />
         <activity android:name=".ui.activities.FilterActivity" />

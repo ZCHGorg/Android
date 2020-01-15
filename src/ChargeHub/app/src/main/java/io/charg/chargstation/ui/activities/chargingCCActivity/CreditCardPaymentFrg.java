@@ -159,6 +159,7 @@ public class CreditCardPaymentFrg extends BaseNavFragment {
         dialog.show();
 
         mChargCoinServiceApi.postConfirmPayment(
+                2,
                 "USD",
                 "0x1aa494ff7a493e0ba002e2d38650d4d21bd5591b",
                 "0x3d203f7ad6471c5d11d9ab5e1950130da759c594aa998435d01e36067ac9b7e8",

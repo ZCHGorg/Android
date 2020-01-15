@@ -58,7 +58,6 @@ public class NodeServiceActivity extends BaseActivity {
 
     private String mPayerId = "uk0505";
     private String mNodeEthAddress;
-    private boolean mPaymentStatus;
     private String mSellOrderHash;
     private String mPaymentHash;
     private String mPaymentNonce;
@@ -108,14 +107,13 @@ public class NodeServiceActivity extends BaseActivity {
 
     private void refreshUI() {
         mTvNodeEthAddress.setText(mNodeEthAddress);
-        mTvPaymentStatus.setText(mPaymentStatus ? "Confirmed" : "Not confirmed");
         mTvSellOrderStatus.setText(mSellOrderHash);
         mTvPaymentStatus.setText(mPaymentHash);
     }
 
     @OnClick(R.id.btn_payment_credit_card)
     void onBtnPayCreditCardClicked() {
-        showLoading();
+        showLoading("Initializing payment...");
 
         mChargCoinServiceApi.getPaymentData("USD")
                 .enqueue(new Callback<PaymentDataDto>() {
@@ -254,11 +252,64 @@ public class NodeServiceActivity extends BaseActivity {
         });
     }
 
-    private void showLoading() {
+    @OnClick(R.id.btn_service_status)
+    void onBtnServiceStatusClicked() {
+        if (TextUtils.isEmpty(mPaymentHash)) {
+            Snackbar.make(mToolbar, "Payment is not confirmed. TxHash required", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (TextUtils.isEmpty(mPaymentNonce)) {
+            Snackbar.make(mToolbar, "Payment is not confirmed. PaymentId required", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+
+        mChargCoinServiceApi.getServiceStatus(mPayerId, mPaymentHash, mPaymentNonce).enqueue(new Callback<ServiceStatusDto>() {
+            @Override
+            public void onResponse(@NonNull Call<ServiceStatusDto> call, @NonNull Response<ServiceStatusDto> response) {
+
+                if (response.errorBody() != null) {
+                    try {
+                        String json = response.errorBody().string();
+                        JsonObject jsonObject = new Gson().fromJson(json, JsonObject.class);
+                        String error = jsonObject.get("error").getAsString();
+                        Snackbar.make(mToolbar, error, Snackbar.LENGTH_SHORT).show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return;
+                }
+
+                if (response.body() == null) {
+                    Snackbar.make(mToolbar, R.string.error_loading_payment_token, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+
+                LogService.info("Wifi stop response: " + response.body());
+
+                ServiceStatusDto body = response.body();
+                if (body.Error) {
+                    Snackbar.make(mToolbar, R.string.error_service_wifi_on, Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(mToolbar, body.Result.Error, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+
+                Snackbar.make(mToolbar, body.toString(), Snackbar.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ServiceStatusDto> call, @NonNull Throwable t) {
+                Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
+                refreshUI();
+            }
+        });
+    }
+
+    private void showLoading(String message) {
 
         if (mLoadingDialog == null) {
             mLoadingDialog = new AlertDialog.Builder(this)
-                    .setMessage("Loading data...")
+                    .setMessage(message)
                     .create();
         }
 
@@ -267,6 +318,7 @@ public class NodeServiceActivity extends BaseActivity {
 
     private void hideLoading() {
         mLoadingDialog.dismiss();
+        mLoadingDialog = null;
     }
 
     private void performPayment(String brainTreeClientToken) {
@@ -334,7 +386,11 @@ public class NodeServiceActivity extends BaseActivity {
     }
 
     private void confirmPayment() {
+
+        showLoading("Confirm payment...");
+
         mChargCoinServiceApi.postConfirmPayment(
+                2,
                 "USD",
                 mNodeEthAddress,
                 mSellOrderHash,
@@ -343,6 +399,8 @@ public class NodeServiceActivity extends BaseActivity {
                 mPayerId).enqueue(new Callback<ConfirmPaymentResponseDto>() {
             @Override
             public void onResponse(@NonNull Call<ConfirmPaymentResponseDto> call, @NonNull Response<ConfirmPaymentResponseDto> response) {
+                hideLoading();
+
                 if (response.errorBody() != null) {
                     try {
                         Snackbar.make(mToolbar, response.errorBody().string(), Snackbar.LENGTH_SHORT).show();
@@ -373,6 +431,8 @@ public class NodeServiceActivity extends BaseActivity {
 
             @Override
             public void onFailure(@NonNull Call<ConfirmPaymentResponseDto> call, @NonNull Throwable t) {
+                hideLoading();
+
                 Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
                 refreshUI();
             }

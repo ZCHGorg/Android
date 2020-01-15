@@ -199,6 +199,7 @@ public class BuyChargActivity extends BaseAuthActivity {
 
     private void confirmPayment(String hash, String nonce) {
         mApi.postConfirmPayment(
+                2,
                 "USD",
                 "0x1aa494ff7a493e0ba002e2d38650d4d21bd5591b",
                 hash,
