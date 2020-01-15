@@ -3,7 +3,7 @@ package io.charg.chargstation.services.remote.api.chargCoinServiceApi;
 import com.google.gson.Gson;
 import com.google.gson.annotations.SerializedName;
 
-public class ServiceOnResponseDto {
+public class ServiceStatusDto {
 
     @SerializedName("error")
     public boolean Error;
@@ -13,6 +13,12 @@ public class ServiceOnResponseDto {
 
     @SerializedName("started")
     public long StartedAt;
+
+    @SerializedName("stopped")
+    public long StoppedAt;
+
+    @SerializedName("remained")
+    public long Remaind;
 
     @SerializedName("time")
     public long TimeElapsed;

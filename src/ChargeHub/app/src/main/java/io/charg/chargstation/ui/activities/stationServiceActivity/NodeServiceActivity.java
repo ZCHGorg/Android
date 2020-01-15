@@ -16,6 +16,8 @@ import com.braintreepayments.api.dropin.DropInActivity;
 import com.braintreepayments.api.dropin.DropInRequest;
 import com.braintreepayments.api.dropin.DropInResult;
 import com.braintreepayments.api.models.PaymentMethodNonce;
+import com.google.gson.Gson;
+import com.google.gson.JsonObject;
 
 import java.io.IOException;
 
@@ -29,7 +31,7 @@ import io.charg.chargstation.services.remote.api.chargCoinServiceApi.BestSellOrd
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.ConfirmPaymentResponseDto;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.IChargCoinServiceApi;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.PaymentDataDto;
-import io.charg.chargstation.services.remote.api.chargCoinServiceApi.ServiceOnResponseDto;
+import io.charg.chargstation.services.remote.api.chargCoinServiceApi.ServiceStatusDto;
 import io.charg.chargstation.ui.activities.BaseActivity;
 import retrofit2.Call;
 import retrofit2.Callback;
@@ -158,14 +160,17 @@ public class NodeServiceActivity extends BaseActivity {
             return;
         }
 
-        mChargCoinServiceApi.postServiceOn(mPayerId, mPaymentHash, mPaymentNonce).enqueue(new Callback<ServiceOnResponseDto>() {
+        mChargCoinServiceApi.postServiceOn(mPayerId, mPaymentHash, mPaymentNonce).enqueue(new Callback<ServiceStatusDto>() {
             @Override
-            public void onResponse(@NonNull Call<ServiceOnResponseDto> call, @NonNull Response<ServiceOnResponseDto> response) {
+            public void onResponse(@NonNull Call<ServiceStatusDto> call, @NonNull Response<ServiceStatusDto> response) {
 
                 if (response.errorBody() != null) {
                     try {
-                        Snackbar.make(mToolbar, response.errorBody().string(), Snackbar.LENGTH_SHORT).show();
-                    } catch (IOException e) {
+                        String json = response.errorBody().string();
+                        JsonObject jsonObject = new Gson().fromJson(json, JsonObject.class);
+                        String error = jsonObject.get("error").getAsString();
+                        Snackbar.make(mToolbar, error, Snackbar.LENGTH_SHORT).show();
+                    } catch (Exception e) {
                         e.printStackTrace();
                     }
                     return;
@@ -178,7 +183,7 @@ public class NodeServiceActivity extends BaseActivity {
 
                 LogService.info("Wifi start response: " + response.body());
 
-                ServiceOnResponseDto body = response.body();
+                ServiceStatusDto body = response.body();
                 if (body.Error) {
                     Snackbar.make(mToolbar, R.string.error_service_wifi_on, Snackbar.LENGTH_SHORT).show();
                     Snackbar.make(mToolbar, body.Result.Error, Snackbar.LENGTH_SHORT).show();
@@ -189,7 +194,7 @@ public class NodeServiceActivity extends BaseActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<ServiceOnResponseDto> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<ServiceStatusDto> call, @NonNull Throwable t) {
                 Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
                 refreshUI();
             }
@@ -198,7 +203,55 @@ public class NodeServiceActivity extends BaseActivity {
 
     @OnClick(R.id.btn_stop_wifi)
     void onBtnWifiStopClicked() {
+        if (TextUtils.isEmpty(mPaymentHash)) {
+            Snackbar.make(mToolbar, "Payment is not confirmed. TxHash required", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
 
+        if (TextUtils.isEmpty(mPaymentNonce)) {
+            Snackbar.make(mToolbar, "Payment is not confirmed. PaymentId required", Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+
+        mChargCoinServiceApi.postServiceOff(mPayerId, mPaymentHash, mPaymentNonce).enqueue(new Callback<ServiceStatusDto>() {
+            @Override
+            public void onResponse(@NonNull Call<ServiceStatusDto> call, @NonNull Response<ServiceStatusDto> response) {
+
+                if (response.errorBody() != null) {
+                    try {
+                        String json = response.errorBody().string();
+                        JsonObject jsonObject = new Gson().fromJson(json, JsonObject.class);
+                        String error = jsonObject.get("error").getAsString();
+                        Snackbar.make(mToolbar, error, Snackbar.LENGTH_SHORT).show();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    return;
+                }
+
+                if (response.body() == null) {
+                    Snackbar.make(mToolbar, R.string.error_loading_payment_token, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+
+                LogService.info("Wifi stop response: " + response.body());
+
+                ServiceStatusDto body = response.body();
+                if (body.Error) {
+                    Snackbar.make(mToolbar, R.string.error_service_wifi_on, Snackbar.LENGTH_SHORT).show();
+                    Snackbar.make(mToolbar, body.Result.Error, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+
+                Snackbar.make(mToolbar, body.toString(), Snackbar.LENGTH_SHORT).show();
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ServiceStatusDto> call, @NonNull Throwable t) {
+                Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
+                refreshUI();
+            }
+        });
     }
 
     private void showLoading() {
