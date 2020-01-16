@@ -48,11 +48,23 @@ public class NodeServiceActivity extends BaseActivity {
     @BindView(R.id.tv_node_eth_address)
     TextView mTvNodeEthAddress;
 
-    @BindView(R.id.tv_payment_status)
+    @BindView(R.id.tv_payment_hash)
     TextView mTvPaymentStatus;
 
-    @BindView(R.id.tv_sell_order_status)
+    @BindView(R.id.tv_sell_order_hash)
     TextView mTvSellOrderStatus;
+
+    @BindView(R.id.tv_service_started_at)
+    TextView mTvServiceStartedAt;
+
+    @BindView(R.id.tv_service_stopped_at)
+    TextView mTvServiceStoppedAt;
+
+    @BindView(R.id.tv_service_remained)
+    TextView mTvServiceRemained;
+
+    @BindView(R.id.tv_service_time_at)
+    TextView mTvServiceTime;
 
     private IChargCoinServiceApi mChargCoinServiceApi;
 
@@ -96,7 +108,6 @@ public class NodeServiceActivity extends BaseActivity {
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
     }
-
 
     private void readIntent() {
         Intent intent = getIntent();
@@ -294,7 +305,10 @@ public class NodeServiceActivity extends BaseActivity {
                     return;
                 }
 
-                Snackbar.make(mToolbar, body.toString(), Snackbar.LENGTH_SHORT).show();
+                mTvServiceStartedAt.setText(String.valueOf(body.StartedAt));
+                mTvServiceStoppedAt.setText(String.valueOf(body.StoppedAt));
+                mTvServiceTime.setText(String.valueOf(body.TimeElapsed));
+                mTvServiceRemained.setText(String.valueOf(body.Remaind));
             }
 
             @Override
@@ -386,7 +400,6 @@ public class NodeServiceActivity extends BaseActivity {
     }
 
     private void confirmPayment() {
-
         showLoading("Confirm payment...");
 
         mChargCoinServiceApi.postConfirmPayment(
