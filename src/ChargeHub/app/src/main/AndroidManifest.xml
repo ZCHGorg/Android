@@ -22,7 +22,7 @@
             </intent-filter>
         </activity>
 
-        <activity android:name=".ui.activities.MapActivity" />
+        <activity android:name=".ui.activities.mapActivity.MapActivity" />
         <activity android:name=".ui.activities.WalletActivity" />
         <activity android:name=".ui.activities.ChangeWalletActivity" />
         <activity android:name=".ui.activities.FilterActivity" />
@@ -52,6 +52,9 @@
         <activity android:name=".ui.activities.stationActivity.StationActivity" />
         <activity android:name=".ui.activities.SocketIOActivity" />
         <activity android:name=".ui.activities.chargingCCActivity.ChargingCCActivity" />
+        <activity android:name=".ui.activities.chargeCoinService.ChargeCoinServiceActivity" />
+        <activity android:name=".ui.activities.webBasedActivity.WebBasedActivity" />
+        <activity android:name=".ui.activities.stationServiceActivity.NodeServiceActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

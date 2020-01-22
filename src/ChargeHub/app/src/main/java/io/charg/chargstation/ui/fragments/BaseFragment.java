@@ -26,12 +26,8 @@ public abstract class BaseFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(getResourceId(), container, false);
         ButterKnife.bind(this, view);
+        onShows();
         return view;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        onShows();
-    }
 }

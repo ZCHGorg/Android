@@ -8,8 +8,9 @@ import android.os.Handler;
 import android.widget.TextView;
 
 import com.crashlytics.android.Crashlytics;
+
+import io.charg.chargstation.ui.activities.mapActivity.MapActivity;
 import io.fabric.sdk.android.Fabric;
-import org.w3c.dom.Text;
 
 import io.charg.chargstation.R;
 

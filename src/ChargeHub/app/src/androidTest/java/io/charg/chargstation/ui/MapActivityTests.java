@@ -4,7 +4,6 @@ import android.Manifest;
 import android.app.Activity;
 import android.app.Instrumentation;
 import android.support.design.widget.NavigationView;
-import android.support.test.espresso.matcher.ViewMatchers;
 import android.support.test.rule.ActivityTestRule;
 import android.support.test.rule.GrantPermissionRule;
 import android.support.test.runner.AndroidJUnit4;
@@ -12,7 +11,6 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.Gravity;
 import android.view.MenuItem;
 
-import org.hamcrest.Matcher;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -21,14 +19,12 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 
 import io.charg.chargstation.R;
-import io.charg.chargstation.services.local.AccountService;
 import io.charg.chargstation.ui.activities.ContractActivity;
 import io.charg.chargstation.ui.activities.FavoritesActivity;
 import io.charg.chargstation.ui.activities.FilterActivity;
-import io.charg.chargstation.ui.activities.MapActivity;
+import io.charg.chargstation.ui.activities.mapActivity.MapActivity;
 import io.charg.chargstation.ui.activities.becomeOwner.BecomeOwnerActivity;
 
-import static android.support.test.InstrumentationRegistry.getContext;
 import static android.support.test.InstrumentationRegistry.getInstrumentation;
 import static android.support.test.espresso.Espresso.onView;
 import static android.support.test.espresso.action.ViewActions.click;

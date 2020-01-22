@@ -1,19 +1,18 @@
-package io.charg.chargstation.services.remote.api.wecharg;
+package io.charg.chargstation.services.remote.api.chargCoinServiceApi;
 
 import com.google.gson.annotations.SerializedName;
 
-public class PaymentDataResponseDto {
+public class PaymentDataDto {
 
     @SerializedName("paymentData")
-    public PaymentDataDto PaymentData;
+    public PaymentDataContentDto PaymentData;
 
-    public class PaymentDataDto {
+    public class PaymentDataContentDto {
 
         @SerializedName("clientToken")
         public String ClientToken;
 
         @SerializedName("success")
         public boolean Success;
-
     }
 }

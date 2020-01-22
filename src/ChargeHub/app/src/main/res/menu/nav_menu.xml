@@ -10,6 +10,16 @@
             android:title="Map" />
 
         <item
+            android:id="@+id/menu_web_based"
+            android:icon="@drawable/ic_public_black_24dp"
+            android:title="Browser mode" />
+
+        <item
+            android:id="@+id/menu_charge_coin_service"
+            android:icon="@drawable/ic_power"
+            android:title="Charge Coin Service" />
+
+        <item
             android:id="@+id/menu_favorites"
             android:icon="@drawable/ic_favorite"
             android:title="@string/favorites" />
@@ -55,10 +65,10 @@
             android:title="Settings" />
 
         <item
-            android:visible="false"
             android:id="@+id/menu_socketio"
             android:icon="@drawable/charg"
-            android:title="Socketio" />
+            android:title="Socketio"
+            android:visible="false" />
 
     </group>
 

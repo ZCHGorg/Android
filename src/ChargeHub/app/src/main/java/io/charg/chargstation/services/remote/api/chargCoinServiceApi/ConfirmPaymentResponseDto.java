@@ -1,8 +1,11 @@
-package io.charg.chargstation.services.remote.api.wecharg;
+package io.charg.chargstation.services.remote.api.chargCoinServiceApi;
 
 import com.google.gson.annotations.SerializedName;
 
-public class PaymentResultResponseDto {
+public class ConfirmPaymentResponseDto {
+
+    @SerializedName("error")
+    public boolean ErrorStatus;
 
     @SerializedName("paymentResult")
     public PaymentResultDto PaymentResult;
@@ -13,4 +16,5 @@ public class PaymentResultResponseDto {
         public String TxHash;
 
     }
+
 }

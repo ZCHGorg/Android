@@ -24,10 +24,11 @@ import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.CommonData;
 import io.charg.chargstation.services.local.LogService;
-import io.charg.chargstation.services.remote.api.wecharg.PaymentDataResponseDto;
-import io.charg.chargstation.services.remote.api.wecharg.PaymentResultResponseDto;
-import io.charg.chargstation.services.remote.api.wecharg.IWeChargApi;
-import io.charg.chargstation.services.remote.api.wecharg.WeChargProvider;
+import io.charg.chargstation.services.remote.api.ApiProvider;
+import io.charg.chargstation.services.remote.api.chargCoinServiceApi.BestSellOrderDto;
+import io.charg.chargstation.services.remote.api.chargCoinServiceApi.ConfirmPaymentResponseDto;
+import io.charg.chargstation.services.remote.api.chargCoinServiceApi.IChargCoinServiceApi;
+import io.charg.chargstation.services.remote.api.chargCoinServiceApi.PaymentDataDto;
 import retrofit2.Call;
 import retrofit2.Callback;
 import retrofit2.Response;
@@ -48,13 +49,7 @@ public class BuyChargActivity extends BaseAuthActivity {
     @BindView(R.id.tv_result)
     TextView mTvResult;
 
-    private IWeChargApi mWeChargApi;
-
-    @Override
-    public boolean onSupportNavigateUp() {
-        onBackPressed();
-        return true;
-    }
+    private IChargCoinServiceApi mApi;
 
     @Override
     public int getResourceId() {
@@ -68,8 +63,10 @@ public class BuyChargActivity extends BaseAuthActivity {
         initEtAmountChg();
     }
 
-    private void initServices() {
-        mWeChargApi = WeChargProvider.getWeChargApi();
+    @Override
+    public boolean onSupportNavigateUp() {
+        onBackPressed();
+        return true;
     }
 
     private void initToolbar() {
@@ -79,6 +76,10 @@ public class BuyChargActivity extends BaseAuthActivity {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
             getSupportActionBar().setDisplayShowHomeEnabled(true);
         }
+    }
+
+    private void initServices() {
+        mApi = ApiProvider.getChargCoinServiceApi();
     }
 
     private void initEtAmountChg() {
@@ -116,15 +117,15 @@ public class BuyChargActivity extends BaseAuthActivity {
 
         LogService.info("Starting payment");
 
-        mWeChargApi.getPaymentDataAsync().enqueue(new Callback<PaymentDataResponseDto>() {
+        mApi.getPaymentData("USD").enqueue(new Callback<PaymentDataDto>() {
             @Override
-            public void onResponse(@NonNull Call<PaymentDataResponseDto> call, @NonNull Response<PaymentDataResponseDto> response) {
+            public void onResponse(@NonNull Call<PaymentDataDto> call, @NonNull Response<PaymentDataDto> response) {
                 if (!response.isSuccessful()) {
                     Snackbar.make(mToolbar, "Response is not successful", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                PaymentDataResponseDto body = response.body();
+                PaymentDataDto body = response.body();
                 if (body == null || body.PaymentData == null) {
                     Snackbar.make(mToolbar, R.string.error_loading_data, Toast.LENGTH_SHORT).show();
                     return;
@@ -142,7 +143,7 @@ public class BuyChargActivity extends BaseAuthActivity {
             }
 
             @Override
-            public void onFailure(@NonNull Call<PaymentDataResponseDto> call, @NonNull Throwable t) {
+            public void onFailure(@NonNull Call<PaymentDataDto> call, @NonNull Throwable t) {
                 Snackbar.make(mToolbar, t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
@@ -160,7 +161,7 @@ public class BuyChargActivity extends BaseAuthActivity {
                     return;
                 }
 
-                Log.i(CommonData.TAG, "nonce:" + nonce.getNonce());
+                Log.i(CommonData.TAG, "nonce: " + nonce.getNonce());
 
                 exchangeUSDtoCHG(nonce.getNonce());
 
@@ -175,36 +176,66 @@ public class BuyChargActivity extends BaseAuthActivity {
 
     private void exchangeUSDtoCHG(final String nonce) {
 
-        mWeChargApi.confirmPaymentAsync(
+        ApiProvider.getChargCoinServiceApi().getBestSellOrder(1000).enqueue(new Callback<BestSellOrderDto>() {
+            @Override
+            public void onResponse(Call<BestSellOrderDto> call, Response<BestSellOrderDto> response) {
+                BestSellOrderDto orderContent = response.body();
+                if (orderContent == null || orderContent.BestSellOrder == null) {
+                    Toast.makeText(BuyChargActivity.this, "Best sell order loading error", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                Toast.makeText(BuyChargActivity.this, orderContent.BestSellOrder.Hash, Toast.LENGTH_SHORT).show();
+
+                confirmPayment(orderContent.BestSellOrder.Hash, nonce);
+            }
+
+            @Override
+            public void onFailure(Call<BestSellOrderDto> call, Throwable t) {
+                Toast.makeText(BuyChargActivity.this, t.getMessage(), Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+
+    private void confirmPayment(String hash, String nonce) {
+        mApi.postConfirmPayment(
+                2,
+                "USD",
+                "0x1aa494ff7a493e0ba002e2d38650d4d21bd5591b",
+                hash,
+                5,
+                nonce,
+                "uk0505")/*
                 "0x1aa494ff7a493e0ba002e2d38650d4d21bd5591b",
                 "0x3d203f7ad6471c5d11d9ab5e1950130da759c594aa998435d01e36067ac9b7e8",
                 5,
-                nonce
-        ).enqueue(new Callback<PaymentResultResponseDto>() {
-            @Override
-            public void onResponse(@NonNull Call<PaymentResultResponseDto> call, @NonNull Response<PaymentResultResponseDto> response) {
-                PaymentResultResponseDto body = response.body();
-                if (body == null || body.PaymentResult == null) {
-                    Snackbar.make(mToolbar, R.string.error_loading_data, Snackbar.LENGTH_SHORT).show();
-                    return;
-                }
+                nonce*/
+                .enqueue(new Callback<ConfirmPaymentResponseDto>() {
+                    @Override
+                    public void onResponse(@NonNull Call<ConfirmPaymentResponseDto> call, @NonNull Response<ConfirmPaymentResponseDto> response) {
+                        ConfirmPaymentResponseDto body = response.body();
+                        if (body == null || body.PaymentResult == null) {
+                            Snackbar.make(mToolbar, R.string.error_loading_data, Snackbar.LENGTH_SHORT).show();
+                            return;
+                        }
 
-                String txHash = body.PaymentResult.TxHash;
-                if (TextUtils.isEmpty(txHash)) {
-                    Snackbar.make(mToolbar, R.string.error_loading_data, Snackbar.LENGTH_SHORT).show();
-                    return;
-                }
+                        String txHash = body.PaymentResult.TxHash;
+                        if (TextUtils.isEmpty(txHash)) {
+                            Snackbar.make(mToolbar, R.string.error_loading_data, Snackbar.LENGTH_SHORT).show();
+                            return;
+                        }
 
-                Snackbar.make(mToolbar, txHash, Snackbar.LENGTH_SHORT).show();
+                        LogService.info("Payment hash: " + txHash);
 
-            }
+                        Snackbar.make(mToolbar, txHash, Snackbar.LENGTH_SHORT).show();
 
-            @Override
-            public void onFailure(@NonNull Call<PaymentResultResponseDto> call, @NonNull Throwable t) {
-                Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
-            }
-        });
+                    }
 
+                    @Override
+                    public void onFailure(@NonNull Call<ConfirmPaymentResponseDto> call, @NonNull Throwable t) {
+                        Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
+                    }
+                });
     }
 
 }

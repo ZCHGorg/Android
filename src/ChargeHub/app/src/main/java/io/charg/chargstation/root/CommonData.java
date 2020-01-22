@@ -14,6 +14,8 @@ public class CommonData {
     public static final String TAG = "Charge";
     public static final String NOT_DEFINED = "Not defined";
 
+    public static final String SITE_URL = "https://chg-hub-002.myreal.space/";
+
     //main net
     /*public static final String ETH_URL = "https://mainnet.infura.io/Zp6evGImttk7WOe95WcW";
     public static final String SMART_CONTRACT_ADDRESS = "0xC4A86561cb0b7EA1214904f26E6D50FD357C7986";*/
