@@ -9,6 +9,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -65,6 +67,18 @@ public class NodeServiceActivity extends BaseActivity {
 
     @BindView(R.id.tv_service_time_at)
     TextView mTvServiceTime;
+
+    @BindView(R.id.rgrp_service_type)
+    RadioGroup mRgrpServiceType;
+
+    @BindView(R.id.rbtn_charging)
+    RadioButton mRbtnCharging;
+
+    @BindView(R.id.rbtn_parking)
+    RadioButton mRbtnParking;
+
+    @BindView(R.id.rbtn_wifi)
+    RadioButton mRbtnWifi;
 
     private IChargCoinServiceApi mChargCoinServiceApi;
 
@@ -156,7 +170,7 @@ public class NodeServiceActivity extends BaseActivity {
                 });
     }
 
-    @OnClick(R.id.btn_start_wifi)
+    @OnClick(R.id.btn_service_start)
     void onBtnWifiStartClicked() {
 
         if (TextUtils.isEmpty(mPaymentHash)) {
@@ -210,7 +224,7 @@ public class NodeServiceActivity extends BaseActivity {
         });
     }
 
-    @OnClick(R.id.btn_stop_wifi)
+    @OnClick(R.id.btn_service_stop)
     void onBtnWifiStopClicked() {
         if (TextUtils.isEmpty(mPaymentHash)) {
             Snackbar.make(mToolbar, "Payment is not confirmed. TxHash required", Snackbar.LENGTH_SHORT).show();
@@ -402,8 +416,18 @@ public class NodeServiceActivity extends BaseActivity {
     private void confirmPayment() {
         showLoading("Confirm payment...");
 
+        int serviceId = -1;
+
+        if (mRgrpServiceType.getCheckedRadioButtonId() == mRbtnCharging.getId()) {
+            serviceId = 0;
+        } else if (mRgrpServiceType.getCheckedRadioButtonId() == mRbtnParking.getId()) {
+            serviceId = 1;
+        } else if (mRgrpServiceType.getCheckedRadioButtonId() == mRbtnWifi.getId()) {
+            serviceId = 2;
+        }
+
         mChargCoinServiceApi.postConfirmPayment(
-                2,
+                serviceId,
                 "USD",
                 mNodeEthAddress,
                 mSellOrderHash,
