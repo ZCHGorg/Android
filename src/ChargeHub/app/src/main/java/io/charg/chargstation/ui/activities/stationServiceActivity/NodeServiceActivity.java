@@ -28,6 +28,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.CommonData;
+import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.services.local.LogService;
 import io.charg.chargstation.services.remote.api.ApiProvider;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.BestSellOrderDto;
@@ -326,7 +327,7 @@ public class NodeServiceActivity extends BaseActivity {
                     return;
                 }
 
-                mTvServiceStartedAt.setText(String.valueOf(body.StartedAt));
+                mTvServiceStartedAt.setText(StringHelper.getDateTimeFromEpoch((body.StartedAt)));
                 mTvServiceStoppedAt.setText(String.valueOf(body.StoppedAt));
                 mTvServiceTime.setText(String.valueOf(body.TimeElapsed));
                 mTvServiceRemained.setText(String.valueOf(body.Remaind));

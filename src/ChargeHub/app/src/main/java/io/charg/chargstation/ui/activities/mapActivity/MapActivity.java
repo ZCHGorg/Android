@@ -12,6 +12,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -52,6 +53,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import butterknife.BindView;
 import butterknife.OnClick;
@@ -74,6 +76,8 @@ import io.charg.chargstation.services.local.AccountService;
 import io.charg.chargstation.services.local.FilteringService;
 import io.charg.chargstation.services.local.LocalDB;
 import io.charg.chargstation.services.local.LogService;
+import io.charg.chargstation.services.remote.api.ApiProvider;
+import io.charg.chargstation.services.remote.api.chargCoinServiceApi.NodeDto;
 import io.charg.chargstation.services.remote.firebase.ChargeDbApi;
 import io.charg.chargstation.services.remote.firebase.ChargeHubService;
 import io.charg.chargstation.services.remote.firebase.tasks.GetStationDtoTask;
@@ -90,10 +94,14 @@ import io.charg.chargstation.ui.activities.chargeCoinService.ChargeCoinServiceAc
 import io.charg.chargstation.ui.activities.chargingActivity.ChargingActivity;
 import io.charg.chargstation.ui.activities.parkingActivity.ParkingActivity;
 import io.charg.chargstation.ui.activities.stationActivity.StationActivity;
+import io.charg.chargstation.ui.activities.stationServiceActivity.NodeServiceActivity;
 import io.charg.chargstation.ui.activities.webBasedActivity.WebBasedActivity;
 import io.charg.chargstation.ui.dialogs.StationEthAddressDialog;
 import io.charg.chargstation.ui.dialogs.TxWaitDialog;
 import io.charg.chargstation.ui.views.ChargeClusterManager;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class MapActivity
         extends BaseAuthActivity
@@ -499,9 +507,6 @@ public class MapActivity
     }
 
     private void drawCurrentLocationMarker(Location location) {
-
-        LogService.info("Current location: " + location.toString());
-
         mGoogleMap.addMarker(new MarkerOptions()
                 .position(new LatLng(location.getLatitude(), location.getLongitude()))
                 .icon(BitmapDescriptorFactory.fromBitmap(BitmapFactory.decodeResource(getResources(), R.mipmap.ic_location))));
@@ -514,7 +519,47 @@ public class MapActivity
         CameraPosition cameraPosition = mGoogleMap.getCameraPosition();
         double radius = Helpers.zoomLevelToRadius(cameraPosition.zoom) / 1000;
         radius = radius > CommonData.RADIUS_LIMIT ? CommonData.RADIUS_LIMIT : radius;
+        radius = (int) radius == 0 ? CommonData.RADIUS_LIMIT : radius;
+
+        loadNearNodesAsync(cameraPosition.target.latitude, cameraPosition.target.longitude, (int) radius);
         searchChargeStations(new GeoFireRequest(new LatLng(cameraPosition.target.latitude, cameraPosition.target.longitude), radius));
+    }
+
+    private void loadNearNodesAsync(double latitude, double longitude, int radius) {
+        LogService.info("Loading stations in area: " + latitude + ";" + longitude + " R=" + radius);
+
+        ApiProvider.getChargCoinServiceApi().getNodes(latitude, longitude, radius).enqueue(new Callback<Map<String, NodeDto>>() {
+            @Override
+            public void onResponse(@NonNull Call<Map<String, NodeDto>> call, @NonNull Response<Map<String, NodeDto>> response) {
+                Map<String, NodeDto> body = response.body();
+                if (body == null) {
+                    return;
+                }
+
+                LogService.info("Found stations: " + body.size());
+
+                for (String key : body.keySet()) {
+                    NodeDto node = body.get(key);
+                    if (node == null) {
+                        return;
+                    }
+
+                    if (mStationKeys.contains(key)) {
+                        return;
+                    }
+
+                    mStationKeys.add(key);
+                    mClusterManager.addItem(new ChargeStationMarker(node.Latitude, node.Longitude, key, ChargeStationMarker.SNIPPET_NODE));
+                }
+
+                mClusterManager.cluster();
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<Map<String, NodeDto>> call, @NonNull Throwable t) {
+                Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
+            }
+        });
     }
 
     @Override
@@ -524,7 +569,13 @@ public class MapActivity
             return true;
         }
 
-        findStationByEthAddressAsync(marker.getKey());
+        if (marker.isCharg()) {
+            findStationByEthAddressAsync(marker.getKey());
+        } else if (marker.isNodeMarker()) {
+            startActivity(new Intent(this, NodeServiceActivity.class)
+                    .putExtra(NodeServiceActivity.EXTRA_NODE_ADDRESS, marker.getKey()));
+        }
+
         return true;
     }
 

@@ -36,6 +36,8 @@ public class StationMarkerRenderer extends DefaultClusterRenderer<ChargeStationM
 
         if (item.isCharg()) {
             bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.ic_station_marker);
+        } else if (item.isNodeMarker()) {
+            bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.ic_node_marker);
         } else {
             bitmap = BitmapFactory.decodeResource(mContext.getResources(), R.mipmap.ic_marker_unknown);
         }

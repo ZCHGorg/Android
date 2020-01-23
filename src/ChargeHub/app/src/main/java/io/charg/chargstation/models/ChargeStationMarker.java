@@ -15,6 +15,7 @@ public class ChargeStationMarker implements ClusterItem {
 
     public static final String SNIPPET_CHARG = "SNIPPET_CHARG";
     public static final String SNIPPET_UNKNOWN = "SNIPPET_UNKNOWN";
+    public static final String SNIPPET_NODE = "SNIPPET_NODE";
 
     public ChargeStationMarker(double lat, double lng, String key, String snippet) {
         mKey = key;
@@ -45,5 +46,8 @@ public class ChargeStationMarker implements ClusterItem {
         return mSnippet.equals(SNIPPET_CHARG);
     }
 
+    public boolean isNodeMarker() {
+        return mSnippet.equals(SNIPPET_NODE);
+    }
 
 }
