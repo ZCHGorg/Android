@@ -13,6 +13,7 @@ import java.util.Map;
 
 import butterknife.BindView;
 import io.charg.chargstation.R;
+import io.charg.chargstation.services.local.FavouriteStationsRepository;
 import io.charg.chargstation.services.remote.api.ApiProvider;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.IChargCoinServiceApi;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.NodeDto;
@@ -25,6 +26,7 @@ import retrofit2.Response;
 public class FrgNodes extends BaseFragment {
 
     private IChargCoinServiceApi mChargCoinServiceApi;
+    private FavouriteStationsRepository mFavouritesRepository;
 
     private NodesAdapter mAdapter;
 
@@ -47,12 +49,24 @@ public class FrgNodes extends BaseFragment {
     }
 
     private void initViews() {
-        mAdapter = new NodesAdapter();
+        mAdapter = new NodesAdapter(getContext());
         mAdapter.setOnBtnPayClickListener(new NodesAdapter.IOnItemClickListener() {
             @Override
             public void onItemClicked(NodeVM nodeDto) {
                 startActivity(new Intent(getContext(), NodeServiceActivity.class)
                         .putExtra(NodeServiceActivity.EXTRA_NODE_ADDRESS, nodeDto.getNodeAddress()));
+            }
+        });
+        mAdapter.setOnMarkFavouriteClickListener(new NodesAdapter.IOnItemClickListener() {
+            @Override
+            public void onItemClicked(NodeVM nodeDto) {
+                mFavouritesRepository.addToFavorites(nodeDto.getNodeAddress());
+            }
+        });
+        mAdapter.setOnUnmarkFavouriteClickListener(new NodesAdapter.IOnItemClickListener() {
+            @Override
+            public void onItemClicked(NodeVM nodeDto) {
+                mFavouritesRepository.removeFromFavorites(nodeDto.getNodeAddress());
             }
         });
 
@@ -62,6 +76,7 @@ public class FrgNodes extends BaseFragment {
 
     private void initServices() {
         mChargCoinServiceApi = ApiProvider.getChargCoinServiceApi();
+        mFavouritesRepository = new FavouriteStationsRepository(getContext());
     }
 
     @Override

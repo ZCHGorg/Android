@@ -100,7 +100,7 @@ public class ChargeFrg extends BaseFragment {
     @BindView(R.id.tv_client_address)
     TextView tvClientAddress;
 
-    @BindView(R.id.btn_pay)
+    @BindView(R.id.btn_open)
     Button btnPay;
 
     private long mChargeTicksEstimate = DEFAULT_CHARG_TICKS;
@@ -439,7 +439,7 @@ public class ChargeFrg extends BaseFragment {
         }, 0, 0, true).show();
     }
 
-    @OnClick(R.id.btn_pay)
+    @OnClick(R.id.btn_open)
     void onBtnPayClicked() {
         SendChargDialog dlg = new SendChargDialog(getContext());
         dlg.sendCharg(mChargeStation.getEth_address(), 1);

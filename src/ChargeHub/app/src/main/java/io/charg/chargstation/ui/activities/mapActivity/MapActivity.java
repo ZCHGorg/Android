@@ -48,10 +48,6 @@ import com.google.maps.android.clustering.ClusterManager;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
-import org.web3j.protocol.Web3j;
-import org.web3j.protocol.Web3jFactory;
-import org.web3j.protocol.http.HttpService;
-
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -78,14 +74,13 @@ import io.charg.chargstation.services.local.AccountService;
 import io.charg.chargstation.services.local.FilteringService;
 import io.charg.chargstation.services.local.LocalDB;
 import io.charg.chargstation.services.local.LogService;
-import io.charg.chargstation.services.local.SettingsProvider;
 import io.charg.chargstation.services.remote.firebase.ChargeDbApi;
 import io.charg.chargstation.services.remote.firebase.ChargeHubService;
 import io.charg.chargstation.services.remote.firebase.tasks.GetStationDtoTask;
 import io.charg.chargstation.ui.activities.BaseAuthActivity;
 import io.charg.chargstation.ui.activities.ChangeWalletActivity;
 import io.charg.chargstation.ui.activities.ContractActivity;
-import io.charg.chargstation.ui.activities.FavoritesActivity;
+import io.charg.chargstation.ui.activities.favoriteActivity.FavoritesActivity;
 import io.charg.chargstation.ui.activities.FilterActivity;
 import io.charg.chargstation.ui.activities.SettingsActivity;
 import io.charg.chargstation.ui.activities.SocketIOActivity;
