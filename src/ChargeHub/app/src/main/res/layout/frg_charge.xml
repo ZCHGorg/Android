@@ -213,7 +213,7 @@
                 android:text="Terms and conditions" />
 
             <Button
-                android:id="@+id/btn_pay"
+                android:id="@+id/btn_open"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:backgroundTint="@color/dark_green"
