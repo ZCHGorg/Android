@@ -1,4 +1,4 @@
-package io.charg.chargstation.ui.adapters;
+package io.charg.chargstation.ui.activities.favoriteActivity;
 
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
@@ -20,6 +20,7 @@ import io.charg.chargstation.root.IAsyncCommand;
 import io.charg.chargstation.services.remote.firebase.ChargeHubService;
 import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.ui.activities.mapActivity.MapActivity;
+import io.charg.chargstation.ui.activities.stationServiceActivity.NodeServiceActivity;
 
 public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHolder> {
 
@@ -40,13 +41,13 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(final ViewHolder holder, int position) {
-        final String id = mItems.get(position);
-        holder.mTvEthAddress.setText(StringHelper.getShortEthAddress(id));
+        final String item = mItems.get(position);
+        holder.mTvEthAddress.setText(StringHelper.getShortEthAddress(item));
 
         mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, StationDto>() {
             @Override
             public String getInputData() {
-                return id;
+                return item;
             }
 
             @Override
@@ -71,6 +72,14 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
             }
         });
 
+        holder.mBtnOpen.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                holder.itemView.getContext().startActivity(new Intent(holder.itemView.getContext(), NodeServiceActivity.class)
+                        .putExtra(NodeServiceActivity.EXTRA_NODE_ADDRESS, item));
+            }
+        });
+
         holder.mBtnMap.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -78,7 +87,7 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
                 mChargeHubService.getLocationAsync(new IAsyncCommand<String, GeofireDto>() {
                     @Override
                     public String getInputData() {
-                        return id;
+                        return item;
                     }
 
                     @Override
@@ -129,6 +138,9 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
 
         @BindView(R.id.btn_map)
         View mBtnMap;
+
+        @BindView(R.id.btn_open)
+        View mBtnOpen;
 
         ViewHolder(View itemView) {
             super(itemView);

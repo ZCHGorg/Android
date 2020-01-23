@@ -20,23 +20,23 @@ public class FavouriteStationsRepository {
 
     public void addToFavorites(String ethAddress) {
 
-        List<String> ids = getIds();
+        List<String> ids = getItems();
         ids.add(ethAddress);
 
         mLocalDb.putValue(FAVOURITE_STATIONS, new Gson().toJson(ids));
     }
 
     public void removeFromFavorites(String ethAddress) {
-        List<String> ids = getIds();
+        List<String> ids = getItems();
         ids.remove(ethAddress);
         mLocalDb.putValue(FAVOURITE_STATIONS, new Gson().toJson(ids));
     }
 
     public boolean isFavourite(String ethAddress) {
-        return getIds().contains(ethAddress);
+        return getItems().contains(ethAddress);
     }
 
-    public List<String> getIds() {
+    public List<String> getItems() {
         String json = mLocalDb.getString(FAVOURITE_STATIONS);
         List<String> ids = new ArrayList<>();
 
