@@ -1,13 +1,13 @@
 package io.charg.chargstation.ui.activities.chargeCoinService;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -15,22 +15,21 @@ import java.util.List;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import io.charg.chargstation.R;
-import io.charg.chargstation.services.remote.api.ApiProvider;
-import io.charg.chargstation.services.remote.api.chargCoinServiceApi.BestSellOrderDto;
-import io.charg.chargstation.services.remote.api.chargCoinServiceApi.NodeDto;
-import io.charg.chargstation.services.remote.api.chargCoinServiceApi.PaymentDataDto;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
+import io.charg.chargstation.services.local.FavouriteStationsRepository;
 
 public class NodesAdapter extends RecyclerView.Adapter<NodesAdapter.ViewHolder> {
 
+    private FavouriteStationsRepository mFavouriteStationsRepository;
+
     private final List<NodeVM> mItems;
 
-    private IOnItemClickListener mOnItemClickListener;
+    private IOnItemClickListener mOnPayClickListener;
+    private IOnItemClickListener mOnMarkFavouriteClickListener;
+    private IOnItemClickListener mOnUnmarkFavouriteClickListener;
 
-    public NodesAdapter() {
+    public NodesAdapter(Context context) {
         mItems = new ArrayList<>();
+        mFavouriteStationsRepository = new FavouriteStationsRepository(context);
     }
 
     @SuppressLint("InflateParams")
@@ -40,7 +39,7 @@ public class NodesAdapter extends RecyclerView.Adapter<NodesAdapter.ViewHolder> 
     }
 
     @Override
-    public void onBindViewHolder(final ViewHolder holder, int position) {
+    public void onBindViewHolder(final ViewHolder holder, @SuppressLint("RecyclerView") final int position) {
         final NodeVM item = mItems.get(position);
 
         holder.mTvEthAddress.setText(item.getNodeAddress());
@@ -53,6 +52,10 @@ public class NodesAdapter extends RecyclerView.Adapter<NodesAdapter.ViewHolder> 
         holder.mTvLongitude.setText(String.valueOf(item.getNodeDto().Longitude));
         holder.mTvConnected.setText(String.valueOf(item.getNodeDto().Connected));
         holder.mTvIp.setText(item.getNodeDto().Ip);
+        holder.mBtnHide.setVisibility(holder.mLayoutCollapsed.getVisibility());
+        holder.mBtnShow.setVisibility(holder.mLayoutCollapsed.getVisibility() == View.VISIBLE ? View.GONE : View.VISIBLE);
+        holder.mBtnUnmarkFavourite.setVisibility(mFavouriteStationsRepository.isFavourite(item.getNodeAddress()) ? View.VISIBLE : View.GONE);
+        holder.mBtnMarkFavourite.setVisibility(mFavouriteStationsRepository.isFavourite(item.getNodeAddress()) ? View.GONE : View.VISIBLE);
 
         holder.mBtnShow.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,8 +85,29 @@ public class NodesAdapter extends RecyclerView.Adapter<NodesAdapter.ViewHolder> 
         holder.mBtnPay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                if (mOnItemClickListener!=null){
-                    mOnItemClickListener.onItemClicked(item);
+                if (mOnPayClickListener != null) {
+                    mOnPayClickListener.onItemClicked(item);
+                    notifyItemChanged(position);
+                }
+            }
+        });
+
+        holder.mBtnMarkFavourite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mOnMarkFavouriteClickListener != null) {
+                    mOnMarkFavouriteClickListener.onItemClicked(item);
+                    notifyItemChanged(position);
+                }
+            }
+        });
+
+        holder.mBtnUnmarkFavourite.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                if (mOnUnmarkFavouriteClickListener != null) {
+                    mOnUnmarkFavouriteClickListener.onItemClicked(item);
+                    notifyItemChanged(position);
                 }
             }
         });
@@ -102,7 +126,15 @@ public class NodesAdapter extends RecyclerView.Adapter<NodesAdapter.ViewHolder> 
     }
 
     public void setOnBtnPayClickListener(IOnItemClickListener onItemClickListener) {
-        mOnItemClickListener = onItemClickListener;
+        mOnPayClickListener = onItemClickListener;
+    }
+
+    public void setOnMarkFavouriteClickListener(IOnItemClickListener onMarkFavouriteClickListener) {
+        mOnMarkFavouriteClickListener = onMarkFavouriteClickListener;
+    }
+
+    public void setOnUnmarkFavouriteClickListener(IOnItemClickListener onUnmarkFavouriteClickListener) {
+        mOnUnmarkFavouriteClickListener = onUnmarkFavouriteClickListener;
     }
 
     interface IOnItemClickListener {
@@ -122,8 +154,14 @@ public class NodesAdapter extends RecyclerView.Adapter<NodesAdapter.ViewHolder> 
         @BindView(R.id.btn_show)
         View mBtnShow;
 
-        @BindView(R.id.btn_pay)
+        @BindView(R.id.btn_open)
         View mBtnPay;
+
+        @BindView(R.id.btn_mark_favourite)
+        View mBtnMarkFavourite;
+
+        @BindView(R.id.btn_unmark_favourite)
+        View mBtnUnmarkFavourite;
 
         @BindView(R.id.tv_node_eth_address)
         TextView mTvEthAddress;

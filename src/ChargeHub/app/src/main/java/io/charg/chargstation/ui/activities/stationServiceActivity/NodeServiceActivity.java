@@ -9,6 +9,7 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.TextView;
@@ -50,6 +51,9 @@ public class NodeServiceActivity extends BaseActivity {
     @BindView(R.id.tv_node_eth_address)
     TextView mTvNodeEthAddress;
 
+    @BindView(R.id.et_amount)
+    EditText mEtAmount;
+
     @BindView(R.id.tv_payment_hash)
     TextView mTvPaymentStatus;
 
@@ -82,6 +86,7 @@ public class NodeServiceActivity extends BaseActivity {
 
     private IChargCoinServiceApi mChargCoinServiceApi;
 
+    private int mUsdAmount;
     private String mPayerId = "uk0505";
     private String mNodeEthAddress;
     private String mSellOrderHash;
@@ -139,6 +144,8 @@ public class NodeServiceActivity extends BaseActivity {
     @OnClick(R.id.btn_payment_credit_card)
     void onBtnPayCreditCardClicked() {
         showLoading("Initializing payment...");
+
+        mUsdAmount = Integer.parseInt(mEtAmount.getText().toString());
 
         mChargCoinServiceApi.getPaymentData("USD")
                 .enqueue(new Callback<PaymentDataDto>() {
@@ -431,7 +438,7 @@ public class NodeServiceActivity extends BaseActivity {
                 "USD",
                 mNodeEthAddress,
                 mSellOrderHash,
-                1,
+                mUsdAmount,
                 mPaymentNonce,
                 mPayerId).enqueue(new Callback<ConfirmPaymentResponseDto>() {
             @Override

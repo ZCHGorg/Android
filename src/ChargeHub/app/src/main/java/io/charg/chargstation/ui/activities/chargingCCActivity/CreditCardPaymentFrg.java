@@ -78,7 +78,7 @@ public class CreditCardPaymentFrg extends BaseNavFragment {
         return null;
     }
 
-    @OnClick(R.id.btn_pay)
+    @OnClick(R.id.btn_open)
     void btnPay() {
         final TxWaitDialog dialog = new TxWaitDialog(getContext(), "Loading payment data");
         dialog.show();

@@ -1,4 +1,4 @@
-package io.charg.chargstation.ui.activities;
+package io.charg.chargstation.ui.activities.favoriteActivity;
 
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.LinearLayoutManager;
@@ -12,7 +12,7 @@ import java.util.List;
 import butterknife.BindView;
 import io.charg.chargstation.R;
 import io.charg.chargstation.services.local.FavouriteStationsRepository;
-import io.charg.chargstation.ui.adapters.FavoriteAdapter;
+import io.charg.chargstation.ui.activities.BaseActivity;
 
 public class FavoritesActivity extends BaseActivity {
 
@@ -47,7 +47,7 @@ public class FavoritesActivity extends BaseActivity {
 
     private void loadItems() {
 
-        List<String> items = mFavoriteService.getIds();
+        List<String> items = mFavoriteService.getItems();
         mAdapter.setItems(items);
 
         if (items.size() > 0) {

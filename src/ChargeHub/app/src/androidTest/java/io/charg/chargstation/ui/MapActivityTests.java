@@ -20,7 +20,7 @@ import org.junit.runner.RunWith;
 
 import io.charg.chargstation.R;
 import io.charg.chargstation.ui.activities.ContractActivity;
-import io.charg.chargstation.ui.activities.FavoritesActivity;
+import io.charg.chargstation.ui.activities.favoriteActivity.FavoritesActivity;
 import io.charg.chargstation.ui.activities.FilterActivity;
 import io.charg.chargstation.ui.activities.mapActivity.MapActivity;
 import io.charg.chargstation.ui.activities.becomeOwner.BecomeOwnerActivity;
