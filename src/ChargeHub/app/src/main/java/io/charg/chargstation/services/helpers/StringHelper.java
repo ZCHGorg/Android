@@ -33,6 +33,11 @@ public class StringHelper {
         return String.format("%s...%s", ethAddress.substring(0, 7), ethAddress.substring(ethAddress.length() - 7));
     }
 
+    public static String getDateTimeFromEpoch(long epochTime) {
+        Date date = new Date(epochTime);
+        return date.toString();
+    }
+
     public static String getCostStr(double value) {
         return String.format(Locale.getDefault(), "%.2f $/MIN", value);
     }

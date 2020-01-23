@@ -1,0 +1,9 @@
+Charg Android Application
+---------------------------------
+versionCode 28
+versionName "1.4.3"
+date 23.06.2019
+---------------------------------
+release notes:
+- added new type of stations according to the api
+- saving station as favorite
