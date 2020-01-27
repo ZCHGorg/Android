@@ -1,9 +1,11 @@
 package io.charg.chargstation.ui.activities;
 
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.v7.app.ActionBar;
 import android.support.v7.widget.Toolbar;
+import android.widget.ImageView;
 import android.widget.RadioButton;
 import android.widget.TextView;
 
@@ -23,8 +25,13 @@ import io.charg.chargstation.root.ICallbackOnComplete;
 import io.charg.chargstation.services.helpers.DialogHelper;
 import io.charg.chargstation.services.local.SettingsProvider;
 import io.charg.chargstation.services.helpers.StringHelper;
+import io.charg.chargstation.services.remote.api.ApiProvider;
+import io.charg.chargstation.services.remote.api.chargCoinServiceApi.ConfigDto;
 import io.charg.chargstation.ui.dialogs.EditNumberDialog;
 import io.charg.chargstation.ui.dialogs.EditTextDialog;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class SettingsActivity extends BaseActivity {
 
@@ -48,6 +55,12 @@ public class SettingsActivity extends BaseActivity {
 
     @BindView(R.id.tv_max_fee)
     TextView mTvMaxFee;
+
+    @BindView(R.id.tv_api_url)
+    TextView mTvApiUrl;
+
+    @BindView(R.id.iv_api_status)
+    ImageView mIvApiStatus;
 
     private SettingsProvider mSettingsProvider;
 
@@ -82,6 +95,36 @@ public class SettingsActivity extends BaseActivity {
                 Convert.fromWei(String.valueOf(mSettingsProvider.getGasPrice()), Convert.Unit.ETHER).toPlainString()));
         mTvMaxFee.setText(String.format(Locale.getDefault(), "%s ETH",
                 Convert.fromWei(BigDecimal.valueOf(mSettingsProvider.getGasLimit().longValue() * mSettingsProvider.getGasPrice().longValue()), Convert.Unit.ETHER)));
+        mTvApiUrl.setText(mSettingsProvider.getApiUrl());
+
+        loadApiStatus();
+    }
+
+    private void loadApiStatus() {
+        mIvApiStatus.setImageDrawable(getResources().getDrawable(R.drawable.ic_notify));
+
+        ApiProvider.getChargCoinServiceApi(this)
+                .getConfig().enqueue(new Callback<ConfigDto>() {
+            @Override
+            public void onResponse(@NonNull Call<ConfigDto> call, @NonNull Response<ConfigDto> response) {
+                if (response.body() == null) {
+                    mIvApiStatus.setImageDrawable(getResources().getDrawable(R.drawable.ic_error));
+                    return;
+                }
+
+                if (response.code() != 200) {
+                    mIvApiStatus.setImageDrawable(getResources().getDrawable(R.drawable.ic_error));
+                    return;
+                }
+
+                mIvApiStatus.setImageDrawable(getResources().getDrawable(R.drawable.ic_ok));
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<ConfigDto> call, @NonNull Throwable t) {
+                mIvApiStatus.setImageDrawable(getResources().getDrawable(R.drawable.ic_error));
+            }
+        });
     }
 
     private void initToolbar() {
@@ -214,4 +257,29 @@ public class SettingsActivity extends BaseActivity {
             }
         });
     }
+
+    @OnClick(R.id.btn_edit_api_url)
+    void onBtnEditApiUrlClicked() {
+        EditTextDialog dialog = new EditTextDialog(this, "Api url", mSettingsProvider.getApiUrl());
+        dialog.setOnComplete(new ICallbackOnComplete<String>() {
+            @Override
+            public void onComplete(String result) {
+                mSettingsProvider.setApiUrl(result);
+                onSettingsChanged();
+            }
+        });
+        dialog.show();
+    }
+
+    @OnClick(R.id.btn_load_default_api_url)
+    void onBtnLoadDefaultApiUrlClicked() {
+        DialogHelper.showQuestion(this, "Do you want load defaults?", new Runnable() {
+            @Override
+            public void run() {
+                mSettingsProvider.setApiUrl(SettingsProvider.DEFAULT_API_URL);
+                onSettingsChanged();
+            }
+        });
+    }
+
 }

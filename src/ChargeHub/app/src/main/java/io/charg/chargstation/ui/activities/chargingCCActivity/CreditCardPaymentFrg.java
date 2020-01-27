@@ -70,7 +70,7 @@ public class CreditCardPaymentFrg extends BaseNavFragment {
     }
 
     private void initServices() {
-        mChargCoinServiceApi = ApiProvider.getChargCoinServiceApi();
+        mChargCoinServiceApi = ApiProvider.getChargCoinServiceApi(getContext());
     }
 
     @Override

@@ -93,7 +93,7 @@ public class ChargeCoinServiceActivity extends BaseActivity {
     }
 
     private void initServices() {
-        mChargCoinServiceApi = ApiProvider.getChargCoinServiceApi();
+        mChargCoinServiceApi = ApiProvider.getChargCoinServiceApi(this);
     }
 
     @Override
@@ -145,7 +145,7 @@ public class ChargeCoinServiceActivity extends BaseActivity {
     }
 
     private void loadConfigAsync() {
-        ApiProvider.getChargCoinServiceApi().getConfig().enqueue(new Callback<ConfigDto>() {
+        ApiProvider.getChargCoinServiceApi(this).getConfig().enqueue(new Callback<ConfigDto>() {
             @Override
             public void onResponse(@NonNull Call<ConfigDto> call, @NonNull Response<ConfigDto> response) {
                 if (!response.isSuccessful() || response.body() == null) {

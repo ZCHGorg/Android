@@ -110,7 +110,7 @@ public class NodeServiceActivity extends BaseActivity {
     }
 
     private void initServices() {
-        mChargCoinServiceApi = ApiProvider.getChargCoinServiceApi();
+        mChargCoinServiceApi = ApiProvider.getChargCoinServiceApi(this);
     }
 
     @Override
@@ -397,7 +397,7 @@ public class NodeServiceActivity extends BaseActivity {
     }
 
     private void loadBestSellOrder() {
-        ApiProvider.getChargCoinServiceApi().getBestSellOrder(1000).enqueue(new Callback<BestSellOrderDto>() {
+        ApiProvider.getChargCoinServiceApi(this).getBestSellOrder(1000).enqueue(new Callback<BestSellOrderDto>() {
             @Override
             public void onResponse(@NonNull Call<BestSellOrderDto> call, @NonNull Response<BestSellOrderDto> response) {
                 BestSellOrderDto orderContent = response.body();

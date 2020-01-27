@@ -12,11 +12,13 @@ public class SettingsProvider {
 
     public static final long DEFAULT_GAS_LIMIT = 200000L;
     public static final long DEFAULT_GAS_PRICE = 48000000000L;
+    public static final String DEFAULT_API_URL = "http://155.138.131.211:3703";
 
     private static final String KEY_SMART_CONTRACT_ADDRESS = "KEY_SMART_CONTRACT_ADDRESS";
     private static final String KEY_NETWORK_TYPE = "KEY_NETWORK_TYPE";
     private static final String KEY_GAS_LIMIT = "KEY_GAS_LIMIT";
     private static final String KEY_GAS_PRICE = "KEY_GAS_PRICE";
+    private static final String KEY_API_URL = "KEY_API_URL";
 
     private LocalDB mLocalDb;
 
@@ -59,5 +61,13 @@ public class SettingsProvider {
     public String getEthConnectionUrl() {
         return String.format(Locale.getDefault(), "https://%s.infura.io/Zp6evGImttk7WOe95WcW",
                 getNetwork() ? "mainnet" : "rinkeby");
+    }
+
+    public String getApiUrl() {
+        return mLocalDb.getString(KEY_API_URL, DEFAULT_API_URL);
+    }
+
+    public void setApiUrl(String value) {
+        mLocalDb.putValue(KEY_API_URL, value);
     }
 }

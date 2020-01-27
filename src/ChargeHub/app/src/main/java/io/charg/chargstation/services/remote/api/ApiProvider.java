@@ -1,5 +1,7 @@
 package io.charg.chargstation.services.remote.api;
 
+import android.content.Context;
+
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.SSLSession;
@@ -7,6 +9,7 @@ import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
+import io.charg.chargstation.services.local.SettingsProvider;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.IChargCoinServiceApi;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
@@ -15,9 +18,12 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class ApiProvider {
 
-    public static IChargCoinServiceApi getChargCoinServiceApi() {
+    public static IChargCoinServiceApi getChargCoinServiceApi(Context context) {
+
+        SettingsProvider settingsProvider = new SettingsProvider(context);
+
         return new Retrofit.Builder()
-                .baseUrl("https://chg-hub-001.myreal.space/")
+                .baseUrl(settingsProvider.getApiUrl())
                 .addConverterFactory(GsonConverterFactory.create())
                 .addConverterFactory(ScalarsConverterFactory.create())
                 .client(getUnsafeOkHttpClient())

@@ -528,7 +528,7 @@ public class MapActivity
     private void loadNearNodesAsync(double latitude, double longitude, int radius) {
         LogService.info("Loading stations in area: " + latitude + ";" + longitude + " R=" + radius);
 
-        ApiProvider.getChargCoinServiceApi().getNodes(latitude, longitude, radius * 1000).enqueue(new Callback<Map<String, NodeDto>>() {
+        ApiProvider.getChargCoinServiceApi(this).getNodes(latitude, longitude, radius * 1000).enqueue(new Callback<Map<String, NodeDto>>() {
             @Override
             public void onResponse(@NonNull Call<Map<String, NodeDto>> call, @NonNull Response<Map<String, NodeDto>> response) {
                 Map<String, NodeDto> body = response.body();
