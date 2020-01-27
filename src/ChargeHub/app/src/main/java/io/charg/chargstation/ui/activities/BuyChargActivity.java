@@ -79,7 +79,7 @@ public class BuyChargActivity extends BaseAuthActivity {
     }
 
     private void initServices() {
-        mApi = ApiProvider.getChargCoinServiceApi();
+        mApi = ApiProvider.getChargCoinServiceApi(this);
     }
 
     private void initEtAmountChg() {
@@ -176,7 +176,7 @@ public class BuyChargActivity extends BaseAuthActivity {
 
     private void exchangeUSDtoCHG(final String nonce) {
 
-        ApiProvider.getChargCoinServiceApi().getBestSellOrder(1000).enqueue(new Callback<BestSellOrderDto>() {
+        ApiProvider.getChargCoinServiceApi(this).getBestSellOrder(1000).enqueue(new Callback<BestSellOrderDto>() {
             @Override
             public void onResponse(Call<BestSellOrderDto> call, Response<BestSellOrderDto> response) {
                 BestSellOrderDto orderContent = response.body();

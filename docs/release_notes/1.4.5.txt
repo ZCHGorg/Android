@@ -1,0 +1,9 @@
+Charg Android Application
+---------------------------------
+versionCode 30
+versionName "1.4.5"
+date 27.01.2020
+---------------------------------
+release notes:
+- settings for API url
+- showing service status

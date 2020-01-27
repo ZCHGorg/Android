@@ -42,7 +42,7 @@ public class FrgRates extends BaseFragment {
     }
 
     private void initServices() {
-        mChargCoinServiceApi = ApiProvider.getChargCoinServiceApi();
+        mChargCoinServiceApi = ApiProvider.getChargCoinServiceApi(getContext());
     }
 
     private void loadRates() {

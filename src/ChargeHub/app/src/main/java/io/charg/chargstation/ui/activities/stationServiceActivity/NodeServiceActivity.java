@@ -110,7 +110,7 @@ public class NodeServiceActivity extends BaseActivity {
     }
 
     private void initServices() {
-        mChargCoinServiceApi = ApiProvider.getChargCoinServiceApi();
+        mChargCoinServiceApi = ApiProvider.getChargCoinServiceApi(this);
     }
 
     @Override
@@ -213,14 +213,8 @@ public class NodeServiceActivity extends BaseActivity {
 
                 LogService.info("Wifi start response: " + response.body());
 
-                ServiceStatusDto body = response.body();
-                if (body.Error) {
-                    Snackbar.make(mToolbar, R.string.error_service_wifi_on, Snackbar.LENGTH_SHORT).show();
-                    Snackbar.make(mToolbar, body.Result.Error, Snackbar.LENGTH_SHORT).show();
-                    return;
-                }
-
-                Snackbar.make(mToolbar, body.toString(), Snackbar.LENGTH_SHORT).show();
+                ServiceStatusDto serviceStatus = response.body();
+                showServiceStatus(serviceStatus);
             }
 
             @Override
@@ -266,14 +260,8 @@ public class NodeServiceActivity extends BaseActivity {
 
                 LogService.info("Wifi stop response: " + response.body());
 
-                ServiceStatusDto body = response.body();
-                if (body.Error) {
-                    Snackbar.make(mToolbar, R.string.error_service_wifi_on, Snackbar.LENGTH_SHORT).show();
-                    Snackbar.make(mToolbar, body.Result.Error, Snackbar.LENGTH_SHORT).show();
-                    return;
-                }
-
-                Snackbar.make(mToolbar, body.toString(), Snackbar.LENGTH_SHORT).show();
+                ServiceStatusDto serviceStatus = response.body();
+                showServiceStatus(serviceStatus);
             }
 
             @Override
@@ -319,17 +307,8 @@ public class NodeServiceActivity extends BaseActivity {
 
                 LogService.info("Wifi stop response: " + response.body());
 
-                ServiceStatusDto body = response.body();
-                if (body.Error) {
-                    Snackbar.make(mToolbar, R.string.error_service_wifi_on, Snackbar.LENGTH_SHORT).show();
-                    Snackbar.make(mToolbar, body.Result.Error, Snackbar.LENGTH_SHORT).show();
-                    return;
-                }
-
-                mTvServiceStartedAt.setText(String.valueOf(body.StartedAt));
-                mTvServiceStoppedAt.setText(String.valueOf(body.StoppedAt));
-                mTvServiceTime.setText(String.valueOf(body.TimeElapsed));
-                mTvServiceRemained.setText(String.valueOf(body.Remaind));
+                ServiceStatusDto serviceStatus = response.body();
+                showServiceStatus(serviceStatus);
             }
 
             @Override
@@ -338,6 +317,20 @@ public class NodeServiceActivity extends BaseActivity {
                 refreshUI();
             }
         });
+    }
+
+    private void showServiceStatus(ServiceStatusDto serviceStatus) {
+
+        if (serviceStatus.Error) {
+            Snackbar.make(mToolbar, R.string.error_service_wifi_on, Snackbar.LENGTH_SHORT).show();
+            Snackbar.make(mToolbar, serviceStatus.Result.Error, Snackbar.LENGTH_SHORT).show();
+            return;
+        }
+
+        mTvServiceStartedAt.setText(String.valueOf(serviceStatus.StartedAt));
+        mTvServiceStoppedAt.setText(String.valueOf(serviceStatus.StoppedAt));
+        mTvServiceTime.setText(String.valueOf(serviceStatus.TimeElapsed));
+        mTvServiceRemained.setText(String.valueOf(serviceStatus.Remaind));
     }
 
     private void showLoading(String message) {
@@ -397,7 +390,7 @@ public class NodeServiceActivity extends BaseActivity {
     }
 
     private void loadBestSellOrder() {
-        ApiProvider.getChargCoinServiceApi().getBestSellOrder(1000).enqueue(new Callback<BestSellOrderDto>() {
+        ApiProvider.getChargCoinServiceApi(this).getBestSellOrder(1000).enqueue(new Callback<BestSellOrderDto>() {
             @Override
             public void onResponse(@NonNull Call<BestSellOrderDto> call, @NonNull Response<BestSellOrderDto> response) {
                 BestSellOrderDto orderContent = response.body();

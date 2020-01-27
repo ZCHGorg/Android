@@ -75,7 +75,7 @@ public class FrgNodes extends BaseFragment {
     }
 
     private void initServices() {
-        mChargCoinServiceApi = ApiProvider.getChargCoinServiceApi();
+        mChargCoinServiceApi = ApiProvider.getChargCoinServiceApi(getContext());
         mFavouritesRepository = new FavouriteStationsRepository(getContext());
     }
 
