@@ -94,7 +94,7 @@ import io.charg.chargstation.ui.activities.chargeCoinService.ChargeCoinServiceAc
 import io.charg.chargstation.ui.activities.chargingActivity.ChargingActivity;
 import io.charg.chargstation.ui.activities.parkingActivity.ParkingActivity;
 import io.charg.chargstation.ui.activities.stationActivity.StationActivity;
-import io.charg.chargstation.ui.activities.stationServiceActivity.NodeServiceActivity;
+import io.charg.chargstation.ui.activities.nodeServiceActivity.NodeServiceActivity;
 import io.charg.chargstation.ui.activities.webBasedActivity.WebBasedActivity;
 import io.charg.chargstation.ui.dialogs.StationEthAddressDialog;
 import io.charg.chargstation.ui.dialogs.TxWaitDialog;

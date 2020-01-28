@@ -1,4 +1,4 @@
-package io.charg.chargstation.ui.activities.stationServiceActivity;
+package io.charg.chargstation.ui.activities.nodeServiceActivity;
 
 import android.app.Activity;
 import android.content.Intent;
@@ -9,6 +9,8 @@ import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
@@ -28,6 +30,7 @@ import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
 import io.charg.chargstation.root.CommonData;
+import io.charg.chargstation.services.local.FavouriteStationsRepository;
 import io.charg.chargstation.services.local.LogService;
 import io.charg.chargstation.services.remote.api.ApiProvider;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.BestSellOrderDto;
@@ -85,6 +88,7 @@ public class NodeServiceActivity extends BaseActivity {
     RadioButton mRbtnWifi;
 
     private IChargCoinServiceApi mChargCoinServiceApi;
+    private FavouriteStationsRepository mFavouriteService;
 
     private int mUsdAmount;
     private String mPayerId = "uk0505";
@@ -94,6 +98,7 @@ public class NodeServiceActivity extends BaseActivity {
     private String mPaymentNonce;
 
     private AlertDialog mLoadingDialog;
+    private MenuItem mMenuFavourite;
 
     @Override
     public int getResourceId() {
@@ -111,12 +116,44 @@ public class NodeServiceActivity extends BaseActivity {
 
     private void initServices() {
         mChargCoinServiceApi = ApiProvider.getChargCoinServiceApi(this);
+        mFavouriteService = new FavouriteStationsRepository(this);
     }
 
     @Override
     public boolean onSupportNavigateUp() {
         onBackPressed();
         return true;
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        mMenuFavourite = menu.add(null);
+        mMenuFavourite.setShowAsAction(MenuItem.SHOW_AS_ACTION_ALWAYS);
+
+        mMenuFavourite.setOnMenuItemClickListener(new MenuItem.OnMenuItemClickListener() {
+            @Override
+            public boolean onMenuItemClick(MenuItem menuItem) {
+                if (mFavouriteService.isFavourite(mNodeEthAddress)) {
+                    mFavouriteService.removeFromFavorites(mNodeEthAddress);
+                } else {
+                    mFavouriteService.addToFavorites(mNodeEthAddress);
+                }
+                refreshMenu();
+                return false;
+            }
+        });
+        refreshMenu();
+
+        return super.onCreateOptionsMenu(menu);
+    }
+
+    private void refreshMenu() {
+        if (mMenuFavourite == null) {
+            return;
+        }
+        mMenuFavourite.setIcon(mFavouriteService.isFavourite(mNodeEthAddress)
+                ? R.drawable.ic_favorite
+                : R.drawable.ic_favorite_border);
     }
 
     private void initToolbar() {

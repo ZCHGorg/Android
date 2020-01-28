@@ -20,7 +20,7 @@ import io.charg.chargstation.root.IAsyncCommand;
 import io.charg.chargstation.services.remote.firebase.ChargeHubService;
 import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.ui.activities.mapActivity.MapActivity;
-import io.charg.chargstation.ui.activities.stationServiceActivity.NodeServiceActivity;
+import io.charg.chargstation.ui.activities.nodeServiceActivity.NodeServiceActivity;
 
 public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHolder> {
 

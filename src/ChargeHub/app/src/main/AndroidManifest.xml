@@ -54,7 +54,7 @@
         <activity android:name=".ui.activities.chargingCCActivity.ChargingCCActivity" />
         <activity android:name=".ui.activities.chargeCoinService.ChargeCoinServiceActivity" />
         <activity android:name=".ui.activities.webBasedActivity.WebBasedActivity" />
-        <activity android:name=".ui.activities.stationServiceActivity.NodeServiceActivity" />
+        <activity android:name=".ui.activities.nodeServiceActivity.NodeServiceActivity" />
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"

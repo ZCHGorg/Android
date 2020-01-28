@@ -17,7 +17,7 @@ import io.charg.chargstation.services.local.FavouriteStationsRepository;
 import io.charg.chargstation.services.remote.api.ApiProvider;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.IChargCoinServiceApi;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.NodeDto;
-import io.charg.chargstation.ui.activities.stationServiceActivity.NodeServiceActivity;
+import io.charg.chargstation.ui.activities.nodeServiceActivity.NodeServiceActivity;
 import io.charg.chargstation.ui.fragments.BaseFragment;
 import retrofit2.Call;
 import retrofit2.Callback;
