@@ -75,13 +75,6 @@ public class NodesAdapter extends RecyclerView.Adapter<NodesAdapter.ViewHolder> 
             }
         });
 
-        if (item.getNodeDto().Assets != null) {
-            NodeAssetAdapter mAssetAdapter = new NodeAssetAdapter();
-            holder.mRecyclerViewAssets.setLayoutManager(new LinearLayoutManager(holder.itemView.getContext(), LinearLayoutManager.VERTICAL, false));
-            holder.mRecyclerViewAssets.setAdapter(mAssetAdapter);
-            mAssetAdapter.updateItems(new ArrayList<>(item.getNodeDto().Assets.values()));
-        }
-
         holder.mBtnPay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

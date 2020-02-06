@@ -77,7 +77,9 @@ public interface IChargCoinServiceApi {
     );
 
     @GET("api/nodeStatus")
-    Call<NodeStatusDto> getNodeStatus();
+    Call<NodeDto> getNodeStatus(
+            @Query("address") String address
+    );
 
     @GET("api/getBlockNumber")
     Call<BlockNumberDto> getBlockNumber();

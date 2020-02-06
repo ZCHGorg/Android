@@ -38,7 +38,19 @@ public class NodeDto {
     public String Ip;
 
     @SerializedName("assets")
-    public Map<String, AssetDto> Assets = new HashMap<>();
+    private Map<String, AssetDto> mAssets = new HashMap<>();
+
+    public AssetDto getChargingAsset() {
+        return mAssets.containsKey("0") ? mAssets.get("0") : null;
+    }
+
+    public AssetDto getParkingAsset() {
+        return mAssets.containsKey("1") ? mAssets.get("1") : null;
+    }
+
+    public AssetDto getWifiAsset() {
+        return mAssets.containsKey("2") ? mAssets.get("2") : null;
+    }
 
     @NonNull
     @Override
@@ -56,6 +68,9 @@ public class NodeDto {
 
         @SerializedName("free")
         public int Free;
+
+        @SerializedName("rate")
+        public long Rate;
 
     }
 }
