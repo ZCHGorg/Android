@@ -1,5 +1,6 @@
 package io.charg.chargstation.ui.activities.nodeServiceActivity;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
 import android.support.annotation.NonNull;
@@ -26,6 +27,7 @@ import com.google.gson.JsonObject;
 
 import java.io.IOException;
 
+import butterknife.BindInt;
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
@@ -36,6 +38,7 @@ import io.charg.chargstation.services.remote.api.ApiProvider;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.BestSellOrderDto;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.ConfirmPaymentResponseDto;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.IChargCoinServiceApi;
+import io.charg.chargstation.services.remote.api.chargCoinServiceApi.NodeDto;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.PaymentDataDto;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.ServiceStatusDto;
 import io.charg.chargstation.ui.activities.BaseActivity;
@@ -87,6 +90,18 @@ public class NodeServiceActivity extends BaseActivity {
     @BindView(R.id.rbtn_wifi)
     RadioButton mRbtnWifi;
 
+    @BindView(R.id.tv_charging_asset)
+    TextView mTvChargingAsset;
+
+    @BindView(R.id.tv_parking_asset)
+    TextView mTvParkingAsset;
+
+    @BindView(R.id.tv_wifi_asset)
+    TextView mTvWifiAsset;
+
+    @BindView(R.id.tv_calc_time)
+    TextView mTvCalcTime;
+
     private IChargCoinServiceApi mChargCoinServiceApi;
     private FavouriteStationsRepository mFavouriteService;
 
@@ -111,7 +126,52 @@ public class NodeServiceActivity extends BaseActivity {
         readIntent();
         initToolbar();
         refreshUI();
+        loadNodeStatus();
         loadBestSellOrder();
+    }
+
+    private void loadNodeStatus() {
+        mChargCoinServiceApi.getNodeStatus(mNodeEthAddress).enqueue(new Callback<NodeDto>() {
+            @SuppressLint({"SetTextI18n", "DefaultLocale"})
+            @Override
+            public void onResponse(@NonNull Call<NodeDto> call, @NonNull Response<NodeDto> response) {
+                LogService.info(new Gson().toJson(response.body()));
+
+                NodeDto body = response.body();
+                if (body == null) {
+                    Snackbar.make(mToolbar, R.string.error_loading_data, Snackbar.LENGTH_SHORT).show();
+                    return;
+                }
+
+                mTvChargingAsset.setText(String.format(
+                        "Free: %d of %d\r\n%.3f CHG/sec",
+                        body.getChargingAsset().Free,
+                        body.getChargingAsset().Slots,
+                        body.getChargingAsset().Rate / 1E18
+                ));
+
+                mTvParkingAsset.setText(String.format(
+                        "Free: %d of %d\r\n%.3f CHG/sec",
+                        body.getParkingAsset().Free,
+                        body.getParkingAsset().Slots,
+                        body.getParkingAsset().Rate / 1E18
+                ));
+
+                mTvWifiAsset.setText(String.format(
+                        "Free: %d of %d\r\n%.3f CHG/sec",
+                        body.getWifiAsset().Free,
+                        body.getWifiAsset().Slots,
+                        body.getWifiAsset().Rate / 1E18
+                ));
+
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<NodeDto> call, @NonNull Throwable t) {
+                Snackbar.make(mToolbar, t.getMessage(), Snackbar.LENGTH_SHORT).show();
+                t.printStackTrace();
+            }
+        });
     }
 
     private void initServices() {
@@ -178,8 +238,17 @@ public class NodeServiceActivity extends BaseActivity {
         mTvPaymentStatus.setText(mPaymentHash);
     }
 
+    @OnClick(R.id.btn_calc_time)
+    public void onBtnCalcTimeClicked() {
+        int amount = Integer.parseInt(mEtAmount.getText().toString());
+
+        int time = (int) (amount / (0.004 * 231 * 0.00115));
+        mTvCalcTime.setText(time + " sec");
+
+    }
+
     @OnClick(R.id.btn_payment_credit_card)
-    void onBtnPayCreditCardClicked() {
+    public void onBtnPayCreditCardClicked() {
         showLoading("Initializing payment...");
 
         mUsdAmount = Integer.parseInt(mEtAmount.getText().toString());
@@ -357,6 +426,8 @@ public class NodeServiceActivity extends BaseActivity {
     }
 
     private void showServiceStatus(ServiceStatusDto serviceStatus) {
+
+        loadNodeStatus();
 
         if (serviceStatus.Error) {
             Snackbar.make(mToolbar, R.string.error_service_wifi_on, Snackbar.LENGTH_SHORT).show();
