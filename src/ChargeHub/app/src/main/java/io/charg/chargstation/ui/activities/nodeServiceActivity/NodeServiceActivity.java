@@ -27,7 +27,6 @@ import com.google.gson.JsonObject;
 
 import java.io.IOException;
 
-import butterknife.BindInt;
 import butterknife.BindView;
 import butterknife.OnClick;
 import io.charg.chargstation.R;
@@ -39,7 +38,9 @@ import io.charg.chargstation.services.remote.api.chargCoinServiceApi.BestSellOrd
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.ConfirmPaymentResponseDto;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.IChargCoinServiceApi;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.NodeDto;
+import io.charg.chargstation.services.remote.api.chargCoinServiceApi.OrdersDto;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.PaymentDataDto;
+import io.charg.chargstation.services.remote.api.chargCoinServiceApi.RatesDto;
 import io.charg.chargstation.services.remote.api.chargCoinServiceApi.ServiceStatusDto;
 import io.charg.chargstation.ui.activities.BaseActivity;
 import retrofit2.Call;
@@ -108,9 +109,11 @@ public class NodeServiceActivity extends BaseActivity {
     private int mUsdAmount;
     private String mPayerId = "uk0505";
     private String mNodeEthAddress;
-    private String mSellOrderHash;
     private String mPaymentHash;
     private String mPaymentNonce;
+    private OrdersDto.OrderDto mBestSellOrder;
+    private NodeDto mNodeStatus;
+    private RatesDto mRatesInfo;
 
     private AlertDialog mLoadingDialog;
     private MenuItem mMenuFavourite;
@@ -126,8 +129,29 @@ public class NodeServiceActivity extends BaseActivity {
         readIntent();
         initToolbar();
         refreshUI();
+
         loadNodeStatus();
         loadBestSellOrder();
+        loadRate();
+    }
+
+    private void loadRate() {
+        mChargCoinServiceApi.getRates().enqueue(new Callback<RatesDto>() {
+            @Override
+            public void onResponse(@NonNull Call<RatesDto> call, @NonNull Response<RatesDto> response) {
+                RatesDto body = response.body();
+                if (body == null) {
+                    return;
+                }
+
+                mRatesInfo = body;
+            }
+
+            @Override
+            public void onFailure(@NonNull Call<RatesDto> call, @NonNull Throwable t) {
+
+            }
+        });
     }
 
     private void loadNodeStatus() {
@@ -143,27 +167,8 @@ public class NodeServiceActivity extends BaseActivity {
                     return;
                 }
 
-                mTvChargingAsset.setText(String.format(
-                        "Free: %d of %d\r\n%.3f CHG/sec",
-                        body.getChargingAsset().Free,
-                        body.getChargingAsset().Slots,
-                        body.getChargingAsset().Rate / 1E18
-                ));
-
-                mTvParkingAsset.setText(String.format(
-                        "Free: %d of %d\r\n%.3f CHG/sec",
-                        body.getParkingAsset().Free,
-                        body.getParkingAsset().Slots,
-                        body.getParkingAsset().Rate / 1E18
-                ));
-
-                mTvWifiAsset.setText(String.format(
-                        "Free: %d of %d\r\n%.3f CHG/sec",
-                        body.getWifiAsset().Free,
-                        body.getWifiAsset().Slots,
-                        body.getWifiAsset().Rate / 1E18
-                ));
-
+                mNodeStatus = body;
+                refreshUI();
             }
 
             @Override
@@ -232,17 +237,82 @@ public class NodeServiceActivity extends BaseActivity {
         }
     }
 
+    @SuppressLint("DefaultLocale")
     private void refreshUI() {
         mTvNodeEthAddress.setText(mNodeEthAddress);
-        mTvSellOrderStatus.setText(mSellOrderHash);
+
+        if (mBestSellOrder != null) {
+            mTvSellOrderStatus.setText(mBestSellOrder.Hash);
+        }
+
         mTvPaymentStatus.setText(mPaymentHash);
+
+        if (mNodeStatus != null) {
+            mTvChargingAsset.setText(String.format(
+                    "Free: %d of %d\r\n%.3f CHG/sec",
+                    mNodeStatus.getChargingAsset().Free,
+                    mNodeStatus.getChargingAsset().Slots,
+                    mNodeStatus.getChargingAsset().Rate / 1E18
+            ));
+
+            mTvParkingAsset.setText(String.format(
+                    "Free: %d of %d\r\n%.3f CHG/sec",
+                    mNodeStatus.getParkingAsset().Free,
+                    mNodeStatus.getParkingAsset().Slots,
+                    mNodeStatus.getParkingAsset().Rate / 1E18
+            ));
+
+            mTvWifiAsset.setText(String.format(
+                    "Free: %d of %d\r\n%.3f CHG/sec",
+                    mNodeStatus.getWifiAsset().Free,
+                    mNodeStatus.getWifiAsset().Slots,
+                    mNodeStatus.getWifiAsset().Rate / 1E18
+            ));
+        }
+
     }
 
+    @SuppressLint("SetTextI18n")
     @OnClick(R.id.btn_calc_time)
     public void onBtnCalcTimeClicked() {
-        int amount = Integer.parseInt(mEtAmount.getText().toString());
 
-        int time = (int) (amount / (0.004 * 231 * 0.00115));
+        if (mBestSellOrder == null) {
+            Snackbar.make(mToolbar, "Error while loading order info", Snackbar.LENGTH_LONG).show();
+            loadBestSellOrder();
+            return;
+        }
+        double bestSellOrderPriceChg = mBestSellOrder.Rate;
+
+        int amount = 0;
+        try {
+            amount = Integer.parseInt(mEtAmount.getText().toString());
+        } catch (Exception ignored) {
+            mEtAmount.setError("Enter valid amount");
+        }
+
+        double serviceRateChgPerSec = 0;
+        if (mNodeStatus == null) {
+            Snackbar.make(mToolbar, "Error while loading node info", Snackbar.LENGTH_LONG).show();
+            loadNodeStatus();
+            return;
+        }
+        if (mRgrpServiceType.getCheckedRadioButtonId() == mRbtnCharging.getId()) {
+            serviceRateChgPerSec = mNodeStatus.getChargingAsset().Rate;
+        } else if (mRgrpServiceType.getCheckedRadioButtonId() == mRbtnParking.getId()) {
+            serviceRateChgPerSec = mNodeStatus.getParkingAsset().Rate;
+        } else if (mRgrpServiceType.getCheckedRadioButtonId() == mRbtnWifi.getId()) {
+            serviceRateChgPerSec = mNodeStatus.getWifiAsset().Rate;
+        }
+        serviceRateChgPerSec /= 1E18;
+
+        if (mRatesInfo == null) {
+            Snackbar.make(mToolbar, "Error while loading rates info", Snackbar.LENGTH_LONG).show();
+            loadRate();
+            return;
+        }
+        double rateEthDollar = mRatesInfo.Usd;
+
+        int time = (int) (amount / (serviceRateChgPerSec * rateEthDollar * bestSellOrderPriceChg));
         mTvCalcTime.setText(time + " sec");
 
     }
@@ -284,7 +354,7 @@ public class NodeServiceActivity extends BaseActivity {
     }
 
     @OnClick(R.id.btn_service_start)
-    void onBtnWifiStartClicked() {
+    void onBtnServiceStartClicked() {
 
         if (TextUtils.isEmpty(mPaymentHash)) {
             Snackbar.make(mToolbar, "Payment is not confirmed. TxHash required", Snackbar.LENGTH_SHORT).show();
@@ -332,7 +402,7 @@ public class NodeServiceActivity extends BaseActivity {
     }
 
     @OnClick(R.id.btn_service_stop)
-    void onBtnWifiStopClicked() {
+    void onBtnServiceStopClicked() {
         if (TextUtils.isEmpty(mPaymentHash)) {
             Snackbar.make(mToolbar, "Payment is not confirmed. TxHash required", Snackbar.LENGTH_SHORT).show();
             return;
@@ -508,7 +578,7 @@ public class NodeServiceActivity extends BaseActivity {
                 }
 
                 LogService.info("SellOrder. " + orderContent.toString());
-                mSellOrderHash = orderContent.BestSellOrder.Hash;
+                mBestSellOrder = orderContent.BestSellOrder;
 
                 refreshUI();
             }
@@ -538,7 +608,7 @@ public class NodeServiceActivity extends BaseActivity {
                 serviceId,
                 "USD",
                 mNodeEthAddress,
-                mSellOrderHash,
+                mBestSellOrder.Hash,
                 mUsdAmount,
                 mPaymentNonce,
                 mPayerId).enqueue(new Callback<ConfirmPaymentResponseDto>() {

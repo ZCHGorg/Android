@@ -63,7 +63,7 @@ public class FavoritesActivity extends BaseActivity {
     private void initRecyclerView() {
         mRvItems.setLayoutManager(new LinearLayoutManager(this));
 
-        mAdapter = new FavoriteAdapter();
+        mAdapter = new FavoriteAdapter(this);
         mRvItems.setAdapter(mAdapter);
     }
 

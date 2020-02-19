@@ -1,6 +1,8 @@
 package io.charg.chargstation.ui.activities.favoriteActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,20 +19,27 @@ import io.charg.chargstation.R;
 import io.charg.chargstation.models.firebase.GeofireDto;
 import io.charg.chargstation.models.firebase.StationDto;
 import io.charg.chargstation.root.IAsyncCommand;
+import io.charg.chargstation.services.remote.api.ApiProvider;
+import io.charg.chargstation.services.remote.api.chargCoinServiceApi.IChargCoinServiceApi;
+import io.charg.chargstation.services.remote.api.chargCoinServiceApi.NodeDto;
 import io.charg.chargstation.services.remote.firebase.ChargeHubService;
 import io.charg.chargstation.services.helpers.StringHelper;
 import io.charg.chargstation.ui.activities.mapActivity.MapActivity;
 import io.charg.chargstation.ui.activities.nodeServiceActivity.NodeServiceActivity;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 
 public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHolder> {
 
-    private List<String> mItems;
+    private final IChargCoinServiceApi mApi;
+    private final List<String> mItems;
+    private final ChargeHubService mChargeHubService;
 
-    private ChargeHubService mChargeHubService;
-
-    public FavoriteAdapter() {
+    public FavoriteAdapter(Context context) {
         mItems = new ArrayList<>();
         mChargeHubService = new ChargeHubService();
+        mApi = ApiProvider.getChargCoinServiceApi(context);
     }
 
     @Override
@@ -44,31 +53,22 @@ public class FavoriteAdapter extends RecyclerView.Adapter<FavoriteAdapter.ViewHo
         final String item = mItems.get(position);
         holder.mTvEthAddress.setText(StringHelper.getShortEthAddress(item));
 
-        mChargeHubService.getChargeNodeAsync(new IAsyncCommand<String, StationDto>() {
+        mApi.getNodeStatus(item).enqueue(new Callback<NodeDto>() {
             @Override
-            public String getInputData() {
-                return item;
-            }
+            public void onResponse(@NonNull Call<NodeDto> call, @NonNull Response<NodeDto> response) {
+                NodeDto body = response.body();
+                if (body == null) {
+                    return;
+                }
 
-            @Override
-            public void onPrepare() {
-                holder.mTvLoading.setText(R.string.loading_details);
-            }
-
-            @Override
-            public void onComplete(StationDto result) {
                 holder.mTvLoading.setText(new StringBuilder()
-                        .append(result.getTitle())
-                        .append("; ")
-                        .append(result.getAddress())
-                        .append("; ")
-                        .append(StringHelper.getCostStr(result.getCost_charge()))
-                );
+                        .append(body.Name));
+
             }
 
             @Override
-            public void onError(String error) {
-                holder.mTvLoading.setText(error);
+            public void onFailure(@NonNull Call<NodeDto> call, @NonNull Throwable t) {
+                Toast.makeText(holder.itemView.getContext(), t.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
 
